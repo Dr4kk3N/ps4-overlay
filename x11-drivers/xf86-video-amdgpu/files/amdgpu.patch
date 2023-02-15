@@ -1,0 +1,14 @@
+diff -ruN b/src/amdgpu_kms.c a/src/amdgpu_kms.c
+--- b/src/amdgpu_kms.c	2019-11-07 08:18:45.438814999 +0100
++++ a/src/amdgpu_kms.c	2019-11-07 08:19:30.648333558 +0100
+@@ -1683,8 +1683,8 @@
+ 		info->cursor_w = CURSOR_WIDTH;
+ 		info->cursor_h = CURSOR_HEIGHT;
+ 	} else {
+-		info->cursor_w = CURSOR_WIDTH_CIK;
+-		info->cursor_h = CURSOR_HEIGHT_CIK;
++		info->cursor_w = CURSOR_WIDTH;
++		info->cursor_h = CURSOR_HEIGHT;
+ 	}
+ 
+ 	amdgpu_query_heap_size(pAMDGPUEnt->pDev, AMDGPU_GEM_DOMAIN_GTT,

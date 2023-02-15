@@ -1,0 +1,15 @@
+--- a/CMakeLists.txt	2022-07-05 10:58:14.407617065 +0200
++++ b/CMakeLists.txt	2022-07-05 10:58:30.710617563 +0200
+@@ -22,9 +22,9 @@
+ cmake_minimum_required(VERSION 3.10)
+ project(MilkyTracker)
+ 
+-# Set C++ standard to C++98
+-set(CMAKE_CXX_STANDARD 98)
+-set(CMAKE_CXX_EXTENSIONS OFF)
++# Set C++ standard to C++11
++set(CMAKE_CXX_STANDARD 11)
++set(CMAKE_CXX_EXTENSIONS ON)
+ 
+ # Enable IDE solution folders
+ set_property(GLOBAL PROPERTY USE_FOLDERS ON)

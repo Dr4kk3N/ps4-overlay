@@ -1,0 +1,11 @@
+--- a/docs/CMakeLists.txt	2017-02-24 10:37:10.226258607 +0100
++++ b/docs/CMakeLists.txt	2017-02-24 10:41:26.784266309 +0100
+@@ -21,7 +21,7 @@
+ 
+ set(
+     DOCUMENTS
+-    ChangeLog.html
++    #ChangeLog.html
+     FAQ.html
+     MilkyTracker.html
+     #readme_PocketPC.html

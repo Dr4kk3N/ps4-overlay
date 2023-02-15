@@ -1,0 +1,38 @@
+diff -ruN a/data/amdgpu.ids b/data/amdgpu.ids
+--- a/data/amdgpu.ids	2020-04-26 11:30:26.955740361 +0200
++++ b/data/amdgpu.ids	2020-04-26 11:32:55.191752844 +0200
+@@ -200,3 +200,7 @@
+ 9874,	85,	AMD Radeon R6 Graphics
+ 9874,	84,	AMD Radeon R7 Graphics
+ 6FDF,	EF,	AMD Radeon RX 580 2048SP
++9920,	0,	AMD Liverpool (PS4)
++9922,	0,	AMD Liverpool (PS4)
++9923,	0,	AMD Liverpool (PS4)
++9924,	11,	AMD Gladius (PS4)
+diff -ruN a/radeon/r600_pci_ids.h b/radeon/r600_pci_ids.h
+--- a/radeon/r600_pci_ids.h	2020-04-26 11:30:26.948739600 +0200
++++ b/radeon/r600_pci_ids.h	2020-04-26 11:32:33.145383105 +0200
+@@ -473,6 +473,11 @@
+ CHIPSET(0x131C, KAVERI_131C, KAVERI)
+ CHIPSET(0x131D, KAVERI_131D, KAVERI)
+ 
++CHIPSET(0x9920, LIVERPOOL_9920, KAVERI)
++CHIPSET(0x9922, LIVERPOOL_9922, KAVERI)
++CHIPSET(0x9923, LIVERPOOL_9923, KAVERI)
++CHIPSET(0x9924, GLADIUS_9924, KAVERI)
++
+ CHIPSET(0x67A0, HAWAII_67A0, HAWAII)
+ CHIPSET(0x67A1, HAWAII_67A1, HAWAII)
+ CHIPSET(0x67A2, HAWAII_67A2, HAWAII)
+diff -ruN a/radeon/radeon_surface.c b/radeon/radeon_surface.c
+--- a/radeon/radeon_surface.c	2020-05-25 18:24:34.398124762 +0200
++++ b/radeon/radeon_surface.c	2020-05-25 18:38:00.004838001 +0200
+@@ -86,6 +86,8 @@
+     CHIP_HAINAN,
+     CHIP_BONAIRE,
+     CHIP_KAVERI,
++    CHIP_LIVERPOOL,
++    CHIP_GLADIUS,
+     CHIP_KABINI,
+     CHIP_HAWAII,
+     CHIP_MULLINS,

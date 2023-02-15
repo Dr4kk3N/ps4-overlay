@@ -1,0 +1,32 @@
+From daa1e5920dfaeace953970c7fdf1f14354e35148 Mon Sep 17 00:00:00 2001
+From: Michael Pyne <mpyne@purinchu.net>
+Date: Wed, 6 Dec 2017 21:16:30 -0500
+Subject: [PATCH 1/2] nsfe: Sanity check block header size before reading.
+
+Addresses a crash and potential out-of-bounds mem access in the NSFE
+emulator, in issue #14.
+
+This is only the barest fix for the current issue, but the codebase
+likely has similar flaws, which I will address (to extent I can find)
+with a separate patch.
+---
+ src/console/Nsfe_Emu.cc | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/console/Nsfe_Emu.cc b/src/console/Nsfe_Emu.cc
+index 2f3d5a762..5cf7a832b 100644
+--- a/src/console/Nsfe_Emu.cc
++++ b/src/console/Nsfe_Emu.cc
+@@ -135,6 +135,9 @@ blargg_err_t Nsfe_Info::load( Data_Reader& in, Nsf_Emu* nsf_emu )
+ 		blargg_long size = GET_LE32( block_header [0] );
+ 		blargg_long tag  = GET_LE32( block_header [1] );
+ 
++		if ( size <= 0 )
++			return "Corrupt file";
++
+ 		//debug_printf( "tag: %c%c%c%c\n", char(tag), char(tag>>8), char(tag>>16), char(tag>>24) );
+ 
+ 		switch ( tag )
+-- 
+2.24.0
+

@@ -1,0 +1,184 @@
+--- mesa/include/pci_ids/radeonsi_pci_ids.h	2022-12-29 20:43:28.000000000 +0100
++++ mesa-patched/include/pci_ids/radeonsi_pci_ids.h	2023-01-17 07:06:19.036964378 +0100
+@@ -88,6 +88,11 @@
+ CHIPSET(0x665D, BONAIRE)
+ CHIPSET(0x665F, BONAIRE)
+ 
+++CHIPSET(0x9920, LIVERPOOL)
+++CHIPSET(0x9922, LIVERPOOL)
+++CHIPSET(0x9923, LIVERPOOL)
+++CHIPSET(0x9924, GLADIUS)
++
+ CHIPSET(0x9830, KABINI)
+ CHIPSET(0x9831, KABINI)
+ CHIPSET(0x9832, KABINI)
+--- mesa/src/amd/addrlib/src/amdgpu_asic_addr.h	2022-12-29 20:43:28.000000000 +0100
++++ mesa-patched/src/amd/addrlib/src/amdgpu_asic_addr.h	2023-01-17 07:09:34.746654513 +0100
+@@ -77,7 +77,9 @@
+ #define AMDGPU_HAWAII_RANGE     0x28, 0x3C //# 40 <= x < 60
+ 
+ #define AMDGPU_SPECTRE_RANGE    0x01, 0x41 //#   1 <= x < 65
+-#define AMDGPU_SPOOKY_RANGE     0x41, 0x81 //#  65 <= x < 129
++#define AMDGPU_SPOOKY_RANGE     0x41, 0x61
++#define AMDGPU_STARSHA_RANGE    0x61, 0x71
++#define AMDGPU_STARSHP_RANGE    0x71, 0x81
+ #define AMDGPU_KALINDI_RANGE    0x81, 0xA1 //# 129 <= x < 161
+ #define AMDGPU_GODAVARI_RANGE   0xA1, 0xFF //# 161 <= x < max
+ 
+@@ -142,6 +144,8 @@
+ 
+ #define ASICREV_IS_SPECTRE(r)          ASICREV_IS(r, SPECTRE)
+ #define ASICREV_IS_SPOOKY(r)           ASICREV_IS(r, SPOOKY)
++#define ASICREV_IS_STARSHA(r)          ASICREV_IS(r, STARSHA)
++#define ASICREV_IS_STARSHP(r)          ASICREV_IS(r, STARSHP)
+ #define ASICREV_IS_KALINDI(r)          ASICREV_IS(r, KALINDI)
+ #define ASICREV_IS_KALINDI_GODAVARI(r) ASICREV_IS(r, GODAVARI)
+ 
+--- mesa/src/amd/common/ac_gpu_info.c	2022-12-29 20:43:28.000000000 +0100
++++ mesa-patched/src/amd/common/ac_gpu_info.c	2023-01-17 07:14:02.337735949 +0100
+@@ -779,6 +779,8 @@
+    case FAMILY_KV:
+       identify_chip2(SPECTRE, KAVERI);
+       identify_chip2(SPOOKY, KAVERI);
++      identify_chip2(STARSHA, LIVERPOOL);
++      identify_chip2(STARSHP, GLADIUS);
+       identify_chip2(KALINDI, KABINI);
+       identify_chip2(GODAVARI, KABINI);
+       break;
+@@ -979,6 +981,8 @@
+    case CHIP_VERDE:
+    case CHIP_HAINAN:
+    case CHIP_BONAIRE:
++   case CHIP_LIVERPOOL:
++   case CHIP_GLADIUS:
+    case CHIP_KAVERI:
+    case CHIP_ICELAND:
+    case CHIP_CARRIZO:
+@@ -1644,6 +1648,8 @@
+    case CHIP_PITCAIRN:
+    case CHIP_VERDE:
+    case CHIP_BONAIRE:
++   case CHIP_LIVERPOOL:
++   case CHIP_GLADIUS:
+    case CHIP_HAWAII:
+    case CHIP_TONGA:
+    case CHIP_FIJI:
+@@ -1694,6 +1700,14 @@
+       raster_config = 0x16000012;
+       raster_config_1 = 0x00000000;
+       break;
++   case CHIP_LIVERPOOL:
++      raster_config = 0x2a00161a;
++      raster_config_1 = 0x00000000;
++      break;
++   case CHIP_GLADIUS:
++      raster_config = 0x2a00161a;
++      raster_config_1 = 0x0000002e;
++      break;
+    /* 2 SEs / 8 RBs */
+    case CHIP_TAHITI:
+    case CHIP_PITCAIRN:
+--- mesa/src/amd/common/amd_family.h	2022-12-29 20:43:28.000000000 +0100
++++ mesa-patched/src/amd/common/amd_family.h	2023-01-17 07:15:16.263143976 +0100
+@@ -94,6 +94,8 @@
+    CHIP_HAINAN,
+    /* GFX7 (Sea Islands) */
+    CHIP_BONAIRE,
++   CHIP_LIVERPOOL,
++   CHIP_GLADIUS,
+    CHIP_KAVERI,
+    CHIP_KABINI,
+    CHIP_HAWAII,         /* Radeon 290, 390 */
+--- mesa/src/amd/llvm/ac_llvm_util.c	2022-12-29 20:43:28.000000000 +0100
++++ mesa-patched/src/amd/llvm/ac_llvm_util.c	2023-01-17 07:16:17.084217042 +0100
+@@ -120,6 +120,10 @@
+       return "hainan";
+    case CHIP_BONAIRE:
+       return "bonaire";
++   case CHIP_LIVERPOOL:
++      return "bonaire";
++   case CHIP_GLADIUS:
++      return "bonaire";
+    case CHIP_KABINI:
+       return "kabini";
+    case CHIP_KAVERI:
+--- mesa/src/amd/vulkan/winsys/null/radv_null_winsys.c	2022-12-29 20:43:28.000000000 +0100
++++ mesa-patched/src/amd/vulkan/winsys/null/radv_null_winsys.c	2023-01-17 07:17:36.296514072 +0100
+@@ -43,6 +43,10 @@
+    [CHIP_OLAND] = {0x6060, 2, true},
+    [CHIP_HAINAN] = {0x6660, 2, true},
+    [CHIP_BONAIRE] = {0x6640, 4, true},
++   [CHIP_LIVERPOOL] = {0x9920, 2, false},
++   [CHIP_LIVERPOOL] = {0x9922, 2, false},
++   [CHIP_LIVERPOOL] = {0x9923, 2, false},
++   [CHIP_GLADIUS] = {0x9924, 4, false},
+    [CHIP_KAVERI] = {0x1304, 2, false},
+    [CHIP_KABINI] = {0x9830, 2, false},
+    [CHIP_HAWAII] = {0x67A0, 16, true},
+--- mesa/src/gallium/targets/d3dadapter9/description.c	2022-12-29 20:43:28.000000000 +0100
++++ mesa-patched/src/gallium/targets/d3dadapter9/description.c	2023-01-17 07:18:38.795467098 +0100
+@@ -53,6 +53,8 @@
+     {"KAVERI",                      "AMD Radeon(TM) R7 Graphics"},
+     {"KABINI",                      "AMD Radeon HD 8400 / R3 Series"},
+     {"BONAIRE",                     "AMD Radeon HD 8770"},
++    {"LIVERPOOL",                   "AMD Liverpool (Playstation 4)"},
++    {"GLADIUS",                     "AMD Gladius (Playstation 4)"},
+     {"OLAND",                       "AMD Radeon HD 8670"},
+     {"HAINAN",                      "AMD Radeon HD 8600M Series"},
+     {"TAHITI",                      "AMD Radeon HD 7900 Series"},
+--- mesa/src/gallium/winsys/radeon/drm/radeon_drm_winsys.c	2022-12-29 20:43:28.000000000 +0100
++++ mesa-patched/src/gallium/winsys/radeon/drm/radeon_drm_winsys.c	2023-01-17 07:20:46.571253312 +0100
+@@ -274,6 +274,8 @@
+       ws->info.gfx_level = GFX6;
+       break;
+    case CHIP_BONAIRE:
++   case CHIP_LIVERPOOL:
++   case CHIP_GLADIUS:
+    case CHIP_KAVERI:
+    case CHIP_KABINI:
+    case CHIP_HAWAII:
+@@ -484,6 +486,8 @@
+    case CHIP_VERDE:
+    case CHIP_OLAND:
+    case CHIP_BONAIRE:
++   case CHIP_LIVERPOOL:
++   case CHIP_GLADIUS:
+    case CHIP_KAVERI:
+       ws->info.max_tcc_blocks = 4;
+       break;
+@@ -513,9 +517,11 @@
+       case CHIP_TAHITI:
+       case CHIP_PITCAIRN:
+       case CHIP_BONAIRE:
++      case CHIP_LIVERPOOL:
+          ws->info.max_se = 2;
+          break;
+       case CHIP_HAWAII:
++      case CHIP_GLADIUS:
+          ws->info.max_se = 4;
+          break;
+       }
+--- mesa/src/amd/vulkan/radv_meta_fast_clear.c	2022-12-29 20:43:28.000000000 +0100
++++ mesa-patched/src/amd/vulkan/radv_meta_fast_clear.c	2023-01-17 07:22:16.200397845 +0100
+@@ -551,7 +551,7 @@
+    switch (op) {
+    case FAST_CLEAR_ELIMINATE:
+       pipeline = &device->meta_state.fast_clear_flush.cmask_eliminate_pipeline;
+-      pred_offset = image->fce_pred_offset;
++      pred_offset = 0;
+       break;
+    case FMASK_DECOMPRESS:
+       pipeline = &device->meta_state.fast_clear_flush.fmask_decompress_pipeline;
+--- mesa/src/gallium/winsys/amdgpu/drm/amdgpu_winsys.c	2022-12-29 20:43:28.000000000 +0100
++++ mesa-patched/src/gallium/winsys/amdgpu/drm/amdgpu_winsys.c	2023-01-17 07:57:17.173249463 +0100
+@@ -77,6 +77,10 @@
+                ws->info.gfx_level = GFX8;
+             else if (i >= CHIP_BONAIRE)
+                ws->info.gfx_level = GFX7;
++            else if (i >= CHIP_LIVERPOOL)
++               ws->info.gfx_level = GFX7;
++            else if (i >= CHIP_GLADIUS)
++               ws->info.gfx_level = GFX7;
+             else
+                ws->info.gfx_level = GFX6;
+ 

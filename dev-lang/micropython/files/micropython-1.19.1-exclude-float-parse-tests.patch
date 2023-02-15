@@ -1,0 +1,11 @@
+--- a/tests/run-tests.py	2022-06-17 04:57:59.000000000 +0200
++++ b/tests/run-tests.py	2022-07-07 16:54:31.049241625 +0200
+@@ -629,6 +629,8 @@
+             "micropython/opt_level_lineno.py"
+         )  # native doesn't have proper traceback info
+         skip_tests.add("micropython/schedule.py")  # native code doesn't check pending events
++        skip_tests.add("float/float_parse_doubleprec.py")
++        skip_tests.add("float/float_parse.py")
+         skip_tests.add("stress/bytecode_limit.py")  # bytecode specific test
+
+     def run_one_test(test_file):

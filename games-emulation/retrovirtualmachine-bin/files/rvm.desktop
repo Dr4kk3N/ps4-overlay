@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Categories=Game;Emulator;
+Name=Retro Virtual Machine
+GenericName=ZX Spectrum Amstrad Emulator
+Comment=Emulator of the Amstrad CPC and ZX Spectrum home computers and clones
+Exec=/opt/RetroVirtualMachine/RetroVirtualMachine
+Icon=/usr/share/icons/hicolor/128x128/apps/rvm.png
+StartupWMClass=Retro Virtual Machine
+Keywords=sinclair;zx;game;retro;amstrad;spectrum
