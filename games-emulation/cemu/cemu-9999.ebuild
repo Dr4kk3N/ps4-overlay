@@ -3,11 +3,11 @@
 
 EAPI=8
 
-inherit cmake desktop wrapper xdg
+inherit cmake desktop xdg
 
 DESCRIPTION="Wii U emulator."
 HOMEPAGE="https://cemu.info/ https://github.com/cemu-project/Cemu"
-SHA="058d11b49b8669438d48ca2b30aaabd0f34437ec"
+SHA="daf3ef060af831da68abcc2f0c536b676b53bcac"
 MY_PN="Cemu"
 IMGUI_PV="1.88"
 SRC_URI="https://github.com/cemu-project/${MY_PN}/archive/${SHA}.tar.gz -> ${P}.tar.gz
@@ -15,7 +15,7 @@ SRC_URI="https://github.com/cemu-project/${MY_PN}/archive/${SHA}.tar.gz -> ${P}.
 
 LICENSE="MPL-2.0 ISC"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS=""
 IUSE="+cubeb discord +sdl +vulkan"
 
 DEPEND="app-arch/zarchive

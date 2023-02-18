@@ -27,7 +27,7 @@ IUSE=""
 DEPEND="
 	dev-qt/qtdeclarative:5[localstorage]
 	dev-qt/qtgraphicaleffects:5
-	dev-qt/qtquickcontrols:5[widgets]
+	dev-qt/qtquickcontrols2:5[widgets]
 	dev-qt/qtsql:5
 	dev-qt/qtwidgets:5
 "
