@@ -9,7 +9,7 @@ inherit xorg-3
 if [[ ${PV} == 9999* ]]; then
 	SRC_URI=""
 else
-	KEYWORDS="~amd64 ~arm64 ~loong ~ppc64 ~riscv ~x86"
+	KEYWORDS="~amd64 arm64 ~loong ~ppc64 ~riscv ~x86"
 fi
 
 DESCRIPTION="Accelerated Open Source driver for AMDGPU cards"
@@ -30,6 +30,6 @@ src_configure() {
 }
 
 src_prepare() {
-        eapply -p1 "${FILESDIR}/xf86-video-amdgpu.patch.9999"
+        eapply -p1 "${FILESDIR}/xf86-video-amdgpu.patch.23.0.0"
         eapply_user
 }
