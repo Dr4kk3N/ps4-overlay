@@ -46,7 +46,6 @@ RDEPEND="
 	games-emulation/libretro-database
 	games-emulation/libretro-info
 	games-emulation/retroarch-assets
-
 	alsa? ( media-libs/alsa-lib )
 	cg? ( media-gfx/nvidia-cg-toolkit )
 	ffmpeg? ( media-video/ffmpeg )
@@ -138,7 +137,6 @@ src_configure() {
 		--disable-audioio \
 		--disable-builtinflac \
 		--disable-builtinmbedtls \
-		--disable-builtinminiupnpc \
 		--disable-builtinzlib \
 		--disable-coreaudio \
 		--disable-jack \
@@ -161,7 +159,6 @@ src_configure() {
 		$(use_enable libcaca caca) \
 		$(use_enable libusb) \
 		$(use_enable materialui) \
-		$(use_enable miniupnpc) \
 		$(use_enable openal al) \
 		$(use_enable opengl) \
 		$(use_enable opengl_core) \

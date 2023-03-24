@@ -1,0 +1,12 @@
+--- a/yabause/src/tools/mini18n/src/CMakeLists.txt	2020-12-16 07:38:41.000000000 -0600
++++ b/yabause/src/tools/mini18n/src/CMakeLists.txt	2021-01-03 00:24:20.702221521 -0600
+@@ -35,7 +35,7 @@
+     set_target_properties(mini18n-static PROPERTIES OUTPUT_NAME mini18n)
+ endif()
+ 
+-install(TARGETS mini18n-shared DESTINATION "lib")
+-install(TARGETS mini18n-static DESTINATION "lib")
++install(TARGETS mini18n-shared DESTINATION "lib64")
++install(TARGETS mini18n-static DESTINATION "lib64")
+ install(FILES mini18n.h DESTINATION "include")
+ install(FILES mini18n-multi.h DESTINATION "include")
