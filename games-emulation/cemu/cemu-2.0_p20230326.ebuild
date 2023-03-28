@@ -1,4 +1,3 @@
-
 # Copyright 2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
@@ -8,7 +7,7 @@ inherit cmake desktop xdg
 
 DESCRIPTION="Wii U emulator."
 HOMEPAGE="https://cemu.info/ https://github.com/cemu-project/Cemu"
-SHA="daf3ef060af831da68abcc2f0c536b676b53bcac"
+SHA="a7f604320505c48d4d7279831ee21febc0d540df"
 MY_PN="Cemu"
 IMGUI_PV="1.88"
 SRC_URI="https://github.com/cemu-project/${MY_PN}/archive/${SHA}.tar.gz -> ${P}.tar.gz
@@ -38,13 +37,15 @@ DEPEND="app-arch/zarchive
 	vulkan? ( dev-util/vulkan-headers )
 	x11-libs/gtk+:3[wayland]
 	x11-libs/libX11
-	x11-libs/wxGTK:3.2-gtk3"
+	x11-libs/wxGTK:3.2-gtk3[opengl]"
 RDEPEND="${DEPEND}"
 BDEPEND="media-libs/glm"
 
 S="${WORKDIR}/${MY_PN}-${SHA}"
 
-PATCHES=( "${FILESDIR}/${PN}-0002-remove-default-from-system-g.patch" )
+PATCHES=(
+	"${FILESDIR}/${PN}-0002-remove-default-from-system-g.patch"
+)
 
 src_prepare() {
 	sed -re \
@@ -62,6 +63,7 @@ src_configure() {
 		-DENABLE_DISCORD_RPC=$(usex discord)
 		-DENABLE_OPENGL=ON
 		-DENABLE_SDL=$(usex sdl)
+		-DENABLE_VCPKG=OFF
 		-DENABLE_VULKAN=$(usex vulkan)
 		-DENABLE_WXWIDGETS=ON
 		-DPORTABLE=OFF
