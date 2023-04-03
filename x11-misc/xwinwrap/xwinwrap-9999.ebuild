@@ -1,29 +1,26 @@
-# Copyright 1999-2021 Gentoo Authors
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
-inherit flag-o-matic
+inherit git-r3
 
 DESCRIPTION="Utility to replace a desktop background with a movie, screensaver, etc"
-KEYWORDS="~amd64"
+HOMEPAGE="https://github.com/mmhobi7/xwinwrap"
+EGIT_REPO_URI="${HOMEPAGE}"
+
 LICENSE="HPND"
-HOMEPAGE="https://github.com/ujjwal96/xwinwrap.git"
-EGIT_REPO_URI="https://github.com/ujjwal96/xwinwrap.git"
 SLOT="0"
-IUSE=""
+KEYWORDS=""
 
-DEPEND=">=x11-libs/libX11-1.0.3
-	>=x11-libs/libXrender-0.9.10-r1
-	>=x11-libs/libXext-1.3.4
-	>=x11-base/xorg-server-1.20.7"
-
+DEPEND="x11-base/xorg-server
+	x11-libs/libX11
+	x11-libs/libXext
+	x11-libs/libXrender"
 RDEPEND="${DEPEND}"
+BDEPEND=""
 
-src_build(){
-	emake
-}
-
-src_install() {
-	emake install
+src_prepare() {
+	sed -i 's/local//' Makefile
+	default
 }
