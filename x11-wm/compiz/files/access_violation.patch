@@ -1,0 +1,18 @@
+--- compiz-9999/compizconfig/libcompizconfig/config/CMakeLists.txt.orig	2015-02-03 12:09:12.000000000 +0100
++++ compiz-9999/compizconfig/libcompizconfig/config/CMakeLists.txt	2015-06-14 13:12:15.009100624 +0200
+@@ -4,4 +4,4 @@
+ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/config_test
+ 		${CMAKE_CURRENT_BINARY_DIR}/compiz-1/compizconfig/config)
+ 
+-install (FILES ${_config_file} DESTINATION ${COMPIZCONFIG_CONFIG_DIR})
++install (FILES ${_config_file} DESTINATION $ENV{DESTDIR}${COMPIZCONFIG_CONFIG_DIR})
+--- compiz-9999/cmake/recompile_gsettings_schemas_in_dir_user_env.cmake.orig	2016-08-01 22:56:04.317994940 +0200
++++ compiz-9999/cmake/recompile_gsettings_schemas_in_dir_user_env.cmake	2016-08-01 22:58:03.707528553 +0200
+@@ -18,6 +18,6 @@
+ if (GLIB_COMPILE_SCHEMAS)
+ 
+     message ("-- Recompiling GSettings schemas in ${SCHEMADIR}")
+-    execute_process (COMMAND ${GLIB_COMPILE_SCHEMAS} ${SCHEMADIR})
++    execute_process (COMMAND ${GLIB_COMPILE_SCHEMAS} \"$ENV{DESTDIR}${SCHEMADIR}\")
+ 
+ endif (GLIB_COMPILE_SCHEMAS)
