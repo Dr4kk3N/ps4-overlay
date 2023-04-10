@@ -4,7 +4,7 @@
 EAPI=8
 XORG_DRI="always"
 XORG_TARBALL_SUFFIX="xz"
-inherit xorg-3
+inherit xorg-3 autotools
 
 if [[ ${PV} == 9999* ]]; then
 	SRC_URI=""
@@ -32,4 +32,5 @@ src_configure() {
 src_prepare() {
         eapply -p1 "${FILESDIR}/xf86-video-amdgpu.patch.9999"
         eapply_user
+	eautoreconf
 }

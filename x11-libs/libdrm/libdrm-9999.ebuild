@@ -1,10 +1,10 @@
-# Copyright 1999-2022 Gentoo Authors
+# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 EGIT_REPO_URI="https://gitlab.freedesktop.org/mesa/drm.git"
-PYTHON_COMPAT=( python3_{8..11} )
+PYTHON_COMPAT=( python3_{9..11} )
 
 if [[ ${PV} = 9999* ]]; then
 	GIT_ECLASS="git-r3"
@@ -39,27 +39,33 @@ BDEPEND="${PYTHON_DEPS}
 	$(python_gen_any_dep 'dev-python/docutils[${PYTHON_USEDEP}]')"
 
 python_check_deps() {
-	has_version -b "dev-python/docutils[${PYTHON_USEDEP}]"
+	python_has_version "dev-python/docutils[${PYTHON_USEDEP}]"
+}
+
+src_prepare() {
+        eapply -p1 "${FILESDIR}/libdrm.patch.9999"
+        eapply_user
 }
 
 multilib_src_configure() {
 	local emesonargs=(
 		# Udev is only used by tests now.
 		-Dudev=false
-		-Dcairo-tests=false
-		$(meson_use video_cards_amdgpu amdgpu)
-		$(meson_use video_cards_exynos exynos)
-		$(meson_use video_cards_freedreno freedreno)
-		$(meson_use video_cards_intel intel)
-		$(meson_use video_cards_nouveau nouveau)
-		$(meson_use video_cards_omap omap)
-		$(meson_use video_cards_radeon radeon)
-		$(meson_use video_cards_tegra tegra)
-		$(meson_use video_cards_vc4 vc4)
-		$(meson_use video_cards_vivante etnaviv)
-		$(meson_use video_cards_vmware vmwgfx)
+		-Dcairo-tests=disabled
+		$(meson_feature video_cards_amdgpu amdgpu)
+		$(meson_feature video_cards_exynos exynos)
+		$(meson_feature video_cards_freedreno freedreno)
+		$(meson_feature video_cards_intel intel)
+		$(meson_feature video_cards_nouveau nouveau)
+		$(meson_feature video_cards_omap omap)
+		$(meson_feature video_cards_radeon radeon)
+		$(meson_feature video_cards_tegra tegra)
+		$(meson_feature video_cards_vc4 vc4)
+		$(meson_feature video_cards_vivante etnaviv)
+		$(meson_feature video_cards_vmware vmwgfx)
 		# valgrind installs its .pc file to the pkgconfig for the primary arch
-		-Dvalgrind=$(usex valgrind auto false)
+		-Dvalgrind=$(usex valgrind auto disabled)
+		-Dtests=false # Tests are restricted
 	)
 	meson_src_configure
 }
