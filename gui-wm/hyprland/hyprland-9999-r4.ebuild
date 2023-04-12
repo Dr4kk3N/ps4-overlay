@@ -13,24 +13,26 @@ EGIT_REPO_URI="https://github.com/hyprwm/Hyprland.git"
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS=""
-IUSE="greetd-fix vulkan +x11-backend X video_cards_nvidia"
+IUSE="+hwdata source +seatd +udev vulkan +x11-backend X video_cards_nvidia"
 
 # Copied from gui-libs/wlroots-9999
 DEPEND="
 	>=dev-libs/libinput-1.14.0:0=
 	>=dev-libs/wayland-1.21.0
-	>=dev-libs/wayland-protocols-1.24
-	media-libs/mesa[egl(+),gles2,gbm(+)]
-	sys-auth/seatd:=
-	virtual/libudev
+	>=dev-libs/wayland-protocols-1.28
+	media-libs/mesa[egl(+),gles2]
+	>=media-libs/libdisplay-info-0.1.1:=
+	hwdata? ( sys-apps/hwdata:= )
+	seatd? ( sys-auth/seatd:= )
+	udev? ( virtual/libudev )
 	vulkan? (
 		dev-util/glslang:0=
 		dev-util/vulkan-headers:0=
 		media-libs/vulkan-loader:0=
 	)
-	>=x11-libs/libdrm-2.4.109:0=
+	>=x11-libs/libdrm-2.4.114:0=
 	x11-libs/libxkbcommon
-	x11-libs/pixman
+	>=x11-libs/pixman-0.42.0:0=
 	x11-backend? ( x11-libs/libxcb:0= )
 	X? (
 		x11-base/xwayland
@@ -43,7 +45,7 @@ RDEPEND="
 	${DEPEND}
 "
 BDEPEND="
-	>=dev-libs/wayland-protocols-1.24
+	>=dev-libs/wayland-protocols-1.31
 	>=dev-util/meson-0.60.0
 	dev-util/wayland-scanner
 	virtual/pkgconfig
@@ -67,6 +69,15 @@ pkg_setup() {
 	fi
 }
 
+compile_udis86() {
+	local S="$S/subprojects/udis86"
+	local BUILD_DIR="${S}/build"
+	local CMAKE_USE_DIR="${S}"
+
+	cmake_src_configure
+	cmake_src_compile
+}
+
 compile_wlroots() {
 	local S="$S/subprojects/wlroots"
 	local BUILD_DIR="${S}/build"
@@ -86,14 +97,12 @@ compile_wlroots() {
 src_prepare() {
 	default
 
-	if use greetd-fix; then
-		eapply "${FILESDIR}/0001-Make-tmp-hypr-readable-writable-by-everyone.patch"
-	fi
-
 	# Nvidia patch
 	if use video_cards_nvidia; then
 		sed -i "s|glFlush();|glFinish();|" \
 			"${S}/subprojects/wlroots/render/gles2/renderer.c" || die "Nvidia patch failed"
+
+		eapply "${FILESDIR}/0001-Workaround-Screencast-for-Nvidia.patch"
 	fi
 
 	cmake_src_prepare
@@ -105,14 +114,17 @@ src_configure() {
 	emake protocols
 	emake fixwlr
 
-	elog "Compiling 'wlroots'"
+	einfo "Compiling 'wlroots'"
 	compile_wlroots
+
+	einfo "Compiling 'udis86'"
+	compile_udis86
 
 	# Use latest gcc
 	latest_gcc=$(ls /usr/bin/gcc-* | grep -vE 'ar|nm|ranlib|config' | sort -r | head -n1)
 	latest_gxx=$(ls /usr/bin/g++-* | grep -vE 'ar|nm|ranlib|config' | sort -r | head -n1)
 
-	elog "Will compile 'Hyprland' with '${latest_gxx}'"
+	einfo "Will compile 'Hyprland' with '${latest_gxx}'"
 
 	CC=${latest_gcc}
 	CXX=${latest_gxx}
@@ -147,16 +159,20 @@ src_install() {
 	doins assets/*
 
 	dodoc example/hyprland.conf
+
+	# Probably not the best way.
+	if use "source"; then
+		emake clear
+		emake protocols
+
+		insinto "/usr/share/hyprland/src"
+		doins "${S}"/*.{c,h}
+
+		doins -r "${S}/src"
+	fi
 }
 
 pkg_postinst() {
-	if use greetd-fix; then
-		ewarn "You've enabled the 'greetd-fix' USE."
-		ewarn "This makes '/tmp/hypr' modifiable by everyone (mode 777),"
-		ewarn "which allows 'hyprctl' to work if '/tmp/hypr' was created by"
-		ewarn "the 'greetd' user."
-		ewarn
-	fi
 	elog "You must be in the input group to allow Hyprland"
 	elog "to access input devices via libinput."
 }
