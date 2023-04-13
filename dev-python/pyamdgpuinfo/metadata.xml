@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>stha09@googlemail.com</email>
+		<name>Stephan Hartmann</name>
+	</maintainer>
+	<upstream>
+		<remote-id type="github">mark9064/pyamdgpuinfo</remote-id>
+	</upstream>
+</pkgmetadata>
