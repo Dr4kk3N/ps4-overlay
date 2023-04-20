@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{9..10} )
+PYTHON_COMPAT=( python3_{9..11} )
 
 inherit flag-o-matic java-pkg-opt-2 java-ant-2 python-any-r1 qmake-utils readme.gentoo-r1 systemd user-info
 
@@ -85,7 +85,7 @@ RDEPEND="
 	opengl? ( dev-qt/qtopengl:5 )
 	pulseaudio? ( media-sound/pulseaudio )
 	systemd? ( sys-apps/systemd:= )
-	vaapi? ( media-libs/libva:=[opengl] )
+	vaapi? ( media-libs/libva:= )
 	vdpau? ( x11-libs/libvdpau )
 	vpx? ( media-libs/libvpx:= )
 	x264? (	media-libs/x264:= )
@@ -150,15 +150,16 @@ python_check_deps() {
 	has_version "dev-python/simplejson[${PYTHON_USEDEP}]"
 }
 
-PATCHES=(
-)
+#PATCHES=(
+#	"${FILESDIR}"/${PN}-32.0-python-version.patch
+#)
 
 DISABLE_AUTOFORMATTING="yes"
 DOC_CONTENTS="
 Support for metadata lookup changes is added. User configuration required.
 Details at: https://www.mythtv.org/wiki/Metadata_Lookup_Changes_March_2021
 
-Suppport for Python 2.7 is removed.
+Support for Python 2.7 is removed.
 
 If a MYSQL server is installed, a mythtv MySQL user and mythconverg database
 is created if it does not already exist.
@@ -284,6 +285,7 @@ src_configure() {
 		$(use_enable vaapi)
 		$(use_enable vdpau)
 		$(use_enable opengl)
+		$(use_enable opengl egl)
 		$(use_enable libass)
 	)
 
