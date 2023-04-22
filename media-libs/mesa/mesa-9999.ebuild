@@ -418,7 +418,7 @@ multilib_src_configure() {
 	# https://bugs.gentoo.org/883955
 	if [[ ${LLVM_SLOT} -ge 16 ]]; then
 		emesonargs+=(
-			-Dcpp_rtti=false
+			-Dcpp_rtti=true
 		)
 	fi
 
