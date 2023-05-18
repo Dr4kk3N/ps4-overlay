@@ -7,7 +7,7 @@ inherit cmake desktop xdg
 
 DESCRIPTION="Wii U emulator."
 HOMEPAGE="https://cemu.info/ https://github.com/cemu-project/Cemu"
-SHA="cb9570e2293075944c3461710719ac6a5417ed51"
+SHA="eda4cf4b241d56c5c16f6aa4d135b8a269676a76"
 MY_PN="Cemu"
 IMGUI_PV="1.88"
 SRC_URI="https://github.com/cemu-project/${MY_PN}/archive/${SHA}.tar.gz -> ${P}.tar.gz
@@ -31,7 +31,7 @@ DEPEND="app-arch/zarchive
 	dev-libs/wayland
 	dev-util/glslang
 	media-libs/libglvnd
-	media-libs/libsdl2[joystick,threads]
+	media-libs/libsdl2[haptic,joystick,threads]
 	net-misc/curl
 	sys-libs/zlib
 	vulkan? ( dev-util/vulkan-headers )
