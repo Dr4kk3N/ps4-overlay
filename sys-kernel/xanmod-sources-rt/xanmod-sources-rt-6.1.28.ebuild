@@ -7,7 +7,7 @@ K_WANT_GENPATCHES="base extras"
 K_GENPATCHES_VER="15"
 K_SECURITY_UNSUPPORTED="1"
 XANMOD_VERSION="1"
-_RT_VERSION="rt8"
+_RT_VERSION="rt10"
 XANMOD_URI="https://github.com/xanmod/linux/releases/download/"
 
 HOMEPAGE="https://xanmod.org"
