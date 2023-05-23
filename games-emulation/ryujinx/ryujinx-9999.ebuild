@@ -29,7 +29,7 @@ NUGETS="avalonia-0.10.18
 	concentus-1.1.7
 	crc32.net-1.2.0
 	discordrichpresence-1.1.3.18
-	dynamicdata-7.12.11
+	dynamicdata-7.13.8
 	excss-4.1.4
 	fizzler-1.2.1
 	fluentavaloniaui-1.4.5
