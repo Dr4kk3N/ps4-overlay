@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-LLVM_MAX_SLOT=14
+LLVM_MAX_SLOT=16
 PLOCALES="cs da de fr hr ja pl ru sl uk zh-CN zh-TW"
 
 inherit cmake llvm optfeature virtualx xdg
