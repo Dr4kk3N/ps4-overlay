@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>audvare@gmail.com</email>
+		<name>Andrew Udvare</name>
+	</maintainer>
+	<upstream>
+		<remote-id type="github">mborgerson/xemu</remote-id>
+		<remote-id type="gitlab">qemu-project/keycodemapdb</remote-id>
+	</upstream>
+	<use>
+		<flag name="aio">Add support for AIO</flag>
+		<flag name="io-uring">Enable efficient I/O via sys-libs/liburing</flag>
+		<flag name="malloc-trim">Enable malloc_trim() support</flag>
+		<flag name="membarrier">Enable membarrier syscall support</flag>
+	</use>
+</pkgmetadata>
