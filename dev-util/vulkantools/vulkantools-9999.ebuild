@@ -4,8 +4,8 @@
 EAPI=8
 
 MY_PN=VulkanTools
-PYTHON_COMPAT=( python3_{9..11} )
-inherit cmake-multilib python-any-r1
+PYTHON_COMPAT=( python3_{9..12} )
+inherit cmake-multilib python-any-r1 xdg-utils
 
 if [[ ${PV} == *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/LunarG/${MY_PN}.git"
@@ -30,6 +30,10 @@ IUSE="wayland +X"
 #BDEPEND="${PYTHON_DEPS}
 #	cube? ( ~dev-util/glslang-${PV}:=[${MULTILIB_USEDEP}] )
 #"
+
+# minimum Qt version required
+QT_PV="5.15.2:5"
+
 RDEPEND="
 	~media-libs/vulkan-loader-${PV}:=[${MULTILIB_USEDEP},wayland?,X?]
 	wayland? ( dev-libs/wayland:=[${MULTILIB_USEDEP}] )
@@ -40,11 +44,17 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}
 	~dev-util/vulkan-headers-${PV}
+	~media-libs/vulkan-layers-${PV}
+	>=dev-libs/jsoncpp-1.9.5
+	>=dev-qt/qtcore-${QT_PV}
+        >=dev-qt/qtgui-${QT_PV}
+        >=dev-qt/qtwidgets-${QT_PV}
+        >=dev-qt/qtnetwork-${QT_PV}
 "
 
 pkg_setup() {
 	MULTILIB_CHOST_TOOLS=(
-		/usr/bin/vulkaninfo
+		/usr/bin/vkconfig
 	)
 
 #	use cube && MULTILIB_CHOST_TOOLS+=(
@@ -68,6 +78,7 @@ multilib_src_configure() {
 		-DBUILD_WSI_XLIB_SUPPORT=$(usex X)
 		-DVULKAN_HEADERS_INSTALL_DIR="${ESYSROOT}/usr"
 		-DVULKAN_LOADER_INSTALL_DIR="${ESYSROOT}/usr"
+		-DVULKAN_VALIDATIONLAYERS_INSTALL_DIR="${ESYSROOT}/usr"
 	)
 
 #	use cube && mycmakeargs+=(
