@@ -8,23 +8,24 @@ inherit desktop dotnet-utils xdg
 
 DESCRIPTION="Experimental Nintendo Switch emulator written in C#"
 HOMEPAGE="https://ryujinx.org/ https://github.com/Ryujinx/Ryujinx"
-SHA="42b9c1e8fede88880454154f8c3683f1f8424ed9"
+SHA="35d91a0e58cb0b2916b7a4f138c63fcc12b71112"
 MY_PN="R${PN:1}"
-NUGETS="avalonia-0.10.19
+NUGETS="avalonia-0.10.21
 	avalonia.angle.windows.natives-2.1.0.2020091801
-	avalonia.controls.datagrid-0.10.19
-	avalonia.desktop-0.10.19
-	avalonia.diagnostics-0.10.19
-	avalonia.freedesktop-0.10.19
-	avalonia.markup.xaml.loader-0.10.19
-	avalonia.native-0.10.19
-	avalonia.remote.protocol-0.10.19
+	avalonia.controls.datagrid-0.10.21
+	avalonia.desktop-0.10.21
+	avalonia.diagnostics-0.10.21
+	avalonia.freedesktop-0.10.21
+	avalonia.markup.xaml.loader-0.10.21
+	avalonia.native-0.10.21
+	avalonia.remote.protocol-0.10.21
 	avalonia.skia-0.10.18
-	avalonia.skia-0.10.19
+	avalonia.skia-0.10.21
 	avalonia.svg-0.10.18
 	avalonia.svg.skia-0.10.18
-	avalonia.win32-0.10.19
-	avalonia.x11-0.10.19
+	avalonia.win32-0.10.21
+	avalonia.x11-0.10.21
+	avalonia.buildservices-0.0.16
 	commandlineparser-2.9.1
 	concentus-1.1.7
 	discordrichpresence-1.1.3.18
@@ -55,7 +56,7 @@ NUGETS="avalonia-0.10.19
 	microsoft.codeanalysis.csharp-4.5.0
 	microsoft.codeanalysis.csharp.scripting-3.4.0
 	microsoft.codeanalysis.scripting.common-3.4.0
-	microsoft.codecoverage-17.5.0
+	microsoft.codecoverage-17.6.0
 	microsoft.csharp-4.3.0
 	microsoft.csharp-4.5.0
 	microsoft.csharp-4.7.0
@@ -77,9 +78,9 @@ NUGETS="avalonia-0.10.19
 	microsoft.netcore.platforms-2.1.2
 	microsoft.netcore.targets-1.0.1
 	microsoft.netcore.targets-1.1.0
-	microsoft.net.test.sdk-17.5.0
-	microsoft.testplatform.objectmodel-17.5.0
-	microsoft.testplatform.testhost-17.5.0
+	microsoft.net.test.sdk-17.6.0
+	microsoft.testplatform.objectmodel-17.6.0
+	microsoft.testplatform.testhost-17.6.0
 	microsoft.win32.primitives-4.0.1
 	microsoft.win32.registry-4.5.0
 	microsoft.win32.systemevents-7.0.0
