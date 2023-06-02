@@ -8,7 +8,7 @@ inherit desktop dotnet-utils xdg
 
 DESCRIPTION="Experimental Nintendo Switch emulator written in C#"
 HOMEPAGE="https://ryujinx.org/ https://github.com/Ryujinx/Ryujinx"
-SHA="0dca1fbe12c637ccf04ac2853ac7476d41310932"
+SHA="96ea4e8c8e38f42073c1f8d7fb66c89a663e95e0"
 MY_PN="R${PN:1}"
 NUGETS="avalonia-0.10.21
 	avalonia.angle.windows.natives-2.1.0.2020091801
@@ -29,7 +29,7 @@ NUGETS="avalonia-0.10.21
 	commandlineparser-2.9.1
 	concentus-1.1.7
 	discordrichpresence-1.1.3.18
-	dynamicdata-7.13.8
+	dynamicdata-7.14.2
 	excss-4.1.4
 	fizzler-1.2.1
 	fluentavaloniaui-1.4.5
@@ -56,7 +56,7 @@ NUGETS="avalonia-0.10.21
 	microsoft.codeanalysis.csharp-4.5.0
 	microsoft.codeanalysis.csharp.scripting-3.4.0
 	microsoft.codeanalysis.scripting.common-3.4.0
-	microsoft.codecoverage-17.6.0
+	microsoft.codecoverage-17.6.1
 	microsoft.csharp-4.3.0
 	microsoft.csharp-4.5.0
 	microsoft.csharp-4.7.0
@@ -78,9 +78,9 @@ NUGETS="avalonia-0.10.21
 	microsoft.netcore.platforms-2.1.2
 	microsoft.netcore.targets-1.0.1
 	microsoft.netcore.targets-1.1.0
-	microsoft.net.test.sdk-17.6.0
-	microsoft.testplatform.objectmodel-17.6.0
-	microsoft.testplatform.testhost-17.6.0
+	microsoft.net.test.sdk-17.6.1
+	microsoft.testplatform.objectmodel-17.6.1
+	microsoft.testplatform.testhost-17.6.1
 	microsoft.win32.primitives-4.0.1
 	microsoft.win32.registry-4.5.0
 	microsoft.win32.systemevents-7.0.0
@@ -89,7 +89,7 @@ NUGETS="avalonia-0.10.21
 	netstandard.library-2.0.0
 	netstandard.library-2.0.3
 	newtonsoft.json-13.0.1
-	nuget.frameworks-5.11.0
+	nuget.frameworks-6.6.0
 	nunit-3.13.3
 	nunit3testadapter-4.1.0
 	opentk.core-4.7.7
@@ -229,7 +229,7 @@ NUGETS="avalonia-0.10.21
 	system.objectmodel-4.0.12
 	system.objectmodel-4.3.0
 	system.private.uri-4.3.0
-	system.reactive-5.0.0
+	system.reactive-6.0.0
 	system.reflection-4.1.0
 	system.reflection-4.3.0
 	system.reflection.emit-4.0.1
