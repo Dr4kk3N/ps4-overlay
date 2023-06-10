@@ -8,7 +8,7 @@ inherit desktop dotnet-utils xdg
 
 DESCRIPTION="Experimental Nintendo Switch emulator written in C#"
 HOMEPAGE="https://ryujinx.org/ https://github.com/Ryujinx/Ryujinx"
-SHA="d98da47a0fd7966be34a37c89a262902b9fa413a"
+SHA="0e95a8271ac96b2c54907858140e2511a25a2b10"
 MY_PN="R${PN:1}"
 NUGETS="avalonia-0.10.21
 	avalonia.angle.windows.natives-2.1.0.2020091801
@@ -56,16 +56,16 @@ NUGETS="avalonia-0.10.21
 	microsoft.codeanalysis.csharp-4.5.0
 	microsoft.codeanalysis.csharp.scripting-3.4.0
 	microsoft.codeanalysis.scripting.common-3.4.0
-	microsoft.codecoverage-17.6.1
+	microsoft.codecoverage-17.6.2
 	microsoft.csharp-4.3.0
 	microsoft.csharp-4.5.0
 	microsoft.csharp-4.7.0
 	microsoft.dotnet.platformabstractions-3.1.6
 	microsoft.extensions.dependencymodel-6.0.0
-	microsoft.identitymodel.abstractions-6.30.1
-	microsoft.identitymodel.jsonwebtokens-6.30.1
-	microsoft.identitymodel.logging-6.30.1
-	microsoft.identitymodel.tokens-6.30.1
+	microsoft.identitymodel.abstractions-6.31.0
+	microsoft.identitymodel.jsonwebtokens-6.31.0
+	microsoft.identitymodel.logging-6.31.0
+	microsoft.identitymodel.tokens-6.31.0
 	microsoft.io.recyclablememorystream-2.3.2
 	microsoft.netcore.app.host.osx-x64-7.0.3
 	microsoft.netcore.app.host.win-x64-7.0.3
@@ -78,9 +78,9 @@ NUGETS="avalonia-0.10.21
 	microsoft.netcore.platforms-2.1.2
 	microsoft.netcore.targets-1.0.1
 	microsoft.netcore.targets-1.1.0
-	microsoft.net.test.sdk-17.6.1
-	microsoft.testplatform.objectmodel-17.6.1
-	microsoft.testplatform.testhost-17.6.1
+	microsoft.net.test.sdk-17.6.2
+	microsoft.testplatform.objectmodel-17.6.2
+	microsoft.testplatform.testhost-17.6.2
 	microsoft.win32.primitives-4.0.1
 	microsoft.win32.registry-4.5.0
 	microsoft.win32.systemevents-7.0.0
@@ -203,7 +203,7 @@ NUGETS="avalonia-0.10.21
 	system.globalization-4.3.0
 	system.globalization.calendars-4.0.1
 	system.globalization.extensions-4.0.1
-	system.identitymodel.tokens.jwt-6.30.1
+	system.identitymodel.tokens.jwt-6.31.0
 	system.io-4.1.0
 	system.io-4.3.0
 	system.io.compression-4.1.0
