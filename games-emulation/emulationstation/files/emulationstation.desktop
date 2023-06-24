@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=EmulationStation
+GenericName=EmulationStation
+Comment=Front-end for emulators
+Exec=emulationstation
+Icon=emulationstation
+Terminal=false
+Type=Application
+StartupNotify=false
+Categories=Game;Emulator;
+
