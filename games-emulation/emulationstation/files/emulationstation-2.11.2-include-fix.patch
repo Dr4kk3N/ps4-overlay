@@ -1,0 +1,140 @@
+diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-app/src/CollectionSystemManager.cpp EmulationStation-2.9.0/es-app/src/CollectionSystemManager.cpp
+--- EmulationStation-2.9.0-orig/es-app/src/CollectionSystemManager.cpp	2020-01-17 06:57:53.790137537 -0300
++++ EmulationStation-2.9.0/es-app/src/CollectionSystemManager.cpp	2020-01-17 06:58:37.275137897 -0300
+@@ -11,7 +11,7 @@
+ #include "Settings.h"
+ #include "SystemData.h"
+ #include "ThemeData.h"
+-#include <pugixml/src/pugixml.hpp>
++#include <pugixml.hpp>
+ #include <fstream>
+ 
+ std::string myCollectionsName = "collections";
+diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-app/src/Gamelist.cpp EmulationStation-2.9.0/es-app/src/Gamelist.cpp
+--- EmulationStation-2.9.0-orig/es-app/src/Gamelist.cpp	2020-01-17 06:57:53.791137537 -0300
++++ EmulationStation-2.9.0/es-app/src/Gamelist.cpp	2020-01-17 06:58:58.418138072 -0300
+@@ -8,7 +8,7 @@
+ #include "Log.h"
+ #include "Settings.h"
+ #include "SystemData.h"
+-#include <pugixml/src/pugixml.hpp>
++#include <pugixml.hpp>
+ 
+ FileData* findOrCreateFile(SystemData* system, const std::string& path, FileType type)
+ {
+diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-app/src/MetaData.cpp EmulationStation-2.9.0/es-app/src/MetaData.cpp
+--- EmulationStation-2.9.0-orig/es-app/src/MetaData.cpp	2020-01-17 06:57:53.791137537 -0300
++++ EmulationStation-2.9.0/es-app/src/MetaData.cpp	2020-01-17 06:59:16.450138221 -0300
+@@ -2,7 +2,7 @@
+ 
+ #include "utils/FileSystemUtil.h"
+ #include "Log.h"
+-#include <pugixml/src/pugixml.hpp>
++#include <pugixml.hpp>
+ 
+ MetaDataDecl gameDecls[] = {
+ 	// key,         type,                   default,            statistic,  name in GuiMetaDataEd,  prompt in GuiMetaDataEd
+diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-app/src/SystemData.cpp EmulationStation-2.9.0/es-app/src/SystemData.cpp
+--- EmulationStation-2.9.0-orig/es-app/src/SystemData.cpp	2020-01-17 06:57:53.791137537 -0300
++++ EmulationStation-2.9.0/es-app/src/SystemData.cpp	2020-01-17 07:00:25.066138789 -0300
+@@ -10,7 +10,7 @@
+ #include "Settings.h"
+ #include "ThemeData.h"
+ #include "views/UIModeController.h"
+-#include <pugixml/src/pugixml.hpp>
++#include <pugixml.hpp>
+ #include <fstream>
+ #ifdef WIN32
+ #include <Windows.h>
+diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-app/src/scrapers/GamesDBJSONScraper.cpp EmulationStation-2.9.0/es-app/src/scrapers/GamesDBJSONScraper.cpp
+--- EmulationStation-2.9.0-orig/es-app/src/scrapers/GamesDBJSONScraper.cpp	2020-01-17 06:57:53.794137537 -0300
++++ EmulationStation-2.9.0/es-app/src/scrapers/GamesDBJSONScraper.cpp	2020-01-17 06:59:38.146138401 -0300
+@@ -10,7 +10,7 @@
+ #include "Settings.h"
+ #include "SystemData.h"
+ #include "utils/TimeUtil.h"
+-#include <pugixml/src/pugixml.hpp>
++#include <pugixml.hpp>
+ 
+ /* When raspbian will get an up to date version of rapidjson we'll be
+    able to have it throw in case of error with the following:
+diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-app/src/scrapers/ScreenScraper.cpp EmulationStation-2.9.0/es-app/src/scrapers/ScreenScraper.cpp
+--- EmulationStation-2.9.0-orig/es-app/src/scrapers/ScreenScraper.cpp	2020-01-17 06:57:53.794137537 -0300
++++ EmulationStation-2.9.0/es-app/src/scrapers/ScreenScraper.cpp	2020-01-17 07:00:05.866138630 -0300
+@@ -7,7 +7,7 @@
+ #include "PlatformId.h"
+ #include "Settings.h"
+ #include "SystemData.h"
+-#include <pugixml/src/pugixml.hpp>
++#include <pugixml.hpp>
+ #include <cstring>
+ 
+ using namespace PlatformIds;
+diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-core/src/InputConfig.cpp EmulationStation-2.9.0/es-core/src/InputConfig.cpp
+--- EmulationStation-2.9.0-orig/es-core/src/InputConfig.cpp	2020-01-17 06:57:53.796137537 -0300
++++ EmulationStation-2.9.0/es-core/src/InputConfig.cpp	2020-01-17 07:01:07.778139142 -0300
+@@ -1,7 +1,7 @@
+ #include "InputConfig.h"
+ 
+ #include "Log.h"
+-#include <pugixml/src/pugixml.hpp>
++#include <pugixml.hpp>
+ 
+ //some util functions
+ std::string inputTypeToString(InputType type)
+diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-core/src/InputManager.cpp EmulationStation-2.9.0/es-core/src/InputManager.cpp
+--- EmulationStation-2.9.0-orig/es-core/src/InputManager.cpp	2020-01-17 06:57:53.796137537 -0300
++++ EmulationStation-2.9.0/es-core/src/InputManager.cpp	2020-01-17 07:01:21.001139252 -0300
+@@ -6,7 +6,7 @@
+ #include "platform.h"
+ #include "Scripting.h"
+ #include "Window.h"
+-#include <pugixml/src/pugixml.hpp>
++#include <pugixml.hpp>
+ #include <SDL.h>
+ #include <iostream>
+ #include <assert.h>
+diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-core/src/MameNames.cpp EmulationStation-2.9.0/es-core/src/MameNames.cpp
+--- EmulationStation-2.9.0-orig/es-core/src/MameNames.cpp	2020-01-17 06:57:53.796137537 -0300
++++ EmulationStation-2.9.0/es-core/src/MameNames.cpp	2020-01-17 07:01:33.321139354 -0300
+@@ -3,7 +3,7 @@
+ #include "resources/ResourceManager.h"
+ #include "utils/FileSystemUtil.h"
+ #include "Log.h"
+-#include <pugixml/src/pugixml.hpp>
++#include <pugixml.hpp>
+ #include <string.h>
+ 
+ MameNames* MameNames::sInstance = nullptr;
+diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-core/src/Settings.cpp EmulationStation-2.9.0/es-core/src/Settings.cpp
+--- EmulationStation-2.9.0-orig/es-core/src/Settings.cpp	2020-01-17 06:57:53.796137537 -0300
++++ EmulationStation-2.9.0/es-core/src/Settings.cpp	2020-01-17 07:01:45.865139457 -0300
+@@ -4,7 +4,7 @@
+ #include "Log.h"
+ #include "Scripting.h"
+ #include "platform.h"
+-#include <pugixml/src/pugixml.hpp>
++#include <pugixml.hpp>
+ #include <algorithm>
+ #include <vector>
+ 
+diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-core/src/ThemeData.cpp EmulationStation-2.9.0/es-core/src/ThemeData.cpp
+--- EmulationStation-2.9.0-orig/es-core/src/ThemeData.cpp	2020-01-17 06:57:53.797137537 -0300
++++ EmulationStation-2.9.0/es-core/src/ThemeData.cpp	2020-01-17 07:01:58.169139559 -0300
+@@ -7,7 +7,7 @@
+ #include "Log.h"
+ #include "platform.h"
+ #include "Settings.h"
+-#include <pugixml/src/pugixml.hpp>
++#include <pugixml.hpp>
+ #include <algorithm>
+ 
+ std::vector<std::string> ThemeData::sSupportedViews { { "system" }, { "basic" }, { "detailed" }, { "grid" }, { "video" } };
+diff '--color=auto' -ruN EmulationStation-2.9.0-orig/external/CMakeLists.txt EmulationStation-2.9.0/external/CMakeLists.txt
+--- EmulationStation-2.9.0-orig/external/CMakeLists.txt	2020-01-17 06:57:53.799137537 -0300
++++ EmulationStation-2.9.0/external/CMakeLists.txt	2020-01-17 07:05:08.912141138 -0300
+@@ -2,4 +2,3 @@
+ # package managers are included with the project (in the 'external' folder)
+ 
+ add_subdirectory("nanosvg")
+-add_subdirectory("pugixml")
