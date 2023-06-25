@@ -3,20 +3,19 @@
 
 EAPI=7
 
-inherit cmake git-r3 
+inherit cmake desktop
 
 DESCRIPTION="Frontend for emulators (RetroPie Fork)"
 HOMEPAGE="https://github.com/RetroPie/EmulationStation"
+SRC_URI="https://github.com/RetroPie/EmulationStation/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="emulationstation"
 SLOT="0"
-KEYWORDS=""
+KEYWORDS="amd64 x86"
 
-EGIT_REPO_URI="https://github.com/RetroPie/EmulationStation.git"
-SRC_URI=""
-KEYWORDS=""
+S="${WORKDIR}/EmulationStation-${PV}"
 
-COMMON_DEPEND="
+DEPEND="
 	dev-cpp/eigen:3
 	dev-libs/boost
 	media-libs/freeimage[png,jpeg]
@@ -25,24 +24,13 @@ COMMON_DEPEND="
 	net-misc/curl
 	media-video/vlc
 	dev-libs/pugixml
-	dev-libs/rapidjson
 "
-RDEPEND="${COMMON_DEPEND}"
-DEPEND="${COMMON_DEPEND}"
 
-src_prepare() {
-	eapply -p1 "${FILESDIR}/${P}-include-fix.patch"
-	eapply_user
-}
-
-src_configure() {
-	local mycmakeargs=(
-		-DCMAKE_INSTALL_PREFIX="${EPREFIX}"/usr
-	)
-}
+PATCHES=( "${FILESDIR}/${P}-include-fix.patch" )
+DOCS=( README.md SYSTEMS.md THEMES.md GAMELISTS.md DEVNOTES.md CREDITS.md )
 
 src_install() {
-	dobin	emulationstation
+	cmake-utils_src_install
 	doicon "${FILESDIR}/emulationstation.png"
 	domenu "${FILESDIR}/emulationstation.desktop"
 }
