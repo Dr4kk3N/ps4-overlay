@@ -19,11 +19,8 @@ LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64"
 
-DEPEND="dev-qt/qtcore:6
-	dev-qt/qtdbus:6
-	dev-qt/qtgui:6
+DEPEND="dev-qt/qtbase:6
 	dev-qt/qtquick3d:6
-	dev-qt/qtquickcontrols2:6
 	kde-frameworks/kconfig:6
 	kde-frameworks/kconfigwidgets:6
 	kde-frameworks/kcoreaddons:6
