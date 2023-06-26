@@ -19,18 +19,18 @@ LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64"
 
-DEPEND="dev-qt/qtcore:5
-	dev-qt/qtdbus:5
-	dev-qt/qtgui:5
-	dev-qt/qtquick3d:5
-	dev-qt/qtquickcontrols2:5
-	kde-frameworks/kconfig:5
-	kde-frameworks/kconfigwidgets:5
-	kde-frameworks/kcoreaddons:5
-	kde-frameworks/kglobalaccel:5
-	kde-frameworks/ki18n:5
-	kde-frameworks/kwindowsystem:5
-	kde-frameworks/kxmlgui:5
+DEPEND="dev-qt/qtcore:6
+	dev-qt/qtdbus:6
+	dev-qt/qtgui:6
+	dev-qt/qtquick3d:6
+	dev-qt/qtquickcontrols2:6
+	kde-frameworks/kconfig:6
+	kde-frameworks/kconfigwidgets:6
+	kde-frameworks/kcoreaddons:6
+	kde-frameworks/kglobalaccel:6
+	kde-frameworks/ki18n:6
+	kde-frameworks/kwindowsystem:6
+	kde-frameworks/kxmlgui:6
 	media-libs/libepoxy
 	kde-plasma/kwin
 	x11-libs/libxcb"
