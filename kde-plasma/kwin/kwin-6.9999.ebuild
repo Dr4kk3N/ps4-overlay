@@ -22,13 +22,8 @@ RESTRICT="test"
 COMMON_DEPEND="
 	>=dev-libs/libinput-1.19
 	>=dev-libs/wayland-1.21.0
-	>=dev-qt/qtconcurrent-${QTMIN}:6
-	>=dev-qt/qtdbus-${QTMIN}:6
 	>=dev-qt/qtdeclarative-${QTMIN}:6
-	>=dev-qt/qtgui-${QTMIN}:6=[egl,gles2-only=,libinput]
 	>=dev-qt/qtwayland-${QTMIN}:6
-	>=dev-qt/qtwidgets-${QTMIN}:6
-	>=dev-qt/qtx11extras-${QTMIN}:6
 	>=kde-frameworks/kactivities-${KFMIN}:6
 	>=kde-frameworks/kauth-${KFMIN}:6
 	>=kde-frameworks/kcmutils-${KFMIN}:6
