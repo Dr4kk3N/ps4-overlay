@@ -1,9 +1,12 @@
 # Copyright 2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 inherit flag-o-matic git-r3
+
+DESCRIPTION="RetroArch is a frontend for emulators, game engines and media players"
+HOMEPAGE="https://www.retroarch.com"
 
 MY_PN=retroarch
 MY_P=${MY_PN}-${PV}
