@@ -20,7 +20,7 @@
 
 case ${EAPI} in
 	7|8) ;;
-	*) die "${ECLASS}: EAPI=${EAPI:-0} is not supported" ;;
+	*) die "${ECLASS}: EAPI ${EAPI:-0} not supported" ;;
 esac
 
 if [[ -z ${_CMAKE_ECLASS} ]]; then
@@ -35,15 +35,15 @@ inherit flag-o-matic multiprocessing ninja-utils toolchain-funcs xdg-utils
 # For in-source build it's fixed to ${CMAKE_USE_DIR}.
 # For out-of-source build it can be overridden, by default it uses
 # ${CMAKE_USE_DIR}_build (in EAPI-7: ${WORKDIR}/${P}_build).
-[[ ${EAPI} == 7 ]] && : ${BUILD_DIR:=${WORKDIR}/${P}_build}
+[[ ${EAPI} == 7 ]] && : "${BUILD_DIR:=${WORKDIR}/${P}_build}"
 # EAPI-8: set inside _cmake_check_build_dir
 
 # @ECLASS_VARIABLE: CMAKE_BINARY
 # @DESCRIPTION:
 # Eclass can use different cmake binary than the one provided in by system.
-: ${CMAKE_BINARY:=cmake}
+: "${CMAKE_BINARY:=cmake}"
 
-[[ ${EAPI} == 7 ]] && : ${CMAKE_BUILD_TYPE:=Gentoo}
+[[ ${EAPI} == 7 ]] && : "${CMAKE_BUILD_TYPE:=Gentoo}"
 # @ECLASS_VARIABLE: CMAKE_BUILD_TYPE
 # @DESCRIPTION:
 # Set to override default CMAKE_BUILD_TYPE. Only useful for packages
@@ -55,7 +55,7 @@ inherit flag-o-matic multiprocessing ninja-utils toolchain-funcs xdg-utils
 # build type to achieve desirable results.
 #
 # In EAPI 7, the default was non-standard build type of Gentoo.
-: ${CMAKE_BUILD_TYPE:=RelWithDebInfo}
+: "${CMAKE_BUILD_TYPE:=RelWithDebInfo}"
 
 # @ECLASS_VARIABLE: CMAKE_IN_SOURCE_BUILD
 # @DEFAULT_UNSET
@@ -69,7 +69,7 @@ inherit flag-o-matic multiprocessing ninja-utils toolchain-funcs xdg-utils
 # Specify a makefile generator to be used by cmake.
 # At this point only "emake" and "ninja" are supported.
 # The default is set to "ninja".
-: ${CMAKE_MAKEFILE_GENERATOR:=ninja}
+: "${CMAKE_MAKEFILE_GENERATOR:=ninja}"
 
 # @ECLASS_VARIABLE: CMAKE_REMOVE_MODULES_LIST
 # @PRE_INHERIT
@@ -100,14 +100,14 @@ fi
 # @USER_VARIABLE
 # @DESCRIPTION:
 # Set to OFF to disable verbose messages during compilation
-: ${CMAKE_VERBOSE:=ON}
+: "${CMAKE_VERBOSE:=ON}"
 
 # @ECLASS_VARIABLE: CMAKE_WARN_UNUSED_CLI
 # @DESCRIPTION:
 # Warn about variables that are declared on the command line
 # but not used. Might give false-positives.
 # "no" to disable (default) or anything else to enable.
-: ${CMAKE_WARN_UNUSED_CLI:=yes}
+: "${CMAKE_WARN_UNUSED_CLI:=yes}"
 
 # @ECLASS_VARIABLE: CMAKE_EXTRA_CACHE_FILE
 # @USER_VARIABLE
@@ -125,12 +125,11 @@ fi
 # read-only. This is a user flag and should under _no circumstances_ be set in
 # the ebuild. Helps in improving QA of build systems that write to source tree.
 
-[[ ${CMAKE_MIN_VERSION} ]] && die "CMAKE_MIN_VERSION is banned; if necessary, set BDEPEND=\">=dev-util/cmake-${CMAKE_MIN_VERSION}\" directly"
-[[ ${CMAKE_BUILD_DIR} ]] && die "The ebuild must be migrated to BUILD_DIR"
-[[ ${CMAKE_REMOVE_MODULES} ]] && die "CMAKE_REMOVE_MODULES is banned, set CMAKE_REMOVE_MODULES_LIST array instead"
-[[ ${CMAKE_UTILS_QA_SRC_DIR_READONLY} ]] && die "Use CMAKE_QA_SRC_DIR_READONLY instead"
-[[ ${WANT_CMAKE} ]] && die "WANT_CMAKE has been removed and is a no-op"
-[[ ${PREFIX} ]] && die "PREFIX has been removed and is a no-op"
+# @ECLASS_VARIABLE: CMAKE_SKIP_TESTS
+# @USER_VARIABLE
+# @DEFAULT_UNSET
+# @DESCRIPTION:
+# Array of tests that should be skipped when running CTest.
 
 case ${CMAKE_MAKEFILE_GENERATOR} in
 	emake)
@@ -184,14 +183,6 @@ cmake_comment_add_subdirectory() {
 	done
 }
 
-# @FUNCTION: comment_add_subdirectory
-# @INTERNAL
-# @DESCRIPTION:
-# Banned. Use cmake_comment_add_subdirectory instead.
-comment_add_subdirectory() {
-	die "comment_add_subdirectory is banned. Use cmake_comment_add_subdirectory instead"
-}
-
 # @FUNCTION: cmake_use_find_package
 # @USAGE: <USE flag> <package name>
 # @DESCRIPTION:
@@ -210,89 +201,21 @@ cmake_use_find_package() {
 	echo "-DCMAKE_DISABLE_FIND_PACKAGE_$2=$(use $1 && echo OFF || echo ON)"
 }
 
-# @FUNCTION: _cmake_banned_func
-# @INTERNAL
-# @DESCRIPTION:
-# Banned functions are banned.
-_cmake_banned_func() {
-	die "${FUNCNAME[1]} is banned. use -D$1<related_CMake_variable>=\"\$(usex $2)\" instead"
-}
-
-# @FUNCTION: cmake-utils_use_with
-# @INTERNAL
-# @DESCRIPTION:
-# Banned. Use -DWITH_FOO=$(usex foo) instead.
-cmake-utils_use_with() { _cmake_banned_func WITH_ "$@" ; }
-
-# @FUNCTION: cmake-utils_use_enable
-# @INTERNAL
-# @DESCRIPTION:
-# Banned. Use -DENABLE_FOO=$(usex foo) instead.
-cmake-utils_use_enable() { _cmake_banned_func ENABLE_ "$@" ; }
-
-# @FUNCTION: cmake-utils_use_disable
-# @INTERNAL
-# @DESCRIPTION:
-# Banned. Use -DDISABLE_FOO=$(usex !foo) instead.
-cmake-utils_use_disable() { _cmake_banned_func DISABLE_ "$@" ; }
-
-# @FUNCTION: cmake-utils_use_no
-# @INTERNAL
-# @DESCRIPTION:
-# Banned. Use -DNO_FOO=$(usex !foo) instead.
-cmake-utils_use_no() { _cmake_banned_func NO_ "$@" ; }
-
-# @FUNCTION: cmake-utils_use_want
-# @INTERNAL
-# @DESCRIPTION:
-# Banned. Use -DWANT_FOO=$(usex foo) instead.
-cmake-utils_use_want() { _cmake_banned_func WANT_ "$@" ; }
-
-# @FUNCTION: cmake-utils_use_build
-# @INTERNAL
-# @DESCRIPTION:
-# Banned. Use -DBUILD_FOO=$(usex foo) instead.
-cmake-utils_use_build() { _cmake_banned_func BUILD_ "$@" ; }
-
-# @FUNCTION: cmake-utils_use_has
-# @INTERNAL
-# @DESCRIPTION:
-# Banned. Use -DHAVE_FOO=$(usex foo) instead.
-cmake-utils_use_has() { _cmake_banned_func HAVE_ "$@" ; }
-
-# @FUNCTION: cmake-utils_use_use
-# @INTERNAL
-# @DESCRIPTION:
-# Banned. Use -DUSE_FOO=$(usex foo) instead.
-cmake-utils_use_use() { _cmake_banned_func USE_ "$@" ; }
-
-# @FUNCTION: cmake-utils_use
-# @INTERNAL
-# @DESCRIPTION:
-# Banned. Use -DFOO=$(usex foo) instead.
-cmake-utils_use() { _cmake_banned_func "" "$@" ; }
-
-# @FUNCTION: cmake-utils_useno
-# @INTERNAL
-# @DESCRIPTION:
-# Banned. Use -DNOFOO=$(usex !foo) instead.
-cmake-utils_useno() { _cmake_banned_func "" "$@" ; }
-
 # @FUNCTION: _cmake_check_build_dir
 # @INTERNAL
 # @DESCRIPTION:
 # Determine using IN or OUT source build
 _cmake_check_build_dir() {
 	if [[ ${EAPI} == 7 ]]; then
-		: ${CMAKE_USE_DIR:=${S}}
+		: "${CMAKE_USE_DIR:=${S}}"
 	else
-		: ${CMAKE_USE_DIR:=${PWD}}
+		: "${CMAKE_USE_DIR:=${PWD}}"
 	fi
 	if [[ -n ${CMAKE_IN_SOURCE_BUILD} ]]; then
 		# we build in source dir
 		BUILD_DIR="${CMAKE_USE_DIR}"
 	else
-		: ${BUILD_DIR:=${CMAKE_USE_DIR}_build}
+		: "${BUILD_DIR:=${CMAKE_USE_DIR}_build}"
 	fi
 
 	einfo "Source directory (CMAKE_USE_DIR): \"${CMAKE_USE_DIR}\""
@@ -489,7 +412,7 @@ cmake_src_configure() {
 			# When cross-compiling with a sysroot (e.g. with crossdev's emerge wrappers)
 			# we need to tell cmake to use libs/headers from the sysroot but programs from / only.
 			cat >> "${toolchain_file}" <<- _EOF_ || die
-				set(CMAKE_FIND_ROOT_PATH "${SYSROOT}")
+				set(CMAKE_SYSROOT "${ESYSROOT}")
 				set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 				set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 				set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
@@ -526,6 +449,7 @@ cmake_src_configure() {
 		set(CMAKE_USER_MAKE_RULES_OVERRIDE "${build_rules}" CACHE FILEPATH "Gentoo override rules")
 		set(CMAKE_INSTALL_DOCDIR "${EPREFIX}/usr/share/doc/${PF}" CACHE PATH "")
 		set(BUILD_SHARED_LIBS ON CACHE BOOL "")
+		set(Python3_FIND_UNVERSIONED_NAMES FIRST CACHE STRING "")
 	_EOF_
 
 	if [[ -n ${_ECM_ECLASS} ]]; then
@@ -595,9 +519,9 @@ cmake_src_configure() {
 		-DCMAKE_TOOLCHAIN_FILE="${toolchain_file}"
 	)
 
-	if [[ -n ${MYCMAKEARGS} ]] ; then
-		cmakeargs+=( "${MYCMAKEARGS}" )
-	fi
+	# Handle quoted whitespace
+	eval "local -a MYCMAKEARGS=( ${MYCMAKEARGS} )"
+	cmakeargs+=( "${MYCMAKEARGS[@]}" )
 
 	if [[ -n "${CMAKE_EXTRA_CACHE_FILE}" ]] ; then
 		cmakeargs+=( -C "${CMAKE_EXTRA_CACHE_FILE}" )
@@ -648,14 +572,6 @@ cmake_build() {
 	popd > /dev/null || die
 }
 
-# @FUNCTION: cmake-utils_src_make
-# @INTERNAL
-# @DESCRIPTION:
-# Banned. Use cmake_build instead.
-cmake-utils_src_make() {
-	die "cmake-utils_src_make is banned. Use cmake_build instead"
-}
-
 # @FUNCTION: cmake_src_test
 # @DESCRIPTION:
 # Function for testing the package. Automatically detects the build type.
@@ -667,6 +583,7 @@ cmake_src_test() {
 	[[ -e CTestTestfile.cmake ]] || { echo "No tests found. Skipping."; return 0 ; }
 
 	[[ -n ${TEST_VERBOSE} ]] && myctestargs+=( --extra-verbose --output-on-failure )
+	[[ -n ${CMAKE_SKIP_TESTS} ]] && myctestargs+=( -E '('$( IFS='|'; echo "${CMAKE_SKIP_TESTS[*]}")')'  )
 
 	set -- ctest -j "$(makeopts_jobs "${MAKEOPTS}" 999)" \
 		--test-load "$(makeopts_loadavg)" "${myctestargs[@]}" "$@"
