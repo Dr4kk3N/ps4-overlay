@@ -56,7 +56,7 @@ NUGETS="avalonia-0.10.21
 	microsoft.codeanalysis.csharp-4.5.0
 	microsoft.codeanalysis.csharp.scripting-3.4.0
 	microsoft.codeanalysis.scripting.common-3.4.0
-	microsoft.codecoverage-17.6.2
+	microsoft.codecoverage-17.6.3
 	microsoft.csharp-4.3.0
 	microsoft.csharp-4.5.0
 	microsoft.csharp-4.7.0
@@ -78,9 +78,9 @@ NUGETS="avalonia-0.10.21
 	microsoft.netcore.platforms-2.1.2
 	microsoft.netcore.targets-1.0.1
 	microsoft.netcore.targets-1.1.0
-	microsoft.net.test.sdk-17.6.2
-	microsoft.testplatform.objectmodel-17.6.2
-	microsoft.testplatform.testhost-17.6.2
+	microsoft.net.test.sdk-17.6.3
+	microsoft.testplatform.objectmodel-17.6.3
+	microsoft.testplatform.testhost-17.6.3
 	microsoft.win32.primitives-4.0.1
 	microsoft.win32.registry-4.5.0
 	microsoft.win32.systemevents-7.0.0
@@ -321,7 +321,6 @@ LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
 PATCHES=(
-	"${FILESDIR}/${PN}-0001-better-defaults.patch"
 	"${FILESDIR}/${PN}-0002-disable-updates.patch"
 )
 
