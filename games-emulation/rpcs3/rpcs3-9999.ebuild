@@ -1,115 +1,117 @@
-# Copyright 2021-2022 Gentoo Authors
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=8
+EAPI=7
+PYTHON_COMPAT=( python3_{8..10} )
 
-inherit cmake flag-o-matic git-r3 xdg
+inherit cmake git-r3 python-single-r1 #flag-o-matic
 
-DESCRIPTION="PS3 emulator/debugger"
+#replace-cpu-flags btver2 x86-64-v2
+#append-flags -mtune=btver2
+
+DESCRIPTION="PlayStation 3 emulator"
 HOMEPAGE="https://rpcs3.net/"
 EGIT_REPO_URI="https://github.com/RPCS3/rpcs3"
-EGIT_SUBMODULES=( 'asmjit' 'llvm' '3rdparty/flatbuffers' '3rdparty/wolfssl'
-	'3rdparty/SoundTouch/soundtouch' )
-# Delete sources when ensuring yaml-cpp compiled with fexceptions
-EGIT_SUBMODULES+=( '3rdparty/yaml-cpp' )
-
+KEYWORDS=""
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS=""
+IUSE="alsa joystick +llvm pulseaudio vulkan"
+RESTRICT="network-sandbox"
 
-DEPEND="alsa? ( media-libs/alsa-lib )
-	faudio? ( app-emulation/faudio )
-	pulseaudio? ( media-sound/pulseaudio )
-	dev-qt/qtcore:5=
-	dev-qt/qtgui:5=
-	dev-qt/qtconcurrent:5=
-	dev-qt/qtdbus:5=
-	dev-qt/qtdeclarative:5=
-	dev-qt/qtnetwork:5=
-	dev-qt/qtwidgets:5=
-	dev-qt/qtmultimedia:5=
-	app-arch/p7zip
-	dev-libs/libevdev
-	dev-libs/pugixml
-	dev-libs/xxhash
-	media-libs/cubeb
-	media-libs/libpng
+RDEPEND="
+	>=dev-libs/pugixml-1.11
+	>=dev-qt/qtcore-5.15.2
+	>=dev-qt/qtdbus-5.15.2
+	>=dev-qt/qtgui-5.15.2
+	>=dev-qt/qtsvg-5.15.2
+	>=dev-qt/qtwidgets-5.15.2
+	>=dev-qt/qtmultimedia-5.15.2
+	alsa? ( media-libs/alsa-lib )
+	sys-devel/gdb
+	joystick? ( dev-libs/libevdev )
+	media-libs/glew:0
+	media-libs/libpng:*
 	media-libs/openal
-	sys-libs/zlib"
-#	dev-cpp/yaml-cpp
-RDEPEND="${DEPEND}"
-BDEPEND=""
+	media-video/ffmpeg
+	pulseaudio? ( media-sound/pulseaudio )
+	sys-libs/zlib
+	virtual/opengl
+	vulkan? ( media-libs/vulkan-loader )
+	x11-libs/libX11
+"
 
-IUSE="alsa discord faudio +llvm pulseaudio vulkan wayland"
+DEPEND="${RDEPEND}
+	>=sys-devel/gcc-9
+"
 
-src_unpack() {
-	git clone https://github.com/intel/ittapi "${WORKDIR}"/ittapi
-	git-r3_src_unpack
-}
+EGIT_SUBMODULES=(
+	"*"
+	"-3rdparty/FAudio"
+	"-3rdparty/curl"
+	"-3rdparty/ffmpeg"
+	"-3rdparty/libpng"
+	"-3rdparty/pugixml"
+	"-3rdparty/zlib"
+)
 
 src_prepare() {
-	append-cflags -DNDEBUG -Wno-error=stringop-truncation
-	append-cppflags -DNDEBUG -Wno-error=stringop-truncation
+	default
 
-	# Disable cache
-	sed -i -e '/find_program(CCACHE_FOUND/d' -e '/set(.*_FLAGS/d' \
-		CMakeLists.txt || die
-
-	# Unbundle hidapi
-	sed -i -e '/hidapi\.h/{s:":<hidapi/:;s/"/>/}' rpcs3/Input/hid_pad_handler.h || die
-	sed -i -e '/hidapi/d' 3rdparty/CMakeLists.txt
-	sed -i -e '1afind_package(PkgConfig REQUIRED)\npkg_check_modules(hidapi-hidraw REQUIRED hidapi-hidraw)' rpcs3/CMakeLists.txt
-	sed -i -e 's/3rdparty::hidapi/hidapi-hidraw/' rpcs3/CMakeLists.txt rpcs3/rpcs3qt/CMakeLists.txt || die
-	sed -i -e 's/hid_write_control/hid_write/' rpcs3/Input/dualsense_pad_handler.cpp rpcs3/Input/ds4_pad_handler.cpp || die
-
-	# Move ittapi to the right place via cmake
-	local regex='/GIT_EXECUTABLE} clone/s!(.*!(COMMAND mv '
-	regex+="${WORKDIR}"
-	regex+='/ittapi \${ITTAPI_SOURCE_DIR}!'
-	sed -i -e "${regex}" \
-		llvm/lib/ExecutionEngine/IntelJITEvents/CMakeLists.txt || die ${regex}
-
-	# Unbundle cubeb
-	sed -i -e '/cubeb/d' 3rdparty/CMakeLists.txt || die
-	sed -i -e '$afind_package(cubeb)\n' CMakeLists.txt || die
-	sed -i -e 's/3rdparty::cubeb/cubeb/' rpcs3/Emu/CMakeLists.txt || die
-
-	# Unbundle yaml-cpp: system yaml-cpp should be compiled with -fexceptions
-	# sed -i -e '/yaml-cpp/d' 3rdparty/CMakeLists.txt || die
-	# sed -i -e '$afind_package(yaml-cpp)\n' CMakeLists.txt || die
-	# sed -i -e 's/3rdparty::yaml-cpp/yaml-cpp/' rpcs3/Emu/CMakeLists.txt \
-	#	rpcs3/rpcs3qt/CMakeLists.txt || die
-
-	# Unbundle glslang SPIRV
-	sed -i -e '/add_subdirectory(glslang/d' \
-		-e '/add_subdirectory(SPIRV/d' \
-		-e '/if(VULKAN_FOUND)/afind_library(SPIRV libSPIRV.so)\nfind_library(SPIRV-Tools-opt libSPIRV-Tools-opt.so)\n' \
-		-e '/target_link_libraries.*SPIRV/{s/SPIRV-Tools-opt/${&}/;s/SPIRV /${SPIRV} /}' \
-		3rdparty/CMakeLists.txt || die
-	sed -i -e '/#include "SPIRV/{s:":<glslang/:;s/"/>/}' rpcs3/Emu/RSX/VK/VKCommonDecompiler.cpp || die
+	sed -i \
+		-e '/find_program(CCACHE_FOUND/d' \
+		CMakeLists.txt
+	sed -i \
+		-e 's/DEBUG|RELEASE|RELWITHDEBINFO|MINSIZEREL/DEBUG|RELEASE|RELWITHDEBINFO|MINSIZEREL|GENTOO/' \
+		llvm/CMakeLists.txt
+	sed -i \
+		-e '/-Werror/d' \
+		buildfiles/cmake/ConfigureCompiler.cmake
 
 	cmake_src_prepare
 }
 
 src_configure() {
+	# We can't use precompiled headers due to https://github.com/RPCS3/rpcs3/issues/8443
 	local mycmakeargs=(
-		-DBUILD_LLVM_SUBMODULE=OFF # ennoying really
-		-DBUILD_SHARED_LIBS=OFF # to remove after unbundling
-		-DUSE_DISCORD_RPC=$(usex discord)
-		-DUSE_FAUDIO=$(usex faudio)
-		-DUSE_PRECOMPILED_HEADERS=ON
-		-DUSE_SYSTEM_CURL=ON
+		-DUSE_NATIVE_INSTRUCTIONS=OFF
+		-DWITH_LLVM=$(usex llvm ON OFF)
+		-DUSE_ALSA=$(usex alsa ON OFF)
+		-DUSE_DISCORD_RPC=OFF
+		-DUSE_PULSE=$(usex pulseaudio ON OFF)
+		-DUSE_FAUDIO=OFF
+		-DUSE_LIBEVDEV=$(usex joystick ON OFF)
+		-DUSE_VULKAN=$(usex vulkan ON OFF)
+		-DUSE_PRECOMPILED_HEADERS=OFF
 		-DUSE_SYSTEM_LIBPNG=ON
-		-DUSE_SYSTEM_LIBUSB=ON
+		-DUSE_SYSTEM_FFMPEG=ON
+		-DUSE_SYSTEM_CURL=ON
 		-DUSE_SYSTEM_PUGIXML=ON
-		-DUSE_SYSTEM_XXHASH=ON
-		-DUSE_SYSTEM_ZLIB=ON
-		-DUSE_VULKAN=$(usex vulkan)
-		-DWITH_LLVM=$(usex llvm)
+		-DCMAKE_C_FLAGS="${CFLAGS}"
+		-DCMAKE_C_FLAGS_GENTOO="${CFLAGS}"
+		-DCMAKE_CXX_FLAGS="${CXXFLAGS}"
+		-DCMAKE_CXX_FLAGS_GENTOO="${CXXFLAGS}"
+		-DBUILD_SHARED_LIBS=OFF
+		-DDISABLE_LTO=TRUE
 	)
-	use faudio && mycmakeargs+=( -DUSE_SYSTEM_FAUDIO=$(usex faudio) )
-	CMAKE_BUILD_TYPE=RELEASE cmake_src_configure
-	sed -i -e 's/FFMPEG_LIB_AVFORMAT-NOTFOUND/avformat/' -e 's/FFMPEG_LIB_AVCODEC-NOTFOUND/avcodec/' \
-		-e 's/FFMPEG_LIB_AVUTIL-NOTFOUND/avutil/' -e 's/FFMPEG_LIB_SWSCALE-NOTFOUND/swscale/' \
-		-e 's/FFMPEG_LIB_SWRESAMPLE-NOTFOUND/swresample/' "${BUILD_DIR}"/build.ninja || die
+	# https://github.com/RPCS3/rpcs3/pull/8609
+	if use vulkan; then
+		mycmakeargs+=( -DCMAKE_DISABLE_FIND_PACKAGE_Wayland=TRUE )
+	fi
+
+	cmake_src_configure
+}
+
+src_install() {
+	cmake_src_install
+
+	mv "${ED}"/usr/bin/rpcs3 "${ED}"/usr/bin/rpcs3.bin
+	cat <<EOF > "${T}"/rpcs3
+#!/bin/sh
+
+# https://github.com/RPCS3/rpcs3/issues/7772
+export QT_AUTO_SCREEN_SCALE_FACTOR=0
+
+exec rpcs3.bin
+EOF
+	dobin "${T}"/rpcs3
 }
