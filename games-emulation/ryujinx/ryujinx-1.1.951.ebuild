@@ -12,6 +12,7 @@ SHA="3b46bb73f781a011705ecbc8a1d3207dfb145829"
 MY_PN="R${PN:1}"
 NUGETS="avalonia-0.10.21
 	avalonia.angle.windows.natives-2.1.0.2020091801
+	avalonia.buildservices-0.0.16
 	avalonia.controls.datagrid-0.10.21
 	avalonia.desktop-0.10.21
 	avalonia.diagnostics-0.10.21
@@ -25,7 +26,6 @@ NUGETS="avalonia-0.10.21
 	avalonia.svg.skia-0.10.18
 	avalonia.win32-0.10.21
 	avalonia.x11-0.10.21
-	avalonia.buildservices-0.0.16
 	commandlineparser-2.9.1
 	concentus-1.1.7
 	discordrichpresence-1.1.3.18
@@ -89,7 +89,7 @@ NUGETS="avalonia-0.10.21
 	netstandard.library-2.0.0
 	netstandard.library-2.0.3
 	newtonsoft.json-13.0.1
-	nuget.frameworks-6.6.0
+	nuget.frameworks-6.5.0
 	nunit-3.13.3
 	nunit3testadapter-4.1.0
 	opentk.core-4.7.7
@@ -229,6 +229,7 @@ NUGETS="avalonia-0.10.21
 	system.objectmodel-4.0.12
 	system.objectmodel-4.3.0
 	system.private.uri-4.3.0
+	system.reactive-5.0.0
 	system.reactive-6.0.0
 	system.reflection-4.1.0
 	system.reflection-4.3.0
@@ -321,6 +322,7 @@ LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
 PATCHES=(
+	"${FILESDIR}/${PN}-0001-better-defaults.patch"
 	"${FILESDIR}/${PN}-0002-disable-updates.patch"
 )
 
@@ -330,8 +332,7 @@ src_install() {
 	newicon distribution/misc/Logo.svg "${MY_PN}.svg"
 	insinto /usr/share/mime/packages
 	doins "distribution/linux/mime/${MY_PN}.xml"
-	insinto /usr/share/applications
-	doins "distribution/linux/${MY_PN}.desktop"
+	domenu "distribution/linux/${MY_PN}.desktop"
 	dobin "src/${MY_PN}/bin/Release/net${DOTNET_SLOT}/linux-x64/publish/${MY_PN}"
 	einstalldocs
 }
