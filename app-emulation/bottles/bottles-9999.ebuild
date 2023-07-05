@@ -1,35 +1,29 @@
-# Copyright 1999-2022 Gentoo Authors
+# Copyright 2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{9..10} )
-inherit optfeature gnome2-utils python-single-r1 meson xdg
+PYTHON_COMPAT=( python3_{10..11} )
+inherit gnome2-utils python-single-r1 meson xdg optfeature
 
-DESCRIPTION="Easily manage WINE prefixes in a new way"
-HOMEPAGE="
-	https://usebottles.com/
-	https://github.com/bottlesdevs/Bottles
-"
+DESCRIPTION="Run Windows software and games on Linux"
+HOMEPAGE="https://usebottles.com/"
 
-LICENSE="GPL-3+"
-SLOT="0"
-
-if [[ "${PV}" == *9999* ]]; then
+if [[ "${PV}" == "9999" ]]; then
 	inherit git-r3
-	EGIT_REPO_URI="https://github.com/bottlesdevs/${PN^}.git"
+	EGIT_REPO_URI="https://github.com/bottlesdevs/Bottles/"
 else
-	year="${PV::4}" month="${PV:4:2}" day="${PV:6:2}" patch="${PV:10:1}"
-	MY_PV="${year}.${month}.${day}${patch:+".${patch}"}"
-	SRC_URI="https://github.com/bottlesdevs/${PN^}/archive/refs/tags/${MY_PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="-* ~amd64"
-	S="${WORKDIR}/${PN^}-${MY_PV}"
+	SRC_URI="https://github.com/bottlesdevs/Bottles/archive/refs/tags/${PV}.tar.gz -> ${P}.tar.gz"
+	S="${WORKDIR}/Bottles-${PV}"
+	KEYWORDS="~amd64"
 fi
 
-RESTRICT="!test? ( test )"
-PROPERTIES="test_network"
+LICENSE="GPL-3"
+SLOT="0"
+
 IUSE="test"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
+RESTRICT="!test? ( test )"
 
 # Very annoying to figure out the deps
 # Script for getting python modules:
@@ -65,26 +59,29 @@ RDEPEND="
 	$(python_gen_cond_dep '
 		app-arch/patool[${PYTHON_USEDEP}]
 		dev-python/FVS[${PYTHON_USEDEP}]
-		dev-python/pygobject[${PYTHON_USEDEP}]
 		dev-python/icoextract[${PYTHON_USEDEP}]
 		dev-python/markdown[${PYTHON_USEDEP}]
 		dev-python/orjson[${PYTHON_USEDEP}]
+		dev-python/pathvalidate[${PYTHON_USEDEP}]
 		dev-python/pefile[${PYTHON_USEDEP}]
+		dev-python/pycairo[${PYTHON_USEDEP}]
 		dev-python/pycurl[${PYTHON_USEDEP}]
+		dev-python/pygobject[${PYTHON_USEDEP}]
+		dev-python/pyyaml[${PYTHON_USEDEP}]
 		dev-python/requests[${PYTHON_USEDEP}]
 		dev-python/vkbasalt-cli[${PYTHON_USEDEP}]
-		dev-python/pyyaml[${PYTHON_USEDEP}]
+		dev-python/wheel[${PYTHON_USEDEP}]
 	')
 "
 BDEPEND="
 	${PYTHON_DEPS}
-	app-text/blueprint-compiler
+	dev-util/blueprint-compiler
 	dev-libs/glib:2
 	sys-devel/gettext
 	test? (
-		dev-libs/appstream
-		dev-libs/glib
-		dev-util/desktop-file-utils
+		$(python_gen_cond_dep '
+			dev-python/pytest[${PYTHON_USEDEP}]
+		')
 	)
 "
 
@@ -92,19 +89,23 @@ pkg_setup() {
 	python-single-r1_pkg_setup
 }
 
-src_prepare() {
-	eapply_user
-
-	if [[ "${PV}" == *9999* ]]; then
-		# https://github.com/bottlesdevs/Bottles#notices-for-package-maintainers
-		sed -i "s/\(.*\)/\1-$(git rev-parse --short HEAD)/" "${S}/VERSION" || die
+src_configure() {
+	if  [[ "${PV}" == "9999" ]]; then
+		local emesonargs=(
+			-Ddevel=true
+		)
 	fi
+	meson_src_configure
 }
 
 src_install() {
 	meson_src_install
 	python_optimize "${D}/usr/share/bottles/"
 	python_fix_shebang "${D}/usr/"
+}
+
+src_test() {
+	epytest
 }
 
 pkg_preinst() {
