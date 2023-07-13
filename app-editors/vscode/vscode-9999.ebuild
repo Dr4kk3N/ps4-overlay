@@ -1,9 +1,9 @@
-# Copyright 2009-2022 Gentoo Authors
+# Copyright 2009-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{8..10} )
+PYTHON_COMPAT=( python3_{10..12} )
 
 inherit desktop flag-o-matic multilib ninja-utils pax-utils portability python-any-r1 toolchain-funcs xdg-utils
 
@@ -11,26 +11,25 @@ DESCRIPTION="Visual Studio Code - Open Source"
 HOMEPAGE="https://github.com/microsoft/vscode"
 LICENSE="MIT"
 SLOT="0"
-VS_RIPGREP_V="1.14.2"
+VS_RIPGREP_V="1.15.0"
 SRC_URI="
 	https://registry.yarnpkg.com/@vscode/ripgrep/-/ripgrep-${VS_RIPGREP_V}.tgz -> @vscode-ripgrep-${VS_RIPGREP_V}.tgz
 "
 
 REPO="https://github.com/microsoft/vscode"
-ELECTRON_SLOT_DEFAULT="19"
+ELECTRON_SLOT_DEFAULT="22"
 #CODE_COMMIT_ID="ae245c9b1f06e79cec4829f8cd1555206b0ec8f2"
 
 if [[ ${PV} = *9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="${REPO}.git"
 	DOWNLOAD=""
-	IUSE="badge-providers +build-online electron-20 electron-21 electron-22 insiders liveshare openvsx substitute-urls"
+	IUSE="badge-providers +build-online electron-19 electron-20 electron-21 electron-23 electron-24 electron-25 insiders liveshare openvsx substitute-urls"
 else
-	IUSE="badge-providers build-online electron-20 electron-21 electron-22 insiders liveshare openvsx substitute-urls"
+	IUSE="badge-providers build-online electron-19 electron-20 electron-21 electron-23 electron-24 electron-25 insiders liveshare openvsx substitute-urls"
 	KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
 	DOWNLOAD="${REPO}/archive/"
-	if [ -z "$CODE_COMMIT_ID" ]
-	then
+	if [ -z "$CODE_COMMIT_ID" ]; then
 		DOWNLOAD+="${PV}.tar.gz -> ${P}.tar.gz"
 	else
 		DOWNLOAD+="${CODE_COMMIT_ID}.tar.gz -> ${PN}-${CODE_COMMIT_ID}.tar.gz"
@@ -47,14 +46,20 @@ COMMON_DEPEND="
 	>=x11-libs/libX11-1.6.9:=
 	>=x11-libs/libxkbfile-1.1.0:=
 	sys-apps/ripgrep
+	electron-19? ( dev-util/electron:19 )
 	electron-20? ( dev-util/electron:20 )
 	electron-21? ( dev-util/electron:21 )
-	electron-22? ( dev-util/electron:22 )
+	electron-23? ( dev-util/electron:23 )
+	electron-24? ( dev-util/electron:24 )
+	electron-25? ( dev-util/electron:25 )
+	!electron-19? (
 	!electron-20? (
 	!electron-21? (
-	!electron-22? (
+	!electron-23? (
+	!electron-24? (
+	!electron-25? (
 		dev-util/electron:${ELECTRON_SLOT_DEFAULT}
-	) ) )
+	) ) ) ) ) )
 "
 #TODO: oniguruma?
 
@@ -65,16 +70,23 @@ DEPEND="${COMMON_DEPEND}
 
 BDEPEND="
 	${PYTHON_DEPS}
+	net-libs/nodejs
 	sys-apps/yarn
 "
 
 src_unpack() {
-	if use electron-20; then
+	if use electron-19; then
+		export ELECTRON_SLOT=19
+	elif use electron-20; then
 		export ELECTRON_SLOT=20
 	elif use electron-21; then
 		export ELECTRON_SLOT=21
-	elif use electron-22; then
-		export ELECTRON_SLOT=22
+	elif use electron-23; then
+		export ELECTRON_SLOT=23
+	elif use electron-24; then
+		export ELECTRON_SLOT=24
+	elif use electron-25; then
+		export ELECTRON_SLOT=25
 	else
 		export ELECTRON_SLOT=$ELECTRON_SLOT_DEFAULT
 	fi
@@ -82,9 +94,9 @@ src_unpack() {
 		if [ -f "${DISTDIR}/${P}.tar.gz" ]; then
 			unpack "${P}".tar.gz || die
 		else
-			if use electron-22; then
-				EGIT_BRANCH="electron-$ELECTRON_SLOT.x.y"
-			fi
+			# if use electron-24; then
+			# 	EGIT_BRANCH="electron-24.x.y"
+			# fi
 			git-r3_src_unpack
 		fi
 	else
@@ -109,28 +121,14 @@ src_prepare() {
 	einfo "Allowing any nodejs version"
 	sed -i 's/if (majorNodeVersion < 16.*/if (false){/' build/npm/preinstall.js || die
 
-	einfo "Removing extensions/npm. Seems to be broken. PRs with fixes are always welcome."
+	ewarn "Removing extensions/npm"
+	ewarn "Please poke Microsoft here: https://github.com/microsoft/vscode/issues/181598"
 	rm -r extensions/npm
 	sed -i '/extensions\/npm/d' build/npm/dirs.js || die
 
 	#TODO: applicationinsights
 	# sed -i '/applicationinsights/d' package.json || die
 	# sed -i '/buildWebNodePaths/d' build/gulpfile.compile.js || die
-
-	if ! use build-online; then
-		#TODO: remove after esbuild dep >= 0.13.0 vvvvv
-		sed -i '/"esbuild"/d' extensions/package.json || die
-		sed -i '/"esbuild"/d' build/package.json || die
-		#TODO: remove after esbuild dep >= 0.13.0 ^^^^^
-
-		# einfo "Removing markdown-math. Enable build-online if you need it."
-		# rm -r extensions/markdown-math
-		# sed -i '/markdown-math/d' build/filters.js || die
-		# sed -i '/markdown-math/d' build/npm/dirs.js || die
-		# sed -i '/markdown-math/d' build/gulpfile.extensions.js || die
-		# sed -i '/markdown-math/d' build/lib/extensions.js || die
-		# sed -i '/markdown-math/d' build/lib/extensions.ts || die
-	fi
 
 	# sed -i '/"electron"/d' package.json || die
 	# sed -i '/vscode-ripgrep/d' remote/package.json || die
@@ -168,26 +166,22 @@ src_prepare() {
 	mv product.json product.json.bak || die
 	sed -i '1d' product.json.bak || die
 
-	if use liveshare
-	then
-	sed -i 's/"ms-vscode.vscode-js-profile-flame",/"ms-vscode.vscode-js-profile-flame", "ms-vsliveshare.vsliveshare",/' product.json.bak || die
+	if use liveshare; then
+		sed -i 's/"ms-vscode.vscode-js-profile-flame",/"ms-vscode.vscode-js-profile-flame", "ms-vsliveshare.vsliveshare",/' product.json.bak || die
 	fi
 
-	if use insiders
-	then
-	sed -i 's/"ms-vscode.vscode-js-profile-flame",/"ms-vscode.references-view", "ms-vsliveshare.vsliveshare", "ms-vsliveshare.cloudenv", "ms-vsliveshare.cloudenv-explorer", "ms-vsonline.vsonline", "GitHub.vscode-pull-request-github", "GitHub.vscode-pull-request-github-insiders", "Microsoft.vscode-nmake-tools", "ms-vscode-remote.remote-containers", "ms-vscode-remote.remote-containers-nightly", "ms-vscode-remote.remote-ssh", "ms-vscode-remote.remote-ssh-nightly", "ms-vscode-remote.remote-ssh-edit", "ms-vscode-remote.remote-ssh-edit-nightly", "ms-vscode-remote.remote-wsl", "ms-vscode-remote.remote-wsl-nightly", "ms-vscode-remote.vscode-remote-extensionpack", "ms-vscode-remote.vscode-remote-extensionpack-nightly", "ms-azuretools.vscode-docker", "ms-vscode.azure-account", "ms-vscode.js-debug", "ms-vscode.js-debug-nightly", "ms-vscode.vscode-js-profile-table", "ms-vscode.vscode-js-profile-flame", "ms-vscode.vscode-github-issue-notebooks", "ms-vscode.vscode-markdown-notebook", "ms-azuretools.vscode-azurestaticwebapps", "ms-dotnettools.dotnet-interactive-vscode", "ms-python.python", "ms-ai-tools.notebook-renderers",/' product.json.bak || die
+	if use insiders; then
+		sed -i 's/"ms-vscode.vscode-js-profile-flame",/"ms-vscode.references-view", "ms-vsliveshare.vsliveshare", "ms-vsliveshare.cloudenv", "ms-vsliveshare.cloudenv-explorer", "ms-vsonline.vsonline", "GitHub.vscode-pull-request-github", "GitHub.vscode-pull-request-github-insiders", "Microsoft.vscode-nmake-tools", "ms-vscode-remote.remote-containers", "ms-vscode-remote.remote-containers-nightly", "ms-vscode-remote.remote-ssh", "ms-vscode-remote.remote-ssh-nightly", "ms-vscode-remote.remote-ssh-edit", "ms-vscode-remote.remote-ssh-edit-nightly", "ms-vscode-remote.remote-wsl", "ms-vscode-remote.remote-wsl-nightly", "ms-vscode-remote.vscode-remote-extensionpack", "ms-vscode-remote.vscode-remote-extensionpack-nightly", "ms-azuretools.vscode-docker", "ms-vscode.azure-account", "ms-vscode.js-debug", "ms-vscode.js-debug-nightly", "ms-vscode.vscode-js-profile-table", "ms-vscode.vscode-js-profile-flame", "ms-vscode.vscode-github-issue-notebooks", "ms-vscode.vscode-markdown-notebook", "ms-azuretools.vscode-azurestaticwebapps", "ms-dotnettools.dotnet-interactive-vscode", "ms-python.python", "ms-ai-tools.notebook-renderers",/' product.json.bak || die
 	fi
 
 	cat "${FILESDIR}/heading.json" > product.json
-	if use openvsx
-	then
+	if use openvsx; then
 		cat "${FILESDIR}/openvsx.json" >> product.json
 	else
 		cat "${FILESDIR}/marketplace.json" >> product.json
 	fi
 
-	if use badge-providers
-	then
+	if use badge-providers; then
 		cat "${FILESDIR}/badge_prov.json" >> product.json
 	fi
 
@@ -201,14 +195,13 @@ src_prepare() {
 	einfo "Disabling automatic updates by default"
 	perl -0777 -pi -e "s/enum: \['none', 'manual', 'start', 'default'\],\n\s*default: 'default',/enum: ['none', 'manual', 'start', 'default'], default: 'none',/m or die" src/vs/platform/update/common/update.config.contribution.ts || die
 
-	if use substitute-urls
-	then
-		ebegin "Substituting urls"
-			#Taken from VSCodium
-			TELEMETRY_URLS="[^/]+\.data\.microsoft\.com"
-			REPLACEMENT="s/$TELEMETRY_URLS/0\.0\.0\.0/g"
-			grep -rl --exclude-dir=.git -E $TELEMETRY_URLS . | xargs sed -i -E $REPLACEMENT
-		eend $? || die
+	if use substitute-urls; then
+	ebegin "Substituting urls"
+		#Taken from VSCodium
+		TELEMETRY_URLS="[^/]+\.data\.microsoft\.com"
+		REPLACEMENT="s/$TELEMETRY_URLS/0\.0\.0\.0/g"
+		grep -rl --exclude-dir=.git -E $TELEMETRY_URLS . | xargs sed -i -E $REPLACEMENT
+	eend $? || die
 	fi
 }
 
@@ -216,18 +209,20 @@ src_configure() {
 
 	local myarch="$(tc-arch)"
 
-	if [[ $myarch = amd64 ]] ; then
+	if [[ $myarch = amd64 ]]; then
 		VSCODE_ARCH="x64"
-	elif [[ $myarch = x86 ]] ; then
+	elif [[ $myarch = x86 ]]; then
 		VSCODE_ARCH="ia32"
-	elif [[ $myarch = ppc64 ]] ; then
+	elif [[ $myarch = ppc64 ]]; then
 		VSCODE_ARCH="ppc64"
 	else
 		die "Failed to determine target arch, got '$myarch'."
 	fi
+	#TODO: exported but unavailable if emerge/ebuild restarted
+	export VSCODE_ARCH
 
 	#TODO: should work starting with electron-22
-	if use electron-20 || use electron-21 ; then
+	if use electron-20 || use electron-21 || use electron-23 || use electron-24; then
 		CPPFLAGS="${CPPFLAGS} -std=c++17";
 		use build-online || eerror "build-online should be enabled for nan substitution to work" || die;
 		sed -i 's$"resolutions": {$"resolutions": {"nan": "^2.17.0",$' package.json || die;
@@ -243,11 +238,11 @@ src_configure() {
 	export CFLAGS="${CFLAGS} -I/usr/include/electron-${ELECTRON_SLOT}/node"
 	export CPPFLAGS="${CPPFLAGS} -I/usr/include/electron-${ELECTRON_SLOT}/node"
 	export ELECTRON_SKIP_BINARY_DOWNLOAD=1
+	export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 	# echo "$PATH"
 	yarn config set disable-self-update-check true || die
 	yarn config set nodedir /usr/include/electron-${ELECTRON_SLOT}/node || die
-	if ! use build-online
-	then
+	if ! use build-online; then
 		ONLINE_OFFLINE="--offline"
 		yarn config set yarn-offline-mirror "${DISTDIR}" || die
 	fi
@@ -263,82 +258,39 @@ src_configure() {
 	# Workaround md4 see https://github.com/webpack/webpack/issues/14560
 	find node_modules/webpack/lib -type f -exec sed -i 's|md4|sha512|g' {} \; || die
 	# For webpack >= 5.61.0
-	# sed -i 's/case "sha512"/case "md4"/' node_modules/webpack/lib/util/createHash.js || die
+	sed -i 's/case "sha512"/case "md4"/' node_modules/webpack/lib/util/createHash.js || die
 
 	export PATH=${OLD_PATH}
 
 	einfo "Restoring vscode-ripgrep"
 	pushd "node_modules/@vscode" > /dev/null || die
-	tar -xf "${DISTDIR}/@vscode-ripgrep-${VS_RIPGREP_V}.tgz"
-	mv package ripgrep
-	sed -i 's$module.exports.rgPath.*$module.exports.rgPath = "/usr/bin/rg";\n$' ripgrep/lib/index.js || die
-	sed -i '/"postinstall"/d' ripgrep/package.json || die
+		tar -xf "${DISTDIR}/@vscode-ripgrep-${VS_RIPGREP_V}.tgz"
+		mv package ripgrep
+		sed -i 's$module.exports.rgPath.*$module.exports.rgPath = "/usr/bin/rg";\n$' ripgrep/lib/index.js || die
+		sed -i '/"postinstall"/d' ripgrep/package.json || die
 	popd > /dev/null || die
 	eend $? || die
 	sed -i "s/\"dependencies\": {/\"dependencies\": {\"@vscode\/ripgrep\": \"^${VS_RIPGREP_V}\",/" package.json || die
 
-	#TODO: remove after esbuild dep >= 0.13.0 vvvvv
-	if ! use build-online; then
-	einfo "Restoring esbuild in build"
-	pushd build/node_modules > /dev/null || die
-	tar -xf "${DISTDIR}/esbuild-${VS_ESBUILD_V}.tgz"
-	mv package esbuild
-	if [[ $myarch = amd64 ]] ; then
-		tar -xf "${DISTDIR}/esbuild-linux-64-${VS_ESBUILD_V}.tgz"
-		cp -f package/bin/esbuild esbuild/bin/
-		mv package esbuild-linux-64
-	elif [[ $myarch = ppc64 ]] ; then
-		tar -xf "${DISTDIR}/esbuild-linux-ppc64le-${VS_ESBUILD_V}.tgz"
-		cp -f package/bin/esbuild esbuild/bin/
-		mv package esbuild-linux-ppc64le
-	else
-		tar -xf "${DISTDIR}/esbuild-linux-32-${VS_ESBUILD_V}.tgz"
-		cp -f package/bin/esbuild esbuild/bin/
-		mv package esbuild-linux-32
-	fi
-	popd > /dev/null || die
-	eend $? || die
-	fi
-
-	if ! use build-online; then
-	einfo "Restoring esbuild in extensions"
-	mkdir -p extensions/node_modules
-	pushd extensions/node_modules > /dev/null || die
-	tar -xf "${DISTDIR}/esbuild-${VS_ESBUILD_V}.tgz"
-	mv package esbuild
-	if [[ $myarch = amd64 ]] ; then
-		tar -xf "${DISTDIR}/esbuild-linux-64-${VS_ESBUILD_V}.tgz"
-		cp -f package/bin/esbuild esbuild/bin/
-		mv package esbuild-linux-64
-	elif [[ $myarch = ppc64 ]] ; then
-		tar -xf "${DISTDIR}/esbuild-linux-ppc64le-${VS_ESBUILD_V}.tgz"
-		cp -f package/bin/esbuild esbuild/bin/
-		mv package esbuild-linux-ppc64le
-	else
-		tar -xf "${DISTDIR}/esbuild-linux-32-${VS_ESBUILD_V}.tgz"
-		cp -f package/bin/esbuild esbuild/bin/
-		mv package esbuild-linux-32
-	fi
-	popd > /dev/null || die
-	eend $? || die
-	fi
-	#TODO: remove after esbuild dep >= 0.13.0 ^^^^^
-
 	#rm extensions/css-language-features/server/test/pathCompletionFixtures/src/data/foo.asar
 	#rm -rf extensions/css-language-features/server/test > /dev/null || die
 
-	einfo "Editing build/lib/util.js"
-	sed -i 's/.*\!version.*/if \(false\)\{/' build/lib/util.js || die
+	einfo "Editing build/lib/getVersion.js"
+	sed -i '/.*\!version.*/{s++if \(false\)\{+;h};${x;/./{x;q0};x;q1}' \
+		build/lib/getVersion.js || die
+
+	#TODO Although this allows the build to continue, it renders vscode unusable
+	#TODO Does it really? Investigate later
+	# einfo "Fixing l10n-dev"
+	# sed -i 's/return await import_web_tree_sitter/return null; await import_web_tree_sitter/' node_modules/@vscode/l10n-dev/dist/main.js || die
 }
 
 src_compile() {
 
-	if [ -d ".git" ]
-	then
+	if [ -d ".git" ]; then
 	    COMMIT_ID="$(git rev-parse HEAD)"
 	else
-		if [ -z "$CODE_COMMIT_ID" ]
-		then
+		if [ -z "$CODE_COMMIT_ID" ]; then
 			COMMIT_ID="${PV}"
 		else
 			COMMIT_ID="${CODE_COMMIT_ID}"
@@ -352,7 +304,8 @@ src_compile() {
 	PATH="/usr/$(get_libdir)/electron-${ELECTRON_SLOT}:$PATH"
 	export PATH
 
-	node --max_old_space_size=8192 node_modules/gulp/bin/gulp.js vscode-linux-${VSCODE_ARCH}-min || die
+	# Real nodejs needed (/usr/bin/node). See https://github.com/microsoft/vscode-l10n/issues/104
+	/usr/bin/node --max_old_space_size=8192 node_modules/gulp/bin/gulp.js vscode-linux-${VSCODE_ARCH}-min || die
 
 	export PATH=${OLD_PATH}
 }
@@ -364,17 +317,22 @@ src_install() {
 	PATH="/usr/$(get_libdir)/electron-${ELECTRON_SLOT}:$PATH"
 	export PATH
 
-	YARN_CACHE_FOLDER="${T}/.yarn-cache" node node_modules/gulp/bin/gulp.js vscode-linux-${VSCODE_ARCH}-prepare-deb || die
+	# Real nodejs needed (/usr/bin/node). See https://github.com/microsoft/vscode-l10n/issues/104
+	YARN_CACHE_FOLDER="${T}/.yarn-cache" /usr/bin/node node_modules/gulp/bin/gulp.js vscode-linux-${VSCODE_ARCH}-prepare-deb || die
 	local VSCODE_HOME="/usr/$(get_libdir)/vscode"
 
 	exeinto "${VSCODE_HOME}"
 	sed -i '/^ELECTRON/,+3d' "${WORKDIR}"/V*/bin/code-oss || die
+
+	awk -i inplace -v text="$(cat ${FILESDIR}/read_flags_file)" '!/^#/ && !p {print text; p=1} 1' "${WORKDIR}"/V*/bin/code-oss
+	sed -i "s|@ELECTRON@|electron-${ELECTRON_SLOT}|" "${WORKDIR}"/V*/bin/code-oss
+
 	echo "VSCODE_PATH=\"/usr/$(get_libdir)/vscode\"
 	ELECTRON_PATH=\"/usr/$(get_libdir)/electron-${ELECTRON_SLOT}\"
 	CLI=\"\${VSCODE_PATH}/out/cli.js\"
 	exec /usr/bin/env ELECTRON_RUN_AS_NODE=1 \
 	NPM_CONFIG_NODEDIR=\"\${ELECTRON_PATH}/node/\" \
-	\"\${ELECTRON_PATH}/electron\" \"\${CLI}\" --app=\"\${VSCODE_PATH}\" \"\$@\"" >> "${WORKDIR}"/V*/bin/code-oss
+	\"\${ELECTRON_PATH}/electron\" \"\${CLI}\" --app=\"\${VSCODE_PATH}\" \"\${flags[@]}\" \"\$@\"" >> "${WORKDIR}"/V*/bin/code-oss
 	doexe "${WORKDIR}"/VSCode-linux-${VSCODE_ARCH}/bin/code-oss
 	dosym "${VSCODE_HOME}/code-oss" /usr/bin/code-oss
 
@@ -385,6 +343,8 @@ src_install() {
 	doins "${WORKDIR}"/VSCode-linux-${VSCODE_ARCH}/*.json
 	doins "${WORKDIR}"/VSCode-linux-${VSCODE_ARCH}/node_modules.asar
 	doins -r "${WORKDIR}"/VSCode-linux-${VSCODE_ARCH}/node_modules.asar.unpacked
+	fperms +x ${VSCODE_HOME}/out/vs/base/node/cpuUsage.sh
+	# fperms +x ${VSCODE_HOME}/node_modules.asar.unpacked/node-pty/build/Release/spawn-helper
 
 	pushd .build/linux/deb/*/code-oss-*/usr/share/ > /dev/null || die
 
