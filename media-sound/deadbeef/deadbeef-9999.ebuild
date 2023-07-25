@@ -71,7 +71,6 @@ BDEPEND="
 "
 
 src_prepare() {
-	xdg_src_prepare
 	if [[ -n ${PV%%*9999} ]]; then
 		mv "${WORKDIR}"/${MY_MP}/* "${S}"/external/mp4p
 	fi
@@ -79,9 +78,20 @@ src_prepare() {
 	sed \
 		-e "s,#define DEFAULT_TIMIDITY_CONFIG \",&${_t}:," \
 		-i plugins/wildmidi/wildmidiplug.c
+
 	default
 	eautopoint --force
 	eautoreconf
+
+	# Get rid of bundled gettext.
+	drop_and_stub "${S}/intl"
+
+	# Plugins that are undesired for whatever reason, candidates for unbundling and such.
+	for i in adplug alac dumb ffap mms gme lfs mono2stereo psf sc60 shn sid soundtouch wma; do
+		drop_and_stub "${S}/plugins/${i}"
+	done
+
+	rm -rf "${S}/plugins/rg_scanner/ebur128"
 }
 
 src_configure () {
