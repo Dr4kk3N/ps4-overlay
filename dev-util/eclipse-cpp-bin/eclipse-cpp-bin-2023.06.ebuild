@@ -74,12 +74,12 @@ _unbundle_known() {
         local mode="${1}"
 
         # https://wiki.gentoo.org/wiki/Eclipse/Building_From_Source
-	_unbundle_single "${mode}" plugins/org.slf4j.api_1.7.30.v20221112-0806.jar slf4j-api slf4j-api.jar
-        _unbundle_single "${mode}" plugins/com.ibm.icu_73.1.0.jar icu4j-70 icu4j.jar
+#	_unbundle_single "${mode}" plugins/org.slf4j.api_1.7.30.v20221112-0806.jar slf4j-api slf4j-api.jar
+         _unbundle_single "${mode}" plugins/com.ibm.icu_73.1.0.jar icu4j-70 icu4j.jar
 #        _unbundle_single "${mode}" plugins/javax.annotation_1.3.5.v20230504-0748.jar jsr305 jsr305.jar
-        _unbundle_single "${mode}" plugins/javax.inject_1.0.0.v20220405-0441.jar javax-inject javax-inject.jar
+#        _unbundle_single "${mode}" plugins/javax.inject_1.0.0.v20220405-0441.jar javax-inject javax-inject.jar
 #        _unbundle_single "${mode}" plugins/org.apache.commons.httpclient_3.1.0.v201012070820.jar commons-httpclient-3 commons-httpclient.jar
-        _unbundle_single "${mode}" plugins/org.apache.xml.resolver_1.2.0.v20220715-1206.jar xml-commons-resolver xml-commons-resolver.jar
+#        _unbundle_single "${mode}" plugins/org.apache.xml.resolver_1.2.0.v20220715-1206.jar xml-commons-resolver xml-commons-resolver.jar
 }
 
 src_prepare() {
