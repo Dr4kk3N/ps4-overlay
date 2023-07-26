@@ -22,12 +22,12 @@ IUSE=""
 # kde-frameworks/kwindowsystem: Various private headers
 DEPEND="
 	>=dev-libs/wayland-1.15
-	>=dev-qt/qtgui-${QTMIN}:6=
+	>=dev-qt/qtbase-${QTMIN}:6=
 	|| (
-		>=dev-qt/qtgui-${QTMIN}:6[libinput]
-		>=dev-qt/qtgui-${QTMIN}:6[X]
+		>=dev-qt/qtbase-${QTMIN}:6[libinput]
+		>=dev-qt/qtbase-${QTMIN}:6[X]
+		>=dev-qt/qtbase-${QTMIN}:6[widgets]
 	)
-	>=dev-qt/qtwidgets-${QTMIN}:6
 	>=dev-qt/qtwayland-${QTMIN}:6=
 	>=kde-frameworks/kwayland-${KFMIN}:6
 	>=kde-frameworks/kwindowsystem-${KFMIN}:6=

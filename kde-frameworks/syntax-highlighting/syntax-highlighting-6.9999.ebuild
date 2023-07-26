@@ -4,7 +4,7 @@
 EAPI=8
 
 ECM_TEST="forceoptional"
-QTMIN=5.15.9
+QTMIN=6.0
 inherit ecm frameworks.kde.org
 
 DESCRIPTION="Framework for syntax highlighting"
@@ -14,15 +14,13 @@ KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86"
 IUSE=""
 
 DEPEND="
-	>=dev-qt/qtdeclarative-${QTMIN}:5
-	>=dev-qt/qtgui-${QTMIN}:5
-	>=dev-qt/qtnetwork-${QTMIN}:5
-	>=dev-qt/qtxmlpatterns-${QTMIN}:5
-"
+	>=dev-qt/qtbase-${QTMIN}:6
+	>=dev-qt/qtdeclarative-${QTMIN}:6
+	"
 RDEPEND="${DEPEND}"
 BDEPEND="
 	dev-lang/perl
-	>=dev-qt/linguist-tools-${QTMIN}:5
+	>=dev-qt/qttools-${QTMIN}:6[linguist]
 "
 
 src_install() {

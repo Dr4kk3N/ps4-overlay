@@ -15,9 +15,8 @@ IUSE="wayland X"
 RESTRICT="test"
 
 RDEPEND="
-	>=dev-qt/qtgui-${QTMIN}:6
+	>=dev-qt/qtbase-${QTMIN}:6[gui]
 	X? (
-		>=dev-qt/qtx11extras-${QTMIN}:6
 		x11-libs/libX11
 		x11-libs/libXfixes
 		x11-libs/libxcb
@@ -28,7 +27,7 @@ DEPEND="${RDEPEND}
 	X? ( x11-base/xorg-proto )
 	test? ( >=dev-qt/qtwidgets-${QTMIN}:6 )
 "
-BDEPEND=">=dev-qt/linguist-tools-${QTMIN}:6"
+BDEPEND=">=dev-qt/qttools-${QTMIN}:6[linguist]"
 PDEPEND="wayland? ( >=kde-plasma/kwayland-integration-6.0:6 )"
 
 DOCS=( docs/README.kstartupinfo )

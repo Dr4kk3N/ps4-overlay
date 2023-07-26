@@ -1,12 +1,12 @@
-# Copyright 2021-2022 Gentoo Authors
+# Copyright 2021-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
 PYTHON_COMPAT=( python3_{9..11} )
 PYTHON_REQ_USE="xml(+)"
-CHROMIUM_VER="106.0.5249.207"
-CHROMIUM_PATCHES_VER="106.0.5249.207"
+CHROMIUM_VER="108.0.5359.181"
+CHROMIUM_PATCHES_VER="114.0.5735.133"
 
 inherit check-reqs estack flag-o-matic multiprocessing python-any-r1 qt6-build
 
@@ -18,7 +18,7 @@ fi
 
 IUSE="
 	alsa bindist designer geolocation +jumbo-build kerberos pulseaudio screencast
-	+system-ffmpeg +system-icu widgets
+	+system-icu widgets
 "
 REQUIRED_USE="designer? ( widgets )"
 
@@ -51,6 +51,7 @@ RDEPEND="
 	media-libs/libpng:=
 	>=media-libs/libvpx-1.5:=[svc(+)]
 	media-libs/libwebp:=
+	media-libs/openjpeg:2=
 	media-libs/opus
 	sys-apps/dbus
 	sys-apps/pciutils
@@ -77,7 +78,6 @@ RDEPEND="
 	kerberos? ( virtual/krb5 )
 	pulseaudio? ( media-libs/libpulse:= )
 	screencast? ( media-video/pipewire:= )
-	system-ffmpeg? ( media-video/ffmpeg:= )
 	system-icu? ( >=dev-libs/icu-69.1:= )
 	widgets? (
 		=dev-qt/qtbase-${PV}*[widgets]
@@ -226,9 +226,10 @@ src_configure() {
 		-DQT_FEATURE_webengine_system_opus=on
 		-DQT_FEATURE_webengine_system_libwebp=on
 		-DQT_FEATURE_webengine_system_alsa=$(usex alsa on off)
-		-DQT_FEATURE_webengine_system_ffmpeg=$(usex system-ffmpeg)
+		-DQT_FEATURE_webengine_system_ffmpeg=off # https://bugs.gentoo.org/831487
 		-DQT_FEATURE_webengine_system_icu=$(usex system-icu)
 		-DQT_FEATURE_webengine_system_libevent=on
+		-DQT_FEATURE_webengine_system_libopenjpeg2=on
 		-DQT_FEATURE_webengine_system_libpci=on
 		-DQT_FEATURE_webengine_system_libpng=on
 		-DQT_FEATURE_webengine_system_pulseaudio=$(usex pulseaudio on off)
