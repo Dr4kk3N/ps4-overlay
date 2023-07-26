@@ -4,7 +4,7 @@
 
 EAPI=7
 
-inherit eutils java-utils-2
+inherit eutils java-utils-2 desktop
 
 RNAME="2023-06"
 SR="R"
@@ -116,5 +116,5 @@ src_install() {
 	newins "${T}"/eclipserc-bin-${SLOT} eclipserc-bin-${SLOT}
 
 	newbin "${T}"/eclipse-bin-${SLOT} eclipse-cpp-${SLOT}
-	make_desktop_entry "eclipse-cpp-${SLOT}" "Eclipse ${PV}" "${dest}/icon.xpm" "Development;IDE"
+	make_desktop_entry "eclipse-cpp-${SLOT}" "Eclipse" "${dest}/icon.xpm" "Development;IDE"
 }
