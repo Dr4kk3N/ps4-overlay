@@ -1,7 +1,7 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 # FIXME: They are not declared in any official eclass.
 # The enlightenment.niifaq overlay at
@@ -11,12 +11,13 @@ EAPI=7
 #E_PYTHON="yes"
 
 PYTHON_COMPAT=( python{2_7,3_{5,6,7,8,9,10,11}} )
+DISTUTILS_USE_PEP517=setuptools
 
-inherit eutils distutils-r1
+inherit distutils-r1
 [ "${PV}" = 9999 ] && inherit git-r3
 
 DESCRIPTION="Python bindings for EFL"
-HOMEPAGE="https://www.enlightenment.org/about-epour"
+HOMEPAGE="https://www.enlightenment.org/"
 EGIT_REPO_URI="https://git.enlightenment.org/enlightenment/${PN}.git"
 
 LICENSE="LGPL-2.1"
@@ -25,10 +26,10 @@ SLOT="0"
 
 IUSE="doc"
 RDEPEND="
-		>=dev-python/cython-0.21[${PYTHON_USEDEP}]
-		>=dev-python/dbus-python-1.2.0-r1[${PYTHON_USEDEP}]
+		>=dev-python/cython-0.21
+		>=dev-python/dbus-python-1.2.0-r1
 		>=dev-libs/efl-1.22.99
-		doc? ( dev-python/sphinx[${PYTHON_USEDEP}] )
+		doc? ( dev-python/sphinx )
 		${PYTHON_DEPS}"
 DEPEND="${RDEPEND}"
 BDEPEND="virtual/pkgconfig"

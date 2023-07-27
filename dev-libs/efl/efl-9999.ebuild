@@ -1,17 +1,14 @@
-# Copyright 1999-2022 Gentoo Authors
+# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-inherit eutils gnome2-utils pax-utils xdg-utils
-[ "${PV}" = 9999 ] && inherit git-r3 meson
+inherit git-r3 meson xdg
 
 DESCRIPTION="Enlightenment Foundation Core Libraries"
 HOMEPAGE="https://www.enlightenment.org/"
 EGIT_REPO_URI="https://git.enlightenment.org/enlightenment/${PN}.git"
 #EGIT_REPO_URI="file:///data/projects/efl"
-
-#[ "${PV}" = 9999 ] || SRC_URI="http://download.enlightenment.org/rel/libs/${PN}/${P/_/-}.tar.bz2"
 
 LICENSE="BSD-2 GPL-2 LGPL-2.1 ZLIB"
 [ "${PV}" = 9999 ] || KEYWORDS="~amd64 ~x86"
@@ -131,24 +128,6 @@ RDEPEND="
 	)
 	xine? ( media-libs/xine-lib )
 	xpm? ( x11-libs/libXpm )
-
-	!dev-libs/ecore
-	!dev-libs/edbus
-	!dev-libs/eet
-	!dev-libs/eeze
-	!dev-libs/efreet
-	!dev-libs/eina
-	!dev-libs/eio
-	!dev-libs/embryo
-	!dev-libs/eobj
-	!dev-libs/ephysics
-	!media-libs/edje
-	!media-libs/emotion
-	!media-libs/ethumb
-	!media-libs/evas
-	!media-libs/elementary
-	!media-plugins/emotion_generic_players
-	!media-plugins/evas_generic_loaders
 "
 
 DEPEND="${RDEPEND}"
@@ -296,15 +275,5 @@ src_install() {
 	MAKEOPTS+=" -j1"
 
 	meson_src_install
-	prune_libtool_files
-}
-
-pkg_postinst() {
-	gnome2_icon_cache_update
-	xdg_mimeinfo_database_update
-}
-
-pkg_postrm() {
-	gnome2_icon_cache_update
-	xdg_mimeinfo_database_update
+	find "${ED}" -name '*.la' -delete || die
 }

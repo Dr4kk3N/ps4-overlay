@@ -39,7 +39,7 @@ HOMEPAGE="https://kde.org/plasma-desktop"
 # @INTERNAL
 # @DESCRIPTION:
 # For proper description see kde.org.eclass manpage.
-KDE_ORG_SCHEDULE_URI+="/Plasma_6"
+KDE_ORG_SCHEDULE_URI+="/Plasma_5"
 
 # @ECLASS_VARIABLE: _KDE_SRC_URI
 # @INTERNAL
@@ -53,7 +53,7 @@ if [[ ${KDE_BUILD_TYPE} == live ]]; then
 	fi
 elif [[ -z ${KDE_ORG_COMMIT} ]]; then
 	case ${PV} in
-		6.??.[6-9][05]* )
+		5.??.[6-9][05]* )
 			_KDE_SRC_URI+="unstable/plasma/$(ver_cut 1-3)/"
 			RESTRICT+=" mirror"
 			;;

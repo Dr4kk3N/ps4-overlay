@@ -11,15 +11,10 @@ DESCRIPTION="Provides KWindowSystem integration plugin for Wayland"
 HOMEPAGE="https://invent.kde.org/plasma/kwayland-integration"
 
 LICENSE="LGPL-2.1"
-SLOT="5"
+SLOT="6"
 KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86"
 IUSE=""
 
-# dev-qt/qtgui: QtXkbCommonSupport is provided by either IUSE libinput or X
-# slot ops:
-# dev-qt/qtgui: QtXkbCommonSupportPrivate
-# dev-qt/qtwayland: Qt::WaylandClientPrivate (private/qwayland*_p.h) stuff
-# kde-frameworks/kwindowsystem: Various private headers
 DEPEND="
 	>=dev-libs/wayland-1.15
 	>=dev-qt/qtbase-${QTMIN}:6=
@@ -35,7 +30,6 @@ DEPEND="
 "
 RDEPEND="${DEPEND}"
 BDEPEND="
-	>=dev-qt/qtwaylandscanner-${QTMIN}:6
 	dev-util/wayland-scanner
 	virtual/pkgconfig
 "

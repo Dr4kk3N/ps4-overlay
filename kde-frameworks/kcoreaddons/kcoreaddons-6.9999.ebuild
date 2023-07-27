@@ -3,7 +3,7 @@
 
 EAPI=8
 
-QTMIN=5.15.9
+QTMIN=6.0
 inherit ecm frameworks.kde.org xdg-utils
 
 DESCRIPTION="Framework for solving common problems such as caching, randomisation, and more"
@@ -13,15 +13,15 @@ KEYWORDS=""
 IUSE="dbus fam"
 
 DEPEND="
-	>=dev-qt/qtcore-${QTMIN}:5[icu]
+	>=dev-qt/qtbase-${QTMIN}:6[icu]
 	virtual/libudev:=
-	dbus? ( >=dev-qt/qtdbus-${QTMIN}:5 )
+	dbus? ( >=dev-qt/qtbase-${QTMIN}:6[dbus] )
 	fam? ( virtual/fam )
 "
 RDEPEND="${DEPEND}
-	>=dev-qt/qttranslations-${QTMIN}:5
+	>=dev-qt/qttranslations-${QTMIN}:6
 "
-BDEPEND=">=dev-qt/linguist-tools-${QTMIN}:5"
+BDEPEND=">=dev-qt/qttools-${QTMIN}:6[linguist]"
 
 src_configure() {
 	local mycmakeargs=(

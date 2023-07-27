@@ -25,18 +25,17 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}
 	X? ( x11-base/xorg-proto )
-	test? ( >=dev-qt/qtwidgets-${QTMIN}:6 )
+	test? ( >=dev-qt/qtbase-${QTMIN}:6[widgets] )
 "
 BDEPEND=">=dev-qt/qttools-${QTMIN}:6[linguist]"
-PDEPEND="wayland? ( >=kde-plasma/kwayland-integration-6.0:6 )"
 
 DOCS=( docs/README.kstartupinfo )
 
 src_configure() {
 	local mycmakeargs=(
-		-DKWINDOWSYSTEM_NO_WIDGETS=ON
-		$(cmake_use_find_package X X11)
+		cmake_use_find_package X X11
 	)
+
 
 	ecm_src_configure
 }

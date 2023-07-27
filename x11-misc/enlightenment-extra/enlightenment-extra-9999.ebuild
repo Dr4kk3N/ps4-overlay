@@ -1,15 +1,14 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-inherit meson
-[ "${PV}" = 9999 ] && inherit git-r3 autotools
+inherit meson git-r3
 MY_PN="${PN/enlightenment-/}"
 
 DESCRIPTION="An app for downloading themes and add-ons to Enlightenment WM"
 HOMEPAGE="https://extra.enlightenment.org"
-EGIT_REPO_URI="https://git.enlightenment.org/extra/${MY_PN}.git"
+EGIT_REPO_URI="https://git.enlightenment.org/apps/${MY_PN}.git"
 
 LICENSE="WTFPL-2"
 SLOT="0"

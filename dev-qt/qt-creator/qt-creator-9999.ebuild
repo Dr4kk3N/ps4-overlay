@@ -66,11 +66,11 @@ REQUIRED_USE="
 "
 
 # minimum Qt version required
-QT_PV="5.15.2:5"
+QT_PV="6.0:6"
 
 BDEPEND="
-	>=dev-qt/linguist-tools-${QT_PV}
-	doc? ( >=dev-qt/qdoc-${QT_PV} )
+	>=dev-qt/qttools-${QT_PV}[linguist]
+	doc? ( >=dev-qt/qttools-${QT_PV}[qdoc] )
 	help? ( !webengine? ( virtual/pkgconfig ) )
 "
 CDEPEND="
@@ -78,21 +78,22 @@ CDEPEND="
 		>=dev-cpp/yaml-cpp-0.6.2:=
 		sys-devel/clang:14=
 	)
-	>=dev-qt/qtconcurrent-${QT_PV}
-	>=dev-qt/qtcore-${QT_PV}
+	>=dev-qt/qtbase-${QT_PV}[concurrent]
+	>=dev-qt/qtbase-${QT_PV}
 	>=dev-qt/qtdeclarative-${QT_PV}[widgets]
-	>=dev-qt/qtgui-${QT_PV}
-	>=dev-qt/qtnetwork-${QT_PV}[ssl]
-	>=dev-qt/qtprintsupport-${QT_PV}
-	>=dev-qt/qtquickcontrols-${QT_PV}
-	>=dev-qt/qtsql-${QT_PV}[sqlite]
-	>=dev-qt/qtwidgets-${QT_PV}
-	>=dev-qt/qtxml-${QT_PV}
-	>=kde-frameworks/syntax-highlighting-5.87:5
+	>=dev-qt/qtbase-${QT_PV}[gui]
+	>=dev-qt/qtbase-${QT_PV}[network]
+	>=dev-qt/qtbase-${QT_PV}[ssl]
+	>=dev-qt/qtnetworkauth-${QT_PV}
+	>=dev-qt/qtbase-${QT_PV}[cups]
+	>=dev-qt/qtbase-${QT_PV}[sqlite]
+	>=dev-qt/qtbase-${QT_PV}[widgets]
+	>=dev-qt/qtscxml-${QT_PV}
+	>=kde-frameworks/syntax-highlighting-6.0:6
 
-	designer? ( >=dev-qt/designer-${QT_PV} )
+	designer? ( >=dev-qt/qttools-${QT_PV}[designer] )
 	help? (
-		>=dev-qt/qthelp-${QT_PV}
+		>=dev-qt/qttools-${QT_PV}[assistant]
 		webengine? ( >=dev-qt/qtwebengine-${QT_PV}[widgets] )
 		!webengine? ( dev-libs/gumbo )
 	)
@@ -112,13 +113,13 @@ DEPEND="
 		dev-cpp/eigen
 		dev-cpp/gtest
 		dev-libs/boost
-		>=dev-qt/qttest-${QT_PV}
+		>=dev-qt/qtbase-${QT_PV}[test]
 	)
 "
 RDEPEND="
 	${CDEPEND}
 	qml? ( >=dev-qt/qtquicktimeline-${QT_PV} )
-	wayland? ( >=dev-qt/qtgui-${QT_PV}[wayland] )
+	wayland? ( >=dev-qt/qtbase-${QT_PV}[wayland] )
 "
 
 # qt translations must also be installed or qt-creator translations won't be loaded

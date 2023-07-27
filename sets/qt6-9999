@@ -6,6 +6,7 @@
 =dev-qt/qtnetworkauth-6.9999
 =dev-qt/qtcharts-6.9999
 =dev-qt/qttools-6.9999
+=dev-qt/qttranslations-6.9999
 =dev-qt/qtimageformats-6.9999
 =dev-qt/qtserialport-6.9999
 =dev-qt/qtpositioning-6.9999

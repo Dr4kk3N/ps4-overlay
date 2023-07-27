@@ -86,12 +86,11 @@ RDEPEND="${COMMON_DEPEND}
 DEPEND="${COMMON_DEPEND}
 	>=dev-libs/plasma-wayland-protocols-1.9
 	>=dev-libs/wayland-protocols-1.31
-	>=dev-qt/designer-${QTMIN}:6
-	>=dev-qt/qtconcurrent-${QTMIN}:6
+	>=dev-qt/qtbase-${QTMIN}:6[designer]
+	>=dev-qt/qtbase-${QTMIN}:6[concurrent]
 	x11-base/xorg-proto
 "
 BDEPEND="
-	>=dev-qt/qtwaylandscanner-${QTMIN}:6
 	dev-util/wayland-scanner
 	>=kde-frameworks/kcmutils-${KFMIN}:6
 "
@@ -113,7 +112,7 @@ src_configure() {
 		$(cmake_use_find_package accessibility QAccessibilityClient)
 		$(cmake_use_find_package caps Libcap)
 		-DKWIN_BUILD_SCREENLOCKER=$(usex lock)
-		$(cmake_use_find_package plasma KF5Runner)
+		$(cmake_use_find_package plasma KF6Runner)
 	)
 
 	ecm_src_configure
@@ -123,7 +122,7 @@ pkg_postinst() {
 	ecm_pkg_postinst
 	optfeature "color management support" x11-misc/colord
 	elog
-	elog "In Plasma 5.20, default behavior of the Task Switcher to move minimised"
+	elog "In Plasma 6, default behavior of the Task Switcher to move minimised"
 	elog "windows to the end of the list was changed so that it remains in the"
 	elog "original order. To revert to the well established behavior:"
 	elog
