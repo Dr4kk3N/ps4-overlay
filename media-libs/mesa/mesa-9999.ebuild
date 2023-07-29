@@ -203,6 +203,7 @@ llvm_check_deps() {
 PATCHES=(
 	# Temporary rusticl workaround: https://gitlab.freedesktop.org/mesa/mesa/-/issues/7717#note_1832122
 	"${FILESDIR}/clang_resource_dir.patch"
+	"${FILESDIR}/mesa-ps4pro.patch.9999"
 )
 
 pkg_pretend() {
@@ -284,11 +285,6 @@ pkg_setup() {
 		llvm_pkg_setup
 	fi
 	python-any-r1_pkg_setup
-}
-
-src_prepare ()  {
-        eapply -p1 "${FILESDIR}/mesa-ps4pro.patch.9999"
-        eapply_user
 }
 
 multilib_src_configure() {

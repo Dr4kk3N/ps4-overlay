@@ -4,7 +4,7 @@
 EAPI=8
 XORG_DRI="always"
 XORG_TARBALL_SUFFIX="xz"
-inherit xorg-3 autotools
+inherit xorg-3
 
 if [[ ${PV} == 9999* ]]; then
 	SRC_URI=""
@@ -21,16 +21,12 @@ RDEPEND=">=x11-libs/libdrm-2.4.89[video_cards_amdgpu]
 	udev? ( virtual/libudev:= )"
 DEPEND="${RDEPEND}"
 
+PATCHES=( "${FILESDIR}/xf86-video-amdgpu.patch.9999" )
+
 src_configure() {
 	local XORG_CONFIGURE_OPTIONS=(
 		--enable-glamor
 		$(use_enable udev)
 	)
 	xorg-3_src_configure
-}
-
-src_prepare() {
-        eapply -p1 "${FILESDIR}/xf86-video-amdgpu.patch.9999"
-        eapply_user
-	eautoreconf
 }

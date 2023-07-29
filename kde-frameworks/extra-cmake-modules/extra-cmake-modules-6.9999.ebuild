@@ -4,7 +4,7 @@
 EAPI=8
 
 PYTHON_COMPAT=( python3_{10..11} )
-QTMIN=6.0
+QTMIN=6.4.0
 inherit cmake frameworks.kde.org python-any-r1
 
 DESCRIPTION="Extra modules and scripts for CMake"
@@ -45,7 +45,7 @@ pkg_setup() {
 src_prepare() {
 	cmake_src_prepare
 	# Requires PyQt5, bug #680256
-	sed -i -e "/^if(NOT SIP_Qt5Core_Mod_FILE)/s/NOT SIP_Qt5Core_Mod_FILE/TRUE/" \
+	sed -i -e "/^if(NOT SIP_Qt6Core_Mod_FILE)/s/NOT SIP_Qt6Core_Mod_FILE/TRUE/" \
 		tests/CMakeLists.txt || die "failed to disable GenerateSipBindings tests"
 }
 

@@ -4,7 +4,7 @@
 EAPI=8
 
 EGIT_REPO_URI="https://gitlab.freedesktop.org/mesa/drm.git"
-PYTHON_COMPAT=( python3_{9..11} )
+PYTHON_COMPAT=( python3_{9..12} )
 
 if [[ ${PV} = 9999* ]]; then
 	GIT_ECLASS="git-r3"
@@ -26,31 +26,31 @@ for card in ${VIDEO_CARDS}; do
 	IUSE_VIDEO_CARDS+=" video_cards_${card}"
 done
 
-IUSE="${IUSE_VIDEO_CARDS} valgrind"
+IUSE="${IUSE_VIDEO_CARDS} udev valgrind"
 RESTRICT="test" # see bug #236845
 LICENSE="MIT"
 SLOT="0"
 
-RDEPEND="
+COMMON_DEPEND="
 	video_cards_intel? ( >=x11-libs/libpciaccess-0.13.1-r1:=[${MULTILIB_USEDEP}] )"
-DEPEND="${RDEPEND}
+DEPEND="${COMMON_DEPEND}
 	valgrind? ( dev-util/valgrind )"
+RDEPEND="${COMMON_DEPEND}
+	udev? ( virtual/udev )"
 BDEPEND="${PYTHON_DEPS}
 	$(python_gen_any_dep 'dev-python/docutils[${PYTHON_USEDEP}]')"
+
+PATCHES=(
+        "${FILESDIR}/libdrm.patch.9999"
+)
 
 python_check_deps() {
 	python_has_version "dev-python/docutils[${PYTHON_USEDEP}]"
 }
 
-src_prepare() {
-        eapply -p1 "${FILESDIR}/libdrm.patch.9999"
-        eapply_user
-}
-
 multilib_src_configure() {
 	local emesonargs=(
-		# Udev is only used by tests now.
-		-Dudev=false
+		$(meson_use udev)
 		-Dcairo-tests=disabled
 		$(meson_feature video_cards_amdgpu amdgpu)
 		$(meson_feature video_cards_exynos exynos)

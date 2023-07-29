@@ -1,6 +1,8 @@
---- mesa/include/pci_ids/radeonsi_pci_ids.h	2023-03-16 05:35:55.849591117 +0100
-+++ mesa-patched/include/pci_ids/radeonsi_pci_ids.h	2023-03-16 05:51:59.882176142 +0100
-@@ -88,6 +88,11 @@
+diff --git a/include/pci_ids/radeonsi_pci_ids.h b/include/pci_ids/radeonsi_pci_ids.h
+index 8c4567e8483..cab7e87f6aa 100644
+--- a/include/pci_ids/radeonsi_pci_ids.h
++++ b/include/pci_ids/radeonsi_pci_ids.h
+@@ -88,6 +88,11 @@ CHIPSET(0x665C, BONAIRE)
  CHIPSET(0x665D, BONAIRE)
  CHIPSET(0x665F, BONAIRE)
  
@@ -12,9 +14,11 @@
  CHIPSET(0x9830, KABINI)
  CHIPSET(0x9831, KABINI)
  CHIPSET(0x9832, KABINI)
---- mesa/src/amd/addrlib/src/amdgpu_asic_addr.h	2023-03-16 05:35:55.875590057 +0100
-+++ mesa-patched/src/amd/addrlib/src/amdgpu_asic_addr.h	2023-03-16 05:55:04.480797470 +0100
-@@ -77,7 +77,9 @@
+diff --git a/src/amd/addrlib/src/amdgpu_asic_addr.h b/src/amd/addrlib/src/amdgpu_asic_addr.h
+index c4b028c3742..1a7ac60d0c0 100644
+--- a/src/amd/addrlib/src/amdgpu_asic_addr.h
++++ b/src/amd/addrlib/src/amdgpu_asic_addr.h
+@@ -60,7 +60,9 @@
  #define AMDGPU_HAWAII_RANGE     0x28, 0x3C //# 40 <= x < 60
  
  #define AMDGPU_SPECTRE_RANGE    0x01, 0x41 //#   1 <= x < 65
@@ -25,7 +29,7 @@
  #define AMDGPU_KALINDI_RANGE    0x81, 0xA1 //# 129 <= x < 161
  #define AMDGPU_GODAVARI_RANGE   0xA1, 0xFF //# 161 <= x < max
  
-@@ -143,6 +145,8 @@
+@@ -126,6 +128,8 @@
  
  #define ASICREV_IS_SPECTRE(r)          ASICREV_IS(r, SPECTRE)
  #define ASICREV_IS_SPOOKY(r)           ASICREV_IS(r, SPOOKY)
@@ -34,9 +38,11 @@
  #define ASICREV_IS_KALINDI(r)          ASICREV_IS(r, KALINDI)
  #define ASICREV_IS_KALINDI_GODAVARI(r) ASICREV_IS(r, GODAVARI)
  
---- mesa/src/amd/common/ac_gpu_info.c	2023-03-16 05:35:55.913588508 +0100
-+++ mesa-patched/src/amd/common/ac_gpu_info.c	2023-03-16 06:03:01.576481569 +0100
-@@ -802,6 +802,8 @@
+diff --git a/src/amd/common/ac_gpu_info.c b/src/amd/common/ac_gpu_info.c
+index 2636ebf83c3..cbf46b91f77 100644
+--- a/src/amd/common/ac_gpu_info.c
++++ b/src/amd/common/ac_gpu_info.c
+@@ -749,6 +749,8 @@ bool ac_query_gpu_info(int fd, void *dev_p, struct radeon_info *info)
     case FAMILY_KV:
        identify_chip2(SPECTRE, KAVERI);
        identify_chip2(SPOOKY, KAVERI);
@@ -45,7 +51,7 @@
        identify_chip2(KALINDI, KABINI);
        identify_chip2(GODAVARI, KABINI);
        break;
-@@ -1025,6 +1027,8 @@
+@@ -1041,6 +1043,8 @@ bool ac_query_gpu_info(int fd, void *dev_p, struct radeon_info *info)
        case CHIP_VERDE:
        case CHIP_HAINAN:
        case CHIP_BONAIRE:
@@ -54,7 +60,7 @@
        case CHIP_KAVERI:
        case CHIP_ICELAND:
        case CHIP_CARRIZO:
-@@ -1786,6 +1790,8 @@
+@@ -1875,6 +1879,8 @@ int ac_get_gs_table_depth(enum amd_gfx_level gfx_level, enum radeon_family famil
     case CHIP_PITCAIRN:
     case CHIP_VERDE:
     case CHIP_BONAIRE:
@@ -63,7 +69,7 @@
     case CHIP_HAWAII:
     case CHIP_TONGA:
     case CHIP_FIJI:
-@@ -1836,6 +1842,14 @@
+@@ -1925,6 +1931,14 @@ void ac_get_raster_config(const struct radeon_info *info, uint32_t *raster_confi
        raster_config = 0x16000012;
        raster_config_1 = 0x00000000;
        break;
@@ -78,9 +84,11 @@
     /* 2 SEs / 8 RBs */
     case CHIP_TAHITI:
     case CHIP_PITCAIRN:
---- mesa/src/amd/common/amd_family.h	2023-03-16 05:35:55.929587855 +0100
-+++ mesa-patched/src/amd/common/amd_family.h	2023-03-16 06:05:32.749886062 +0100
-@@ -94,6 +94,8 @@
+diff --git a/src/amd/common/amd_family.h b/src/amd/common/amd_family.h
+index 288abdec2ed..d5bad7e9eae 100644
+--- a/src/amd/common/amd_family.h
++++ b/src/amd/common/amd_family.h
+@@ -78,6 +78,8 @@ enum radeon_family
     CHIP_HAINAN,
     /* GFX7 (Sea Islands) */
     CHIP_BONAIRE,
@@ -89,22 +97,11 @@
     CHIP_KAVERI,
     CHIP_KABINI,
     CHIP_HAWAII,         /* Radeon 290, 390 */
---- mesa/src/amd/common/amd_family.c	2023-03-16 05:35:55.929587855 +0100
-+++ mesa-patched/src/amd/common/amd_family.c	2023-03-16 06:20:55.988664835 +0100
-@@ -42,6 +42,10 @@
-       return "HAINAN";
-    case CHIP_BONAIRE:
-       return "BONAIRE";
-+   case CHIP_LIVERPOOL:
-+      return "LIVERPOOL";
-+   case CHIP_GLADIUS:
-+      return "GLADIUS";
-    case CHIP_KABINI:
-       return "KABINI";
-    case CHIP_KAVERI:
---- mesa/src/amd/llvm/ac_llvm_util.c	2023-03-16 05:35:55.969586225 +0100
-+++ mesa-patched/src/amd/llvm/ac_llvm_util.c	2023-03-16 06:07:07.773917925 +0100
-@@ -122,6 +122,10 @@
+diff --git a/src/amd/llvm/ac_llvm_util.c b/src/amd/llvm/ac_llvm_util.c
+index 7c0e7695dc6..e5e78616223 100644
+--- a/src/amd/llvm/ac_llvm_util.c
++++ b/src/amd/llvm/ac_llvm_util.c
+@@ -96,6 +96,10 @@ const char *ac_get_llvm_processor_name(enum radeon_family family)
        return "hainan";
     case CHIP_BONAIRE:
        return "bonaire";
@@ -115,9 +112,24 @@
     case CHIP_KABINI:
        return "kabini";
     case CHIP_KAVERI:
---- mesa/src/amd/vulkan/winsys/null/radv_null_winsys.c	2023-03-16 05:35:56.058582600 +0100
-+++ mesa-patched/src/amd/vulkan/winsys/null/radv_null_winsys.c	2023-03-16 06:09:33.203832267 +0100
-@@ -43,6 +43,10 @@
+diff --git a/src/amd/vulkan/meta/radv_meta_fast_clear.c b/src/amd/vulkan/meta/radv_meta_fast_clear.c
+index 686a375fef6..42037a1f182 100644
+--- a/src/amd/vulkan/meta/radv_meta_fast_clear.c
++++ b/src/amd/vulkan/meta/radv_meta_fast_clear.c
+@@ -529,7 +529,7 @@ radv_process_color_image(struct radv_cmd_buffer *cmd_buffer, struct radv_image *
+    switch (op) {
+    case FAST_CLEAR_ELIMINATE:
+       pipeline = &device->meta_state.fast_clear_flush.cmask_eliminate_pipeline;
+-      pred_offset = image->fce_pred_offset;
++      pred_offset = 0;
+       break;
+    case FMASK_DECOMPRESS:
+       pipeline = &device->meta_state.fast_clear_flush.fmask_decompress_pipeline;
+diff --git a/src/amd/vulkan/winsys/null/radv_null_winsys.c b/src/amd/vulkan/winsys/null/radv_null_winsys.c
+index a9cf5abd799..38e92175f05 100644
+--- a/src/amd/vulkan/winsys/null/radv_null_winsys.c
++++ b/src/amd/vulkan/winsys/null/radv_null_winsys.c
+@@ -44,6 +44,10 @@ static const struct {
     [CHIP_OLAND] = {0x6060, 2, true},
     [CHIP_HAINAN] = {0x6660, 2, true},
     [CHIP_BONAIRE] = {0x6640, 4, true},
@@ -128,20 +140,11 @@
     [CHIP_KAVERI] = {0x1304, 2, false},
     [CHIP_KABINI] = {0x9830, 2, false},
     [CHIP_HAWAII] = {0x67A0, 16, true},
-@@ -98,6 +102,10 @@
-             info->gfx_level = GFX8;
-          else if (i >= CHIP_BONAIRE)
-             info->gfx_level = GFX7;
-+         else if (i >= CHIP_LIVERPOOL)
-+            info->gfx_level = GFX7;
-+         else if (i >= CHIP_GLADIUS)
-+            info->gfx_level = GFX7;
-          else
-             info->gfx_level = GFX6;
-       }
---- mesa/src/gallium/targets/d3dadapter9/description.c	2023-03-16 05:35:57.458525660 +0100
-+++ mesa-patched/src/gallium/targets/d3dadapter9/description.c	2023-03-16 06:10:44.451962053 +0100
-@@ -53,6 +53,8 @@
+diff --git a/src/gallium/targets/d3dadapter9/description.c b/src/gallium/targets/d3dadapter9/description.c
+index a3e4cd61770..61ceb5a4a51 100644
+--- a/src/gallium/targets/d3dadapter9/description.c
++++ b/src/gallium/targets/d3dadapter9/description.c
+@@ -53,6 +53,8 @@ cards_amd[] = {
      {"KAVERI",                      "AMD Radeon(TM) R7 Graphics"},
      {"KABINI",                      "AMD Radeon HD 8400 / R3 Series"},
      {"BONAIRE",                     "AMD Radeon HD 8770"},
@@ -150,9 +153,26 @@
      {"OLAND",                       "AMD Radeon HD 8670"},
      {"HAINAN",                      "AMD Radeon HD 8600M Series"},
      {"TAHITI",                      "AMD Radeon HD 7900 Series"},
---- mesa/src/gallium/winsys/radeon/drm/radeon_drm_winsys.c	2023-03-16 05:35:57.498524035 +0100
-+++ mesa-patched/src/gallium/winsys/radeon/drm/radeon_drm_winsys.c	2023-03-16 06:15:56.963041137 +0100
-@@ -277,6 +277,8 @@
+diff --git a/src/gallium/winsys/amdgpu/drm/amdgpu_winsys.c b/src/gallium/winsys/amdgpu/drm/amdgpu_winsys.c
+index f563b185f76..b11909ec960 100644
+--- a/src/gallium/winsys/amdgpu/drm/amdgpu_winsys.c
++++ b/src/gallium/winsys/amdgpu/drm/amdgpu_winsys.c
+@@ -57,6 +57,10 @@ static void handle_env_var_force_family(struct amdgpu_winsys *ws)
+                ws->info.gfx_level = GFX8;
+             else if (i >= CHIP_BONAIRE)
+                ws->info.gfx_level = GFX7;
++            else if (i >= CHIP_LIVERPOOL)
++               ws->info.gfx_level = GFX7;
++            else if (i >= CHIP_GLADIUS)
++               ws->info.gfx_level = GFX7;
+             else
+                ws->info.gfx_level = GFX6;
+ 
+diff --git a/src/gallium/winsys/radeon/drm/radeon_drm_winsys.c b/src/gallium/winsys/radeon/drm/radeon_drm_winsys.c
+index 18eb60b6ac2..ef8c6063403 100644
+--- a/src/gallium/winsys/radeon/drm/radeon_drm_winsys.c
++++ b/src/gallium/winsys/radeon/drm/radeon_drm_winsys.c
+@@ -258,6 +258,8 @@ static bool do_winsys_init(struct radeon_drm_winsys *ws)
        ws->info.gfx_level = GFX6;
        break;
     case CHIP_BONAIRE:
@@ -161,7 +181,7 @@
     case CHIP_KAVERI:
     case CHIP_KABINI:
     case CHIP_HAWAII:
-@@ -490,6 +492,8 @@
+@@ -471,6 +473,8 @@ static bool do_winsys_init(struct radeon_drm_winsys *ws)
     case CHIP_VERDE:
     case CHIP_OLAND:
     case CHIP_BONAIRE:
@@ -170,7 +190,7 @@
     case CHIP_KAVERI:
        ws->info.max_tcc_blocks = 4;
        break;
-@@ -519,9 +523,11 @@
+@@ -500,9 +504,11 @@ static bool do_winsys_init(struct radeon_drm_winsys *ws)
        case CHIP_TAHITI:
        case CHIP_PITCAIRN:
        case CHIP_BONAIRE:
@@ -182,16 +202,12 @@
           ws->info.max_se = 4;
           break;
        }
---- mesa/src/gallium/winsys/amdgpu/drm/amdgpu_winsys.c	2023-03-19 15:11:03.269111837 +0100
-+++ mesa-patched/src/gallium/winsys/amdgpu/drm/amdgpu_winsys.c	2023-03-26 15:49:27.182810642 +0200
-@@ -77,6 +77,10 @@
-                ws->info.gfx_level = GFX8;
-             else if (i >= CHIP_BONAIRE)
-                ws->info.gfx_level = GFX7;
-+            else if (i >= CHIP_LIVERPOOL)
-+               ws->info.gfx_level = GFX7;
-+            else if (i >= CHIP_GLADIUS)
-+               ws->info.gfx_level = GFX7;
-             else
-                ws->info.gfx_level = GFX6;
- 
+@@ -601,6 +607,8 @@ static bool do_winsys_init(struct radeon_drm_winsys *ws)
+    case CHIP_VERDE:
+    case CHIP_HAINAN:
+    case CHIP_BONAIRE:
++   case CHIP_LIVERPOOL:
++   case CHIP_GLADIUS:
+    case CHIP_KAVERI:
+       ws->info.l2_cache_size = ws->info.num_tcc_blocks * 128 * 1024;
+       break;

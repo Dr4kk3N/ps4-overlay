@@ -15,7 +15,7 @@ DESCRIPTION="Qt documentation generator"
 IUSE="qml"
 
 DEPEND="
-	=dev-qt/qtbase-${PV}*:5=
+	=dev-qt/qtbase-${PV}*:6=
 	sys-devel/clang:=
 	qml? ( =dev-qt/qtdeclarative-${PV}* )
 "
@@ -29,7 +29,7 @@ src_prepare() {
 	qt_use_disable_mod qml qmldevtools-private \
 		src/qdoc/qdoc.pro
 
-	qt5-build_src_prepare
+	qt6-build_src_prepare
 }
 
 src_configure() {
