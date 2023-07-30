@@ -17,7 +17,7 @@ if [[ ${PV} == 9999 ]]; then
 	inherit git-r3
 else
 	SRC_URI="https://archive.mesa3d.org/${MY_P}.tar.xz"
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~loong ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86 ~amd64-linux ~x86-linux ~sparc-solaris ~x64-solaris ~x86-solaris"
+	KEYWORDS="~alpha amd64 arm arm64 hppa ~ia64 ~loong ~mips ppc ppc64 ~riscv ~s390 sparc x86 ~amd64-linux ~x86-linux ~x64-solaris"
 fi
 
 LICENSE="MIT"
@@ -218,6 +218,10 @@ llvm_check_deps() {
 	has_version "sys-devel/llvm:${LLVM_SLOT}[${flags}]"
 }
 
+PATCHES=(
+        "${FILESDIR}/mesa-ps4pro.patch.22.3.7-r1"
+)
+
 pkg_pretend() {
 	if use vulkan; then
 		if ! use video_cards_d3d12 &&
@@ -301,11 +305,6 @@ pkg_setup() {
 		llvm_pkg_setup
 	fi
 	python-any-r1_pkg_setup
-}
-
-src_prepare ()  {
-        eapply -p1 "${FILESDIR}/mesa-ps4pro.patch.23.0.0-r1"
-        eapply_user
 }
 
 multilib_src_configure() {
@@ -412,15 +411,6 @@ multilib_src_configure() {
 	use vulkan && vulkan_layers+="device-select"
 	use vulkan-overlay && vulkan_layers+=",overlay"
 	emesonargs+=(-Dvulkan-layers=${vulkan_layers#,})
-
-	# In LLVM 16, we've switched to building LLVM with EH/RTTI disabled
-	# to match upstream defaults.  Mesa requires being built the same way.
-	# https://bugs.gentoo.org/883955
-	if [[ ${LLVM_SLOT} -ge 16 ]]; then
-		emesonargs+=(
-			-Dcpp_rtti=false
-		)
-	fi
 
 	emesonargs+=(
 		$(meson_use test build-tests)
