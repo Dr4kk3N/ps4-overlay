@@ -11,7 +11,7 @@ if [[ ${QT6_BUILD_TYPE} == release ]]; then
 	KEYWORDS="~amd64"
 fi
 
-IUSE="alsa +ffmpeg gstreamer pulseaudio v4l vaapi"
+IUSE="alsa +ffmpeg gstreamer pulseaudio v4l vaapi widgets qml"
 
 REQUIRED_USE="
 	|| ( ffmpeg gstreamer )
@@ -59,6 +59,9 @@ src_configure() {
 		$(qt_feature v4l linux_v4l)
 		$(qt_feature pulseaudio)
 		$(qt_feature vaapi)
+                $(qt_feature widgets)
+                $(qt_feature qml)
+
 	)
 
 	qt6-build_src_configure

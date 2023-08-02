@@ -11,7 +11,7 @@ if [[ ${QT6_BUILD_TYPE} == release ]]; then
 	KEYWORDS="~amd64"
 fi
 
-IUSE="opengl +sql +widgets"
+IUSE="opengl +sql +widgets vulkan"
 
 DEPEND="
 	=dev-qt/qtbase-${PV}*[network,opengl=,sql=,widgets=]
@@ -24,6 +24,7 @@ src_configure() {
 		$(qt_feature opengl)
 		$(qt_feature sql)
 		$(qt_feature widgets)
+		$(qt_feature vulkan)
 	)
 
 	qt6-build_src_configure

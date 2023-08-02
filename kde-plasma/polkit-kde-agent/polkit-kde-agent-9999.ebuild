@@ -4,9 +4,9 @@
 EAPI=8
 
 KDE_ORG_NAME="${PN}-1"
-KFMIN=6.0
+KFMIN=5.240.0
 PVCUT=$(ver_cut 1-3)
-QTMIN=6.0
+QTMIN=6.4.2
 inherit ecm plasma.kde.org
 
 DESCRIPTION="PolKit agent module for KDE Plasma"

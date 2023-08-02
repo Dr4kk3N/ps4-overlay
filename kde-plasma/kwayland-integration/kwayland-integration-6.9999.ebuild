@@ -3,8 +3,8 @@
 
 EAPI=8
 
-KFMIN=6.0
-QTMIN=6.0
+KFMIN=5.240.0
+QTMIN=6.4.2
 inherit ecm plasma.kde.org
 
 DESCRIPTION="Provides KWindowSystem integration plugin for Wayland"

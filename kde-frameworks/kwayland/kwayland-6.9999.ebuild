@@ -5,7 +5,7 @@ EAPI=8
 
 ECM_TEST="true"
 PVCUT=$(ver_cut 1-2)
-QTMIN=6.0
+QTMIN=6.4.2
 inherit ecm frameworks.kde.org
 
 DESCRIPTION="Qt-style client and server library wrapper for Wayland libraries"
@@ -19,9 +19,7 @@ RESTRICT="test"
 
 RDEPEND="
 	>=dev-libs/wayland-1.15.0
-	>=dev-qt/qtbase-${QTMIN}:6[concurrent]
-	>=dev-qt/qtbase-${QTMIN}:6=[gui]
-	>=dev-qt/qtbase-${QTMIN}:6=[egl]
+	>=dev-qt/qtbase-${QTMIN}:6[concurrent,gui,egl]
 	>=dev-qt/qtwayland-${QTMIN}:6
 	media-libs/libglvnd
 "

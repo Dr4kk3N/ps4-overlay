@@ -11,6 +11,8 @@ if [[ ${QT6_BUILD_TYPE} == release ]]; then
 	KEYWORDS="~amd64"
 fi
 
+IUSE="vulkan"
+
 BDEPEND="dev-util/wayland-scanner"
 DEPEND="
 	dev-libs/wayland
@@ -20,3 +22,11 @@ DEPEND="
 	x11-libs/libxkbcommon
 "
 RDEPEND="${DEPEND}"
+
+src_configure() {
+        local mycmakeargs=(
+                $(qt_feature vulkan)
+        )
+
+	qt6-build_src_configure
+}

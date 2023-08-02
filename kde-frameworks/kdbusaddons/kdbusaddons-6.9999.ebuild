@@ -3,7 +3,7 @@
 
 EAPI=8
 
-QTMIN=6.0
+QTMIN=6.4.2
 VIRTUALDBUS_TEST="true"
 inherit ecm frameworks.kde.org
 
@@ -21,8 +21,7 @@ BDEPEND=">=dev-qt/qttools-${QTMIN}:6[linguist]"
 
 src_configure() {
 	local mycmakeargs=(
-		$(cmake_use_find_package X Qt5X11Extras)
-	)
+		)
 
 	ecm_src_configure
 }

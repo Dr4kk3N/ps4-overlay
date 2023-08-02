@@ -76,7 +76,7 @@ BDEPEND="
 CDEPEND="
 	clang? (
 		>=dev-cpp/yaml-cpp-0.6.2:=
-		sys-devel/clang:14=
+		sys-devel/clang:16=
 	)
 	>=dev-qt/qtbase-${QT_PV}[concurrent]
 	>=dev-qt/qtbase-${QT_PV}
@@ -248,7 +248,7 @@ src_configure() {
 		-DWITH_SANITIZE=NO
 
 		# Don't build bundled ksyntaxhighlighting
-		-DBUILD_LIBRARY_KSYNTAXHIGHLIGHTING=NO
+		-DBUILD_LIBRARY_KSYNTAXHIGHLIGHTING=YES
 
 		-DWITH_DOCS=$(usex doc)
 		-DBUILD_DEVELOPER_DOCS=$(usex doc)
@@ -343,11 +343,11 @@ src_configure() {
 		-DBUILD_PLUGIN_CLANGFORMAT=$(usex clang)
 
 		# QML stuff
-		# -DBUILD_PLUGIN_QMLDESIGNER=$(usex qml) #Qt6 only
+		-DBUILD_PLUGIN_QMLDESIGNER=$(usex qml) #Qt6 only
 		-DBUILD_PLUGIN_QMLJSEDITOR=$(usex qml)
 		-DBUILD_PLUGIN_QMLPREVIEW=$(usex qml)
 		-DBUILD_PLUGIN_QMLPROJECTMANAGER=$(usex qml)
-		# -DBUILD_PLUGIN_STUDIOWELCOME=$(usex qml) #Qt6 only
+		-DBUILD_PLUGIN_STUDIOWELCOME=$(usex qml) #Qt6 only
 
 		# Don't spam "created by a different GCC executable [-Winvalid-pch]"
 		-DBUILD_WITH_PCH=NO

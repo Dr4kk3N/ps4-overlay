@@ -1,11 +1,11 @@
 # Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
-inherit gnome2-utils qmake-utils
+inherit qmake-utils xdg
 
-QTW_PN=qmltermwidget
+QTW_PN="qmltermwidget"
 
 DESCRIPTION="A good looking terminal emulator which mimics the old cathode display"
 HOMEPAGE="https://github.com/Swordfish90/cool-retro-term"
@@ -25,20 +25,24 @@ SLOT="0"
 IUSE=""
 
 DEPEND="
+	dev-qt/qtcore:5
 	dev-qt/qtdeclarative:5[localstorage]
 	dev-qt/qtgraphicaleffects:5
+	dev-qt/qtgui:5
+	dev-qt/qtnetwork:5
+	dev-qt/qtquickcontrols:5[widgets]
 	dev-qt/qtquickcontrols2:5[widgets]
-	dev-qt/qtsql:5
 	dev-qt/qtwidgets:5
 "
 
-RDEPEND="${DEPEND}"
+RDEPEND="${DEPEND}
+	virtual/opengl"
 
 src_prepare() {
 	default
 
-#	rmdir qmltermwidget || die
-#	mv "${WORKDIR}/${QTW_P}" qmltermwidget || die
+#	rmdir "${QTW_PN}" || die
+#	mv "${WORKDIR}/${QTW_P}" "${QTW_PN}" || die
 }
 
 src_configure() {
@@ -46,11 +50,13 @@ src_configure() {
 }
 
 src_install() {
-	# default attempts to install directly to /usr
-	emake INSTALL_ROOT="${D}" install
-	doman packaging/debian/cool-retro-term.1
-}
+	# `default` attempts to install directly to /usr and parallelised
+	# installation is not supported as `qmake5 -install` does not implictly
+	# create target directory.
 
-pkg_preinst() { gnome2_icon_savelist; }
-pkg_postinst() { gnome2_icon_cache_update; }
-pkg_postrm() { gnome2_icon_cache_update; }
+	emake -j1 INSTALL_ROOT="${ED}" install
+	doman "packaging/debian/cool-retro-term.1"
+
+	insinto "/usr/share/metainfo"
+	doins "packaging/appdata/cool-retro-term.appdata.xml"
+}
