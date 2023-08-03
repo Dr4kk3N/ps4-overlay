@@ -5,7 +5,7 @@ EAPI=8
 
 PLOCALES="be bg bn ca cs da de el en_GB es et eu fa fi fr gl he hr hu id it ja kk km lg lt nl pl pt pt_BR ro ru si_LK sk sl sr sr@latin sv te tr ug uk vi zh_CN zh_TW"
 
-inherit autotools plocale toolchain-funcs xdg git-r3
+inherit autotools plocale toolchain-funcs xdg flag-o-matic git-r3
 
 DESCRIPTION="DeaDBeeF is a modular audio player similar to foobar2000"
 HOMEPAGE="https://deadbeef.sourceforge.io/"
@@ -19,10 +19,10 @@ LICENSE="
 "
 SLOT="0"
 KEYWORDS="~amd64 ~riscv ~x86"
-IUSE="aac alsa cdda converter cover dts ffmpeg flac +hotkeys lastfm libsamplerate mp3 musepack nls notify +nullout opus oss pulseaudio sc68 shellexec +supereq threads vorbis wavpack mac zip"
+IUSE="aac alsa cdda converter cover dts ffmpeg flac +hotkeys lastfm libsamplerate mp3 musepack nls notify +nullout opus oss pulseaudio pipewire sc68 shellexec +supereq threads vorbis wavpack mac zip"
 
 REQUIRED_USE="
-	|| ( alsa oss pulseaudio nullout )
+	|| ( alsa oss pulseaudio pipewire nullout )
 "
 
 DEPEND="
@@ -70,7 +70,13 @@ BDEPEND="
 	virtual/pkgconfig
 "
 
+PATCHES=(
+	"${FILESDIR}/deadbeef-9999-drop-Werror.patch"
+)
+
 src_prepare() {
+	default
+	
 	if [[ -n ${PV%%*9999} ]]; then
 		mv "${WORKDIR}"/${MY_MP}/* "${S}"/external/mp4p
 	fi
@@ -79,12 +85,27 @@ src_prepare() {
 		-e "s,#define DEFAULT_TIMIDITY_CONFIG \",&${_t}:," \
 		-i plugins/wildmidi/wildmidiplug.c
 
-	default
+	drop_from_linguas() {
+		sed "/${1}/d" -i "${S}/po/LINGUAS" || die
+	}
+
+	drop_and_stub() {
+		rm -rf "${1}"
+		mkdir "${1}"
+		cat > "${1}/Makefile.in" <<-EOF
+			all: nothing
+			install: nothing
+			nothing:
+		EOF
+	}
+
+	plocale_for_each_disabled_locale drop_from_linguas || die
+
 	eautopoint --force
 	eautoreconf
 
 	# Get rid of bundled gettext.
-	drop_and_stub "${S}/intl"
+	use elibc_musl || drop_and_stub "${S}/intl"
 
 	# Plugins that are undesired for whatever reason, candidates for unbundling and such.
 	for i in adplug alac dumb ffap mms gme lfs mono2stereo psf sc60 shn sid soundtouch wma; do
@@ -131,6 +152,7 @@ src_configure () {
 		"--disable-sndfile"
 		"--disable-soundtouch"
 		"--disable-tta"
+		"--disable-vfs-zip"
 		"--disable-vtx"
 		"--disable-wildmidi"
 		"--disable-wma"
@@ -158,14 +180,13 @@ src_configure () {
 		"$(use_enable notify)"
 		"$(use_enable nullout)"
 		"$(use_enable opus)"
-		"$(use_enable pulseaudio pulse)"
+		"$(use_enable pipewire)"
 		"$(use_enable sc68)"
 		"$(use_enable shellexec)"
 		"$(use_enable shellexec shellexecui)"
 		"$(use_enable lastfm lfm)"
 		"$(use_enable libsamplerate src)"
 		"$(use_enable wavpack)"
-		"$(use_enable zip vfs-zip)"
 
 		"--enable-gtk3"
 		"--enable-vfs-curl"
