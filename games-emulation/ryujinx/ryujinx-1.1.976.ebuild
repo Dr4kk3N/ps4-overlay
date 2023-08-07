@@ -8,7 +8,7 @@ inherit desktop dotnet-utils xdg
 
 DESCRIPTION="Experimental Nintendo Switch emulator written in C#"
 HOMEPAGE="https://ryujinx.org/ https://github.com/Ryujinx/Ryujinx"
-SHA="487261592eb9e9c31cacd08860f8894027bb1a07"
+SHA="42750a74f82ee69cabfaf3c5497af6a8ebc13eca"
 MY_PN="R${PN:1}"
 NUGETS="avalonia-0.10.21
 	avalonia.angle.windows.natives-2.1.0.2020091801
@@ -28,7 +28,7 @@ NUGETS="avalonia-0.10.21
 	avalonia.x11-0.10.21
 	commandlineparser-2.9.1
 	concentus-1.1.7
-	discordrichpresence-1.1.3.18
+	discordrichpresence-1.2.1.24
 	dynamicdata-7.14.2
 	excss-4.1.4
 	fizzler-1.2.1
@@ -45,15 +45,15 @@ NUGETS="avalonia-0.10.21
 	libhac-0.18.0
 	microcom.codegenerator.msbuild-0.10.4
 	microcom.runtime-0.10.4
-	microsoft.aspnetcore.app.runtime.linux-x64-7.0.3
-	microsoft.aspnetcore.app.runtime.osx-x64-7.0.3
-	microsoft.aspnetcore.app.runtime.win-x64-7.0.3
+	microsoft.aspnetcore.app.runtime.linux-x64-7.0.9
+	microsoft.aspnetcore.app.runtime.osx-x64-7.0.9
+	microsoft.aspnetcore.app.runtime.win-x64-7.0.9
 	microsoft.codeanalysis.analyzers-2.9.6
 	microsoft.codeanalysis.analyzers-3.3.4
 	microsoft.codeanalysis.common-3.4.0
-	microsoft.codeanalysis.common-4.5.0
+	microsoft.codeanalysis.common-4.6.0
 	microsoft.codeanalysis.csharp-3.4.0
-	microsoft.codeanalysis.csharp-4.5.0
+	microsoft.codeanalysis.csharp-4.6.0
 	microsoft.codeanalysis.csharp.scripting-3.4.0
 	microsoft.codeanalysis.scripting.common-3.4.0
 	microsoft.codecoverage-17.6.3
@@ -67,11 +67,11 @@ NUGETS="avalonia-0.10.21
 	microsoft.identitymodel.logging-6.31.0
 	microsoft.identitymodel.tokens-6.31.0
 	microsoft.io.recyclablememorystream-2.3.2
-	microsoft.netcore.app.host.osx-x64-7.0.3
-	microsoft.netcore.app.host.win-x64-7.0.3
-	microsoft.netcore.app.runtime.linux-x64-7.0.3
-	microsoft.netcore.app.runtime.osx-x64-7.0.3
-	microsoft.netcore.app.runtime.win-x64-7.0.3
+	microsoft.netcore.app.host.osx-x64-7.0.9
+	microsoft.netcore.app.host.win-x64-7.0.9
+	microsoft.netcore.app.runtime.linux-x64-7.0.9
+	microsoft.netcore.app.runtime.osx-x64-7.0.9
+	microsoft.netcore.app.runtime.win-x64-7.0.9
 	microsoft.netcore.platforms-1.0.1
 	microsoft.netcore.platforms-1.1.0
 	microsoft.netcore.platforms-2.0.0
@@ -189,7 +189,7 @@ NUGETS="avalonia-0.10.21
 	system.collections-4.3.0
 	system.collections.concurrent-4.0.12
 	system.collections.immutable-1.5.0
-	system.collections.immutable-6.0.0
+	system.collections.immutable-7.0.0
 	system.componentmodel.annotations-4.5.0
 	system.console-4.0.0
 	system.diagnostics.debug-4.0.11
@@ -243,7 +243,7 @@ NUGETS="avalonia-0.10.21
 	system.reflection.extensions-4.0.1
 	system.reflection.extensions-4.3.0
 	system.reflection.metadata-1.6.0
-	system.reflection.metadata-6.0.1
+	system.reflection.metadata-7.0.0
 	system.reflection.primitives-4.0.1
 	system.reflection.primitives-4.3.0
 	system.reflection.typeextensions-4.1.0
@@ -282,7 +282,7 @@ NUGETS="avalonia-0.10.21
 	system.text.encoding-4.0.11
 	system.text.encoding-4.3.0
 	system.text.encoding.codepages-4.5.1
-	system.text.encoding.codepages-6.0.0
+	system.text.encoding.codepages-7.0.0
 	system.text.encoding.extensions-4.0.11
 	system.text.encodings.web-4.7.2
 	system.text.encodings.web-6.0.0
@@ -309,6 +309,7 @@ SRC_URI="https://github.com/${MY_PN}/${MY_PN}/archive/${SHA}.tar.gz -> ${P}.tar.
 	$(nuget_uris)"
 
 DEPEND="sys-libs/zlib"
+BDEPEND=">dev-dotnet/dotnet-sdk-bin-7.0.200"
 RDEPEND="${DEPEND}
 	dev-libs/icu
 	dev-libs/openssl
@@ -336,3 +337,4 @@ src_install() {
 	dobin "src/${MY_PN}/bin/Release/net${DOTNET_SLOT}/linux-x64/publish/${MY_PN}"
 	einstalldocs
 }
+
