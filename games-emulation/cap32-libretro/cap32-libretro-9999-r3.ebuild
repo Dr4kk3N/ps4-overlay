@@ -3,13 +3,11 @@
 
 EAPI=7
 
-LIBRETRO_REPO_NAME="libretro/libretro-uae"
-LIBRETRO_CORE_NAME="puae"
-
+LIBRETRO_REPO_NAME="libretro/libretro-cap32"
 inherit libretro-core
 
-DESCRIPTION="WIP libretro port of UAE (P-UAE and libco), a Commodore Amiga Emulator."
-HOMEPAGE="https://github.com/libretro/libretro-uae"
+DESCRIPTION="Caprice32 libretro core"
+HOMEPAGE="https://github.com/libretro/libretro-cap32"
 KEYWORDS=""
 
 LICENSE="GPL-2"
@@ -18,3 +16,9 @@ SLOT="0"
 DEPEND=""
 RDEPEND="${DEPEND}
 		games-emulation/libretro-info"
+
+pkg_preinst() {
+	if ! has_version "=${CATEGORY}/${PN}-${PVR}"; then
+		first_install="1"
+	fi
+}

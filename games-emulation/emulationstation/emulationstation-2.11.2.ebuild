@@ -26,11 +26,11 @@ DEPEND="
 	dev-libs/pugixml
 "
 
-#PATCHES=( "${FILESDIR}/${P}-include-fix.patch" )
+PATCHES=( "${FILESDIR}/${P}-include-fix.patch" )
 DOCS=( README.md SYSTEMS.md THEMES.md GAMELISTS.md DEVNOTES.md CREDITS.md )
 
 src_install() {
-	cmake-utils_src_install
+	cmake_src_install
 	doicon "${FILESDIR}/emulationstation.png"
 	domenu "${FILESDIR}/emulationstation.desktop"
 }

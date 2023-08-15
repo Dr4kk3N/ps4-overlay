@@ -4,6 +4,7 @@
 EAPI=7
 
 LIBRETRO_REPO_NAME="libretro/yabause"
+LIBRETRO_CORE_NAME="yabause"
 
 inherit libretro-core
 
