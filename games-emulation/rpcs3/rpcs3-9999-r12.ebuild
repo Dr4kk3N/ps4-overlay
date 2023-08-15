@@ -56,7 +56,7 @@ EGIT_SUBMODULES=(
 	"-3rdparty/pugixml"
 	"-3rdparty/xxHash"
 	"-3rdparty/zlib"
-	"-rpcs3-ffmpeg"
+	"-3rdparty/ffmpeg"
 )
 
 PATCHES=(
@@ -89,7 +89,7 @@ src_configure() {
 		-DUSE_PULSE=$(usex pulseaudio ON OFF)
 		-DUSE_SDL=$(usex sdl)
 		-DUSE_SYSTEM_CURL=ON
-		-DUSE_SYSTEM_FFMPEG=ON
+		-DUSE_SYSTEM_FFMPEG=OFF
 		-DUSE_SYSTEM_FLATBUFFERS=ON
 		-DUSE_SYSTEM_LIBPNG=ON
 		-DUSE_SYSTEM_LIBUSB=ON
