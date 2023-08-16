@@ -17,3 +17,7 @@ SLOT="0"
 DEPEND=""
 RDEPEND="${DEPEND}
 		games-emulation/libretro-info"
+
+src_configure() {
+	emake -f Makefile.libretro PYTHON_EXECUTABLE=python3 REGENIE=0 VERBOSE=0 NOWERROR=0
+}
