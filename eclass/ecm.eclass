@@ -153,13 +153,13 @@ fi
 if [[ ${CATEGORY} = kde-frameworks ]]; then
 	: "${KFMIN:=$(ver_cut 1-2)}"
 fi
-: "${KFMIN:=5.82.0}"
+: "${KFMIN:=5.240.0}"
 
 # @ECLASS_VARIABLE: _KFSLOT
 # @INTERNAL
 # @DESCRIPTION:
 # KDE Frameworks and Qt slot dependency, implied by KFMIN version.
-: "${_KFSLOT:=5}"
+: "${_KFSLOT:=6}"
 if [[ ${CATEGORY} == kde-frameworks ]]; then
 	if [[ ${PV} != 5.9999 ]] && $(ver_test ${KFMIN} -ge 5.240); then
 		_KFSLOT=6

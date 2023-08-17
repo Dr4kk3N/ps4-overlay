@@ -21,7 +21,6 @@ DEPEND="
 	=kde-frameworks/kcoreaddons-${PVCUT}*:6
 	=kde-frameworks/kcrash-${PVCUT}*:6
 	=kde-frameworks/kdbusaddons-${PVCUT}*:6
-	=kde-frameworks/kinit-${PVCUT}*:6
 	=kde-frameworks/kservice-${PVCUT}*:6
 "
 RDEPEND="${DEPEND}"

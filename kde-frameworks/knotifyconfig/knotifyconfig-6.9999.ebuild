@@ -15,10 +15,10 @@ IUSE="phonon"
 
 DEPEND="
 	>=dev-qt/qtbase-${QTMIN}:6[dbus,gui,widgets]
-	=kde-frameworks/kcompletion-${PVCUT}*:5
-	=kde-frameworks/kconfig-${PVCUT}*:5
-	=kde-frameworks/ki18n-${PVCUT}*:5
-	=kde-frameworks/kio-${PVCUT}*:5
+	=kde-frameworks/kcompletion-${PVCUT}*:6
+	=kde-frameworks/kconfig-${PVCUT}*:6
+	=kde-frameworks/ki18n-${PVCUT}*:6
+	=kde-frameworks/kio-${PVCUT}*:6
 	!phonon? ( media-libs/libcanberra )
 	phonon? ( >=media-libs/phonon-4.11.0 )
 "

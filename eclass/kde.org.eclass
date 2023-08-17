@@ -151,8 +151,8 @@ has ${PV} "${KDE_PV_UNRELEASED[*]}" && KDE_ORG_UNRELEASED=true
 HOMEPAGE="https://kde.org/"
 
 if [[ ${CATEGORY} == dev-qt ]]; then
-	KDE_ORG_NAME=${QT5_MODULE:-${PN}}
-	HOMEPAGE="https://community.kde.org/Qt5PatchCollection
+	KDE_ORG_NAME=${QT6_MODULE:-${PN}}
+	HOMEPAGE="https://community.kde.org/Qt6PatchCollection
 		https://invent.kde.org/qt/qt/ https://www.qt.io/"
 fi
 
@@ -161,7 +161,7 @@ case ${KDE_BUILD_TYPE} in
 		EGIT_MIRROR=${EGIT_MIRROR:=https://invent.kde.org/${KDE_ORG_CATEGORY}}
 		EGIT_REPO_URI="${EGIT_MIRROR}/${EGIT_REPONAME:=$KDE_ORG_NAME}.git"
 
-		if [[ ${PV} == 5.15.*.9999 && ${CATEGORY} == dev-qt ]]; then
+		if [[ ${PV} == 6.5.*.9999 && ${CATEGORY} == dev-qt ]]; then
 			EGIT_BRANCH="kde/$(ver_cut 1-2)"
 		fi
 		;;

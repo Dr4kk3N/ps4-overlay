@@ -23,7 +23,7 @@ REQUIRED_USE="kdesu? ( X )"
 RESTRICT="test"
 
 DEPEND="
-	>=dev-qt/qtdbus-${QTMIN}:6[dbus,gui,widgets]
+	>=dev-qt/qtbase-${QTMIN}:6[dbus,gui,widgets]
 	>=dev-qt/qtsvg-${QTMIN}:6
 	>=kde-frameworks/kactivities-${KFMIN}:6
 	>=kde-frameworks/kcmutils-${KFMIN}:6
@@ -38,7 +38,6 @@ DEPEND="
 	>=kde-frameworks/kservice-${KFMIN}:6
 	>=kde-frameworks/kwidgetsaddons-${KFMIN}:6
 	>=kde-frameworks/kwindowsystem-${KFMIN}:6
-	>=kde-plasma/libkworkspace-${PVCUT}:6
 	kdesu? ( >=kde-frameworks/kdesu-${KFMIN}:6 )
 	X? (
 		x11-libs/libX11
@@ -54,7 +53,7 @@ PATCHES=( "${FILESDIR}/${PN}-5.12.80-tests-optional.patch" )
 src_configure() {
 	local mycmakeargs=(
 		$(cmake_use_find_package kdesu KF6Su)
-		$(cmake_use_find_package X Qt5X11Extras)
+		$(cmake_use_find_package X Qt6X11Extras)
 	)
 
 	ecm_src_configure

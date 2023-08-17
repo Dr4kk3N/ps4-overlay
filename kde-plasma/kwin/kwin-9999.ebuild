@@ -5,9 +5,9 @@ EAPI=8
 
 ECM_HANDBOOK="optional"
 ECM_TEST="optional"
-KFMIN=6.0
+KFMIN=5.240.0
 PVCUT=$(ver_cut 1-3)
-QTMIN=6.0
+QTMIN=6.4.2
 inherit ecm plasma.kde.org optfeature
 
 DESCRIPTION="Flexible, composited Window Manager for windowing systems on Linux"
@@ -46,7 +46,6 @@ COMMON_DEPEND="
 	>=kde-frameworks/kwindowsystem-${KFMIN}:6=[X]
 	>=kde-frameworks/kxmlgui-${KFMIN}:6
 	>=kde-frameworks/plasma-${KFMIN}:6
-	>=kde-plasma/breeze-${PVCUT}:6
 	>=kde-plasma/kdecoration-${PVCUT}:6
 	media-libs/fontconfig
 	media-libs/freetype
@@ -74,8 +73,6 @@ COMMON_DEPEND="
 "
 RDEPEND="${COMMON_DEPEND}
 	!kde-plasma/kwayland-server
-	>=dev-qt/qtquickcontrols-${QTMIN}:6
-	>=dev-qt/qtquickcontrols2-${QTMIN}:6
 	>=dev-qt/qtvirtualkeyboard-${QTMIN}:6
 	>=kde-frameworks/kirigami-${KFMIN}:6
 	>=kde-frameworks/kitemmodels-${KFMIN}:6[qml]
@@ -86,7 +83,6 @@ RDEPEND="${COMMON_DEPEND}
 DEPEND="${COMMON_DEPEND}
 	>=dev-libs/plasma-wayland-protocols-1.9
 	>=dev-libs/wayland-protocols-1.31
-	>=dev-qt/qtbase-${QTMIN}:6[designer]
 	>=dev-qt/qtbase-${QTMIN}:6[concurrent]
 	x11-base/xorg-proto
 "

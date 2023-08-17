@@ -6,7 +6,7 @@ EAPI=8
 PYTHON_COMPAT=( python3_{10..12} )
 
 # Check this on updates
-LLVM_MAX_SLOT=16
+LLVM_MAX_SLOT=15
 
 inherit cmake cuda flag-o-matic llvm toolchain-funcs python-single-r1
 

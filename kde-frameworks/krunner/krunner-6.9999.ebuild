@@ -30,7 +30,7 @@ RDEPEND="${DEPEND}"
 
 src_configure() {
 	local mycmakeargs=(
-		$(cmake_use_find_package activities KF5Activities)
+		$(cmake_use_find_package activities KF6Activities)
 	)
 	ecm_src_configure
 }

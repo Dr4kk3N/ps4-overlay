@@ -42,8 +42,8 @@ if [[ ${KDE_BUILD_TYPE} == release ]]; then
 else
 	_SUBSLOT=9999
 fi
-if [[ ${PV/.*} == 5 ]]; then
-	_SLOT=5
+if [[ ${PV/.*} == 6 ]]; then
+	_SLOT=6
 fi
 SLOT=${_SLOT}/${_SUBSLOT}
 unset _SLOT _SUBSLOT
@@ -62,8 +62,8 @@ _KDE_SRC_URI="mirror://kde/"
 
 case ${KDE_BUILD_TYPE} in
 	live)
-		if [[ ${PV} == 5.9999 ]]; then
-			EGIT_BRANCH="kf5"
+		if [[ ${PV} == 6.9999 ]]; then
+			EGIT_BRANCH="kf6"
 		fi
 		;;
 	*)
