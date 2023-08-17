@@ -6,18 +6,24 @@ EAPI=8
 PYTHON_COMPAT=( python3_{10..12} )
 
 # Check this on updates
-LLVM_MAX_SLOT=16
+LLVM_MAX_SLOT=15
 
 inherit cmake cuda flag-o-matic llvm toolchain-funcs python-single-r1
 
 DESCRIPTION="Advanced shading language for production GI renderers"
 HOMEPAGE="http://opensource.imageworks.com/?p=osl"
-SRC_URI="https://github.com/AcademySoftwareFoundation/OpenShadingLanguage/archive/v${PV}.tar.gz -> ${P}.tar.gz"
-S="${WORKDIR}/OpenShadingLanguage-${PV}"
+
+if [[ ${PV} == 9999 ]]; then
+	EGIT_REPO_URI="https://github.com/AcademySoftwareFoundation/OpenShadingLanguage.git"
+	inherit git-r3
+else
+	SRC_URI="https://github.com/AcademySoftwareFoundation/OpenShadingLanguage/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+	KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~x86"
+	S="${WORKDIR}/OpenShadingLanguage-${PV}"
+fi
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~x86"
 
 X86_CPU_FEATURES=(
 	sse2:sse2 sse3:sse3 ssse3:ssse3 sse4_1:sse4.1 sse4_2:sse4.2
@@ -69,10 +75,6 @@ BDEPEND="
 	sys-devel/flex
 	virtual/pkgconfig
 "
-
-PATCHES=(
-	${FILESDIR}/osl-1.12.12.0-llvm-16.patch
-)
 
 llvm_check_deps() {
 	has_version -r "sys-devel/clang:${LLVM_SLOT}"
