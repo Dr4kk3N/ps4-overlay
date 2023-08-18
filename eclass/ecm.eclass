@@ -557,12 +557,12 @@ ecm_src_configure() {
 		cmakeargs+=( -DBUILD_TESTING=OFF )
 
 		if [[ ${ECM_TEST} = optional ]] ; then
-			cmakeargs+=( -DCMAKE_DISABLE_FIND_PACKAGE_Qt5Test=ON )
+			cmakeargs+=( -DCMAKE_DISABLE_FIND_PACKAGE_Qt6Test=ON )
 		fi
 	fi
 
 	if [[ ${ECM_HANDBOOK} = optional ]] ; then
-		cmakeargs+=( -DCMAKE_DISABLE_FIND_PACKAGE_KF5DocTools=$(usex !handbook) )
+		cmakeargs+=( -DCMAKE_DISABLE_FIND_PACKAGE_KF6DocTools=$(usex !handbook) )
 	fi
 
 	if in_iuse designer && [[ ${ECM_DESIGNERPLUGIN} = true ]]; then

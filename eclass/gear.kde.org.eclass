@@ -39,7 +39,7 @@ HOMEPAGE="https://apps.kde.org/"
 # @INTERNAL
 # @DESCRIPTION:
 # For proper description see kde.org.eclass manpage.
-KDE_ORG_SCHEDULE_URI+="/KDE_Gear_${PV:0:5}_Schedule"
+KDE_ORG_SCHEDULE_URI+="/KDE_Gear_${PV:0:6}_Schedule"
 
 # @ECLASS_VARIABLE: _KDE_SRC_URI
 # @INTERNAL

@@ -64,7 +64,7 @@ COMMON_DEPEND="
 	>=kde-frameworks/kunitconversion-${KFMIN}:6
 	>=kde-frameworks/kwallet-${KFMIN}:6
 	>=kde-frameworks/kwayland-${KFMIN}:6
-	>=kde-frameworks/kwidgetsaddons-${KFMIN}:5
+	>=kde-frameworks/kwidgetsaddons-${KFMIN}:6
 	>=kde-frameworks/kwindowsystem-${KFMIN}:6[X]
 	>=kde-frameworks/kxmlgui-${KFMIN}:6
 	>=kde-frameworks/plasma-${KFMIN}:6
@@ -124,8 +124,6 @@ DEPEND="${COMMON_DEPEND}
 RDEPEND="${COMMON_DEPEND}
 	app-text/iso-codes
 	>=dev-qt/qtbase-${QTMIN}:*[dbus]
-	>=dev-qt/qtgraphicaleffects-${QTMIN}:6
-	>=dev-qt/qtpaths-${QTMIN}:6
 	kde-apps/kio-extras:6
 	>=kde-frameworks/kirigami-${KFMIN}:6
 	>=kde-frameworks/kquickcharts-${KFMIN}:6

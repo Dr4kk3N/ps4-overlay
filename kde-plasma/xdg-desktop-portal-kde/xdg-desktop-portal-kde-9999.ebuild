@@ -50,7 +50,7 @@ DEPEND="${COMMON_DEPEND}
 	>=dev-qt/qtbase-${QTMIN}:6[concurrent]
 "
 RDEPEND="${COMMON_DEPEND}
-	kde-misc/kio-fuse:5
+	kde-misc/kio-fuse:6
 	sys-apps/xdg-desktop-portal
 "
 BDEPEND="

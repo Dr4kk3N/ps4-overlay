@@ -29,7 +29,7 @@ _FRAMEWORKS_KDE_ORG_ECLASS=1
 # @INTERNAL
 # @DESCRIPTION:
 # For proper description see kde.org.eclass manpage.
-KDE_PV_UNRELEASED=( )
+KDE_PV_UNRELEASED=( 5.109.0 )
 
 inherit kde.org
 
@@ -42,8 +42,8 @@ if [[ ${KDE_BUILD_TYPE} == release ]]; then
 else
 	_SUBSLOT=9999
 fi
-if [[ ${PV/.*} == 6 ]]; then
-	_SLOT=6
+if [[ ${PV/.*} == 5 ]]; then
+	_SLOT=5
 fi
 SLOT=${_SLOT}/${_SUBSLOT}
 unset _SLOT _SUBSLOT

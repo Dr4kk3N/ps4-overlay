@@ -161,7 +161,7 @@ case ${KDE_BUILD_TYPE} in
 		EGIT_MIRROR=${EGIT_MIRROR:=https://invent.kde.org/${KDE_ORG_CATEGORY}}
 		EGIT_REPO_URI="${EGIT_MIRROR}/${EGIT_REPONAME:=$KDE_ORG_NAME}.git"
 
-		if [[ ${PV} == 6.5.*.9999 && ${CATEGORY} == dev-qt ]]; then
+		if [[ ${PV} == 5.15.*.9999 && ${CATEGORY} == dev-qt ]]; then
 			EGIT_BRANCH="kde/$(ver_cut 1-2)"
 		fi
 		;;
@@ -177,7 +177,7 @@ case ${KDE_BUILD_TYPE} in
 		debug-print "${LINENO} ${ECLASS} ${FUNCNAME}: SRC_URI is ${SRC_URI}"
 		if [[ -n ${KDE_ORG_COMMIT} ]]; then
 			S=${WORKDIR}/${KDE_ORG_NAME}-${KDE_ORG_COMMIT}
-			[[ ${CATEGORY} == dev-qt ]] && QT5_BUILD_DIR="${S}_build"
+			[[ ${CATEGORY} == dev-qt ]] && QT6_BUILD_DIR="${S}_build"
 		else
 			S=${WORKDIR}/${KDE_ORG_NAME}-${PV}
 		fi
