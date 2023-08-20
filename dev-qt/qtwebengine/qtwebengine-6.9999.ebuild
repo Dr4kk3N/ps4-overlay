@@ -235,7 +235,7 @@ src_configure() {
 		-DQT_FEATURE_webengine_system_pulseaudio=$(usex pulseaudio on off)
 		-DQT_FEATURE_webengine_system_zlib=on
 		-DQT_FEATURE_webengine_webchannel=on
-		-DQT_FEATURE_webengine_webrtc=on
+		-DQT_FEATURE_webengine_webrtc=off
 		-DQT_FEATURE_webengine_webrtc_pipewire=$(usex screencast on off)
 		#-DQT_FEATURE_xcb=off
 	)
