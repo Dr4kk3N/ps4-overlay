@@ -45,7 +45,7 @@ RDEPEND="
 	dev-libs/pugixml:=
 	media-libs/cubeb:=
 	media-libs/libpng:=
-	media-libs/libsfml
+	media-libs/libsfml:=
 	media-libs/mesa[egl(+)]
 	net-libs/enet:1.3
 	net-libs/mbedtls:=
@@ -101,7 +101,7 @@ declare -A KEEP_BUNDLED=(
 	[xxhash]=BSD-2
 
 	# FIXME: requires minizip-ng
-	[minizip]=ZLIB
+	#[minizip]=ZLIB
 
 	[FreeSurround]=GPL-2+
 	[soundtouch]=LGPL-2.1+
