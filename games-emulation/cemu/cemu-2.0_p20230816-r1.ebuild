@@ -7,7 +7,7 @@ inherit cmake desktop xdg
 
 DESCRIPTION="Wii U emulator."
 HOMEPAGE="https://cemu.info/ https://github.com/cemu-project/Cemu"
-SHA="2200cc0ddf61d345c774daccdbadd92a00133890"
+SHA="d8b9a74d861dbf857d2debc00f9ba12ea890c6ad"
 MY_PN="Cemu"
 IMGUI_PV="1.88"
 SRC_URI="https://github.com/cemu-project/${MY_PN}/archive/${SHA}.tar.gz -> ${P}.tar.gz
@@ -23,6 +23,7 @@ DEPEND="app-arch/zarchive
 	cubeb? ( media-libs/cubeb )
 	dev-libs/boost
 	dev-libs/glib
+	dev-libs/hidapi
 	>=dev-libs/libfmt-9.1.0:=
 	dev-libs/libzip
 	dev-libs/openssl
