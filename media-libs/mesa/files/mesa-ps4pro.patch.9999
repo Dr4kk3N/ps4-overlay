@@ -39,19 +39,19 @@ index c4b028c3742..1a7ac60d0c0 100644
  #define ASICREV_IS_KALINDI_GODAVARI(r) ASICREV_IS(r, GODAVARI)
  
 diff --git a/src/amd/common/ac_gpu_info.c b/src/amd/common/ac_gpu_info.c
-index 2636ebf83c3..cbf46b91f77 100644
+index 480b2d95beb..cf5bae87b9e 100644
 --- a/src/amd/common/ac_gpu_info.c
 +++ b/src/amd/common/ac_gpu_info.c
-@@ -749,6 +749,8 @@ bool ac_query_gpu_info(int fd, void *dev_p, struct radeon_info *info)
-    case FAMILY_KV:
-       identify_chip2(SPECTRE, KAVERI);
-       identify_chip2(SPOOKY, KAVERI);
-+      identify_chip2(STARSHA, LIVERPOOL);
-+      identify_chip2(STARSHP, GLADIUS);
-       identify_chip2(KALINDI, KABINI);
-       identify_chip2(GODAVARI, KABINI);
-       break;
-@@ -1041,6 +1043,8 @@ bool ac_query_gpu_info(int fd, void *dev_p, struct radeon_info *info)
+@@ -786,6 +786,8 @@ bool ac_query_gpu_info(int fd, void *dev_p, struct radeon_info *info,
+       case FAMILY_KV:
+          identify_chip2(SPECTRE, KAVERI);
+          identify_chip2(SPOOKY, KAVERI);
++         identify_chip2(STARSHA, LIVERPOOL);
++         identify_chip2(STARSHP, GLADIUS);
+          identify_chip2(KALINDI, KABINI);
+          identify_chip2(GODAVARI, KABINI);
+          break;
+@@ -1083,6 +1085,8 @@ bool ac_query_gpu_info(int fd, void *dev_p, struct radeon_info *info,
        case CHIP_VERDE:
        case CHIP_HAINAN:
        case CHIP_BONAIRE:
@@ -60,7 +60,7 @@ index 2636ebf83c3..cbf46b91f77 100644
        case CHIP_KAVERI:
        case CHIP_ICELAND:
        case CHIP_CARRIZO:
-@@ -1875,6 +1879,8 @@ int ac_get_gs_table_depth(enum amd_gfx_level gfx_level, enum radeon_family famil
+@@ -1916,6 +1920,8 @@ int ac_get_gs_table_depth(enum amd_gfx_level gfx_level, enum radeon_family famil
     case CHIP_PITCAIRN:
     case CHIP_VERDE:
     case CHIP_BONAIRE:
@@ -69,7 +69,7 @@ index 2636ebf83c3..cbf46b91f77 100644
     case CHIP_HAWAII:
     case CHIP_TONGA:
     case CHIP_FIJI:
-@@ -1925,6 +1931,14 @@ void ac_get_raster_config(const struct radeon_info *info, uint32_t *raster_confi
+@@ -1966,6 +1972,14 @@ void ac_get_raster_config(const struct radeon_info *info, uint32_t *raster_confi
        raster_config = 0x16000012;
        raster_config_1 = 0x00000000;
        break;
@@ -97,21 +97,6 @@ index 288abdec2ed..d5bad7e9eae 100644
     CHIP_KAVERI,
     CHIP_KABINI,
     CHIP_HAWAII,         /* Radeon 290, 390 */
-diff --git a/src/amd/llvm/ac_llvm_util.c b/src/amd/llvm/ac_llvm_util.c
-index 7c0e7695dc6..e5e78616223 100644
---- a/src/amd/llvm/ac_llvm_util.c
-+++ b/src/amd/llvm/ac_llvm_util.c
-@@ -96,6 +96,10 @@ const char *ac_get_llvm_processor_name(enum radeon_family family)
-       return "hainan";
-    case CHIP_BONAIRE:
-       return "bonaire";
-+   case CHIP_LIVERPOOL:
-+      return "bonaire";
-+   case CHIP_GLADIUS:
-+      return "bonaire";
-    case CHIP_KABINI:
-       return "kabini";
-    case CHIP_KAVERI:
 diff --git a/src/amd/vulkan/meta/radv_meta_fast_clear.c b/src/amd/vulkan/meta/radv_meta_fast_clear.c
 index 686a375fef6..42037a1f182 100644
 --- a/src/amd/vulkan/meta/radv_meta_fast_clear.c
@@ -153,21 +138,6 @@ index a3e4cd61770..61ceb5a4a51 100644
      {"OLAND",                       "AMD Radeon HD 8670"},
      {"HAINAN",                      "AMD Radeon HD 8600M Series"},
      {"TAHITI",                      "AMD Radeon HD 7900 Series"},
-diff --git a/src/gallium/winsys/amdgpu/drm/amdgpu_winsys.c b/src/gallium/winsys/amdgpu/drm/amdgpu_winsys.c
-index f563b185f76..b11909ec960 100644
---- a/src/gallium/winsys/amdgpu/drm/amdgpu_winsys.c
-+++ b/src/gallium/winsys/amdgpu/drm/amdgpu_winsys.c
-@@ -57,6 +57,10 @@ static void handle_env_var_force_family(struct amdgpu_winsys *ws)
-                ws->info.gfx_level = GFX8;
-             else if (i >= CHIP_BONAIRE)
-                ws->info.gfx_level = GFX7;
-+            else if (i >= CHIP_LIVERPOOL)
-+               ws->info.gfx_level = GFX7;
-+            else if (i >= CHIP_GLADIUS)
-+               ws->info.gfx_level = GFX7;
-             else
-                ws->info.gfx_level = GFX6;
- 
 diff --git a/src/gallium/winsys/radeon/drm/radeon_drm_winsys.c b/src/gallium/winsys/radeon/drm/radeon_drm_winsys.c
 index 18eb60b6ac2..ef8c6063403 100644
 --- a/src/gallium/winsys/radeon/drm/radeon_drm_winsys.c
