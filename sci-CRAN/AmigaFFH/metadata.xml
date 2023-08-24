@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<longdescription>
+		Commodore Amiga File Format Handler // Modern software often
+		poorly support older file formats. This package intends to
+		handle many file formats that were native to the antiquated
+		Commodore Amiga machine. This package focuses on file types
+		from the older Amiga operating systems (= 3.0). It will read
+		and write specific file formats and coerces them into more
+		contemporary data.
+	</longdescription>
+</pkgmetadata>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<longdescription>
+		Signal Processing // A set of signal processing functions
+		originally written for 'Matlab' and 'Octave'. Includes filter
+		generation utilities, filtering functions, resampling routines,
+		and visualization of filter models. It also includes
+		interpolation functions.
+	</longdescription>
+</pkgmetadata>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<longdescription>
+		Tools for Parsing and Generating XML Within R and S-Plus // Many
+		approaches for both reading and creating XML (and HTML)
+		documents (including DTDs), both local and accessible via HTTP
+		or FTP.  Also offers access to an 'XPath' "interpreter".
+	</longdescription>
+</pkgmetadata>

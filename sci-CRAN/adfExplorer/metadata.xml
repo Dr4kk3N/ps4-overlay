@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<longdescription>
+		Import from and Export to Amiga Disk Files // Amiga Disk Files
+		(ADF) are virtual representations of 3.5 inch floppy disks for
+		the Commodore Amiga. Most disk drives from other systems
+		(including modern drives) are not able to read these disks. To
+		be able to emulate this system, the ADF format was created.
+		This package enables you to read ADF files and import and
+		export files from and to such virtual DOS-formatted disks.
+	</longdescription>
+</pkgmetadata>
