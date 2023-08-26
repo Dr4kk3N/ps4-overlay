@@ -36,6 +36,7 @@ BDEPEND="
 	split-monitor-workspaces? ( gui-libs/wlroots[X?] )
 	x11-libs/libdrm
 	x11-libs/pixman
+	x11-libs/xcb-util-wm
 "
 
 src_unpack() {
