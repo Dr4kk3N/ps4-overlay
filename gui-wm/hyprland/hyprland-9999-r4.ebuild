@@ -97,14 +97,6 @@ compile_wlroots() {
 src_prepare() {
 	default
 
-	# Nvidia patch
-	if use video_cards_nvidia; then
-		sed -i "s|glFlush();|glFinish();|" \
-			"${S}/subprojects/wlroots/render/gles2/renderer.c" || die "Nvidia patch failed"
-
-		eapply "${FILESDIR}/0001-Workaround-Screencast-for-Nvidia.patch"
-	fi
-
 	cmake_src_prepare
 }
 
