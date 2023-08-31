@@ -1,0 +1,78 @@
+From 31055327bf018d6b2e91ac7fdb5190851ad2f820 Mon Sep 17 00:00:00 2001
+From: Maksym Sditanov <msditanov@200volts.com>
+Date: Mon, 21 Feb 2022 16:30:49 +0200
+Subject: [PATCH] Fix compilation error in tutorials for linux
+
+:Release Notes:
+GLTF library contains implicit dependency from openmp.
+Latest gcc version doesn't include openmp by default, so it is requried to bypass
+-fopenmp flag to linkage
+
+:Detailed Notes:
+
+Fix error:
+RadeonProRender/binUbuntu18/libProRenderGLTF.so: undefined reference to `omp_get_thread_num'
+RadeonProRender/binUbuntu18/libProRenderGLTF.so: undefined reference to `omp_get_num_threads'
+RadeonProRender/binUbuntu18/libProRenderGLTF.so: undefined reference to `omp_get_thread_num'
+RadeonProRender/binUbuntu18/libProRenderGLTF.so: undefined reference to `omp_get_num_threads'
+RadeonProRender/binUbuntu18/libProRenderGLTF.so: undefined reference to `GOMP_parallel'
+RadeonProRender/binUbuntu18/libProRenderGLTF.so: undefined reference to `GOMP_parallel'
+
+:Testing Performed:
+Compilation and run at gentoo linux
+
+:QA Notes:
+
+:Issues Addressed:
+
+Signed-off-by: Maksym Sditanov <msditanov@200volts.com>
+---
+ tutorials/60_mesh_export/premake4.lua | 10 +++++++---
+ tutorials/61_mesh_import/premake4.lua | 10 +++++++---
+ 2 files changed, 14 insertions(+), 6 deletions(-)
+
+diff --git a/tutorials/60_mesh_export/premake4.lua b/tutorials/60_mesh_export/premake4.lua
+index a8b6fe1..a75ce23 100644
+--- a/tutorials/60_mesh_export/premake4.lua
++++ b/tutorials/60_mesh_export/premake4.lua
+@@ -12,9 +12,13 @@ project "60_mesh_export"
+     
+     buildoptions "-std=c++11"
+ 
+-	configuration {"x64"}
+-	links {"RadeonProRender64", "RprLoadStore64", "ProRenderGLTF"}
+-	
++    configuration {"x64"}
++    links {"RadeonProRender64", "RprLoadStore64", "ProRenderGLTF"}
++
++    if os.istarget("linux") then
++        linkoptions "-fopenmp"
++    end
++
+     configuration {"x64", "Debug"}
+         targetdir "../Bin"
+     configuration {"x64", "Release"}
+diff --git a/tutorials/61_mesh_import/premake4.lua b/tutorials/61_mesh_import/premake4.lua
+index 95bf965..095a91f 100644
+--- a/tutorials/61_mesh_import/premake4.lua
++++ b/tutorials/61_mesh_import/premake4.lua
+@@ -12,9 +12,13 @@ project "61_mesh_import"
+     
+     buildoptions "-std=c++11"
+ 
+-	configuration {"x64"}
+-	links {"RadeonProRender64", "RprLoadStore64", "ProRenderGLTF"}
+-	
++    configuration {"x64"}
++    links {"RadeonProRender64", "RprLoadStore64", "ProRenderGLTF"}
++
++    if os.istarget("linux") then
++        linkoptions "-fopenmp"
++    end
++
+     configuration {"x64", "Debug"}
+         targetdir "../Bin"
+     configuration {"x64", "Release"}
+-- 
+2.34.1
+

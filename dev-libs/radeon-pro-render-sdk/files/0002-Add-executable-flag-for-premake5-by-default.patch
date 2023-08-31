@@ -1,0 +1,16 @@
+From fbe029387c063a9ee81d6aace706667476de4b27 Mon Sep 17 00:00:00 2001
+From: Maksym Sditanov <msditanov@200volts.com>
+Date: Mon, 29 Nov 2021 05:41:33 +0200
+Subject: [PATCH 2/3] Add executable flag for premake5 by default
+
+---
+ premake5/linux64/premake5 | Bin
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 premake5/linux64/premake5
+
+diff --git a/premake5/linux64/premake5 b/premake5/linux64/premake5
+old mode 100644
+new mode 100755
+-- 
+2.32.0
+

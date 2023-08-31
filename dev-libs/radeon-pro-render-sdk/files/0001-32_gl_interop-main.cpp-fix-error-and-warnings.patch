@@ -1,0 +1,39 @@
+From d2ddc112f81fc87c803d6765b70f3abeab3adb91 Mon Sep 17 00:00:00 2001
+From: Maksym Sditanov <msditanov@200volts.com>
+Date: Mon, 29 Nov 2021 05:36:58 +0200
+Subject: [PATCH 1/3] 32_gl_interop/main.cpp: fix error and warnings
+
+On linux  g++ headers more "clean" and doesn't implicitly include <memory>. Include <memory> header to avoid compilation error
+GLuint = NUL provides warning at compilation time "warning: converting to non-pointer type". GLuint should be = 0
+---
+ tutorials/32_gl_interop/main.cpp | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/tutorials/32_gl_interop/main.cpp b/tutorials/32_gl_interop/main.cpp
+index f9cff9b..86781a2 100644
+--- a/tutorials/32_gl_interop/main.cpp
++++ b/tutorials/32_gl_interop/main.cpp
+@@ -45,6 +45,7 @@
+ #include <cassert>
+ #include <iostream>
+ #include <thread>
++#include <memory>
+ 
+ const unsigned int WINDOW_WIDTH = 640;
+ const unsigned int WINDOW_HEIGHT = 480;
+@@ -84,9 +85,9 @@ public:
+ };
+ 
+ 
+-GLuint              g_vertex_buffer_id = NULL;
+-GLuint              g_index_buffer_id = NULL;
+-GLuint              g_texture = NULL;
++GLuint              g_vertex_buffer_id = 0;
++GLuint              g_index_buffer_id = 0;
++GLuint              g_texture = 0;
+ rpr_framebuffer		g_frame_buffer = NULL;
+ rpr_context         g_context = NULL;
+ rpr_material_system g_matsys = NULL;
+-- 
+2.32.0
+

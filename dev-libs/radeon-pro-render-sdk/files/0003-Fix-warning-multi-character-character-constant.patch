@@ -1,0 +1,51 @@
+From 8a499902a8ecad0e8a770e9c782ae7053f91d10f Mon Sep 17 00:00:00 2001
+From: Maksym Sditanov <msditanov@200volts.com>
+Date: Mon, 29 Nov 2021 05:45:50 +0200
+Subject: [PATCH 3/3] Fix warning: multi-character character constant
+
+Fix warning: multi-character character constant
+---
+ tutorials/64_mesh_obj_demo/main.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tutorials/64_mesh_obj_demo/main.cpp b/tutorials/64_mesh_obj_demo/main.cpp
+index 33becd8..9df790f 100644
+--- a/tutorials/64_mesh_obj_demo/main.cpp
++++ b/tutorials/64_mesh_obj_demo/main.cpp
+@@ -401,7 +401,7 @@ const Configuration loadConfigFile(const char* filepath)
+ 		std::cout << "Rendermode         : " << config.contextSettings.renderMode << '\n';
+ 		std::cout << "Recursion          : " << config.contextSettings.recursion << '\n';
+ 		std::cout << "Batchsize          : " << config.contextSettings.batchSize << '\n';
+-		std::cout << "outImageFile       : " << config.contextSettings.outImgFile << '\n\n';
++		std::cout << "outImageFile       : " << config.contextSettings.outImgFile << "\n\n";
+ 	}
+ 
+ 	if (!bLight && !bIbl)
+@@ -421,7 +421,7 @@ const Configuration loadConfigFile(const char* filepath)
+ 		std::cout << "Translation :" << config.cameraSettings.translation << '\n';
+ 		std::cout << "Up          :" << config.cameraSettings.up << '\n';
+ 		std::cout << "Focal Length:" << config.cameraSettings.focalLength << '\n';
+-		std::cout << "Camera Mode :" << config.cameraSettings.cameraMode << '\n\n';
++		std::cout << "Camera Mode :" << config.cameraSettings.cameraMode << "\n\n";
+ 	}
+ 
+ 	if (!bShape)
+@@ -432,7 +432,7 @@ const Configuration loadConfigFile(const char* filepath)
+ 		std::cout << "Path        :" << settings.path << '\n';
+ 		std::cout << "Rotation    : " << settings.rotation << '\n';
+ 		std::cout << "Translation : " << settings.translation << '\n';
+-		std::cout << "Scale       : " << settings.scale << '\n\n';
++		std::cout << "Scale       : " << settings.scale << "\n\n";
+ 
+ 		settings.translation = RadeonProRender::float3{0.0f, -3.0f, 0.0f};
+ 		settings.scale = RadeonProRender::float3{1.0f, 1.0f, 1.0f};
+@@ -967,4 +967,4 @@ int main(int argc , char* argv[])
+ 	CHECK(rprObjectDelete(context)); context = nullptr; // Always delete the RPR Context in last.
+ 
+ 	return 0;
+-}
+\ No newline at end of file
++}
+-- 
+2.32.0
+
