@@ -8,43 +8,47 @@ inherit desktop dotnet-utils xdg
 
 DESCRIPTION="Experimental Nintendo Switch emulator written in C#"
 HOMEPAGE="https://ryujinx.org/ https://github.com/Ryujinx/Ryujinx"
-SHA="fe15c77d30b94a8b720b520dcacf39a0c832d58f"
+SHA="437c78e19840a9f4a9fdb4e491a8214019c536fe"
 MY_PN="R${PN:1}"
-NUGETS="avalonia-0.10.21
-	avalonia.angle.windows.natives-2.1.0.2020091801
-	avalonia.buildservices-0.0.16
-	avalonia.controls.datagrid-0.10.21
-	avalonia.desktop-0.10.21
-	avalonia.diagnostics-0.10.21
-	avalonia.freedesktop-0.10.21
-	avalonia.markup.xaml.loader-0.10.21
-	avalonia.native-0.10.21
-	avalonia.remote.protocol-0.10.21
+NUGETS="avalonia-11.0.3
+	avalonia.angle.windows.natives-2.1.0.2023020321
+	avalonia.buildservices-0.0.29
+	avalonia.controls.colorpicker-11.0.3
+	avalonia.themes.simple-11.0.3
+	avalonia.controls.itemsrepeater-11.0.3
+	avalonia.controls.datagrid-11.0.3
+	avalonia.desktop-11.0.3
+	avalonia.diagnostics-11.0.3
+	avalonia.freedesktop-11.0.3
+	avalonia.markup.xaml.loader-11.0.3
+	avalonia.native-11.0.3
+	avalonia.remote.protocol-11.0.3
 	avalonia.skia-0.10.18
-	avalonia.skia-0.10.21
-	avalonia.svg-0.10.18
-	avalonia.svg.skia-0.10.18
-	avalonia.win32-0.10.21
-	avalonia.x11-0.10.21
+	avalonia.skia-11.0.0
+	avalonia.skia-11.0.3
+	avalonia.svg-11.0.0
+	avalonia.svg.skia-11.0.0
+	avalonia.win32-11.0.3
+	avalonia.x11-11.0.3
 	commandlineparser-2.9.1
 	concentus-1.1.7
 	discordrichpresence-1.2.1.24
 	dynamicdata-7.14.2
 	excss-4.1.4
 	fizzler-1.2.1
-	fluentavaloniaui-1.4.5
+	fluentavaloniaui-2.0.1
 	fsharp.core-7.0.200
 	gtksharp.dependencies-1.1.1
-	harfbuzzsharp-2.8.2.1-preview.108
-	harfbuzzsharp.nativeassets.linux-2.8.2.1-preview.108
-	harfbuzzsharp.nativeassets.macos-2.8.2.1-preview.108
-	harfbuzzsharp.nativeassets.webassembly-2.8.2.1-preview.108
-	harfbuzzsharp.nativeassets.win32-2.8.2.1-preview.108
+	harfbuzzsharp-2.8.2.3
+	harfbuzzsharp.nativeassets.linux-2.8.2.3
+	harfbuzzsharp.nativeassets.macos-2.8.2.3
+	harfbuzzsharp.nativeassets.webassembly-2.8.2.3
+	harfbuzzsharp.nativeassets.win32-2.8.2.3
 	jetbrains.annotations-10.3.0
-	jp2masa.avalonia.flexbox-0.2.0
+	jp2masa.avalonia.flexbox-0.3.0-beta.4
 	libhac-0.18.0
-	microcom.codegenerator.msbuild-0.10.4
-	microcom.runtime-0.10.4
+	microcom.codegenerator.msbuild-0.11.0
+	microcom.runtime-0.11.0
 	microsoft.aspnetcore.app.runtime.linux-x64-7.0.9
 	microsoft.aspnetcore.app.runtime.osx-x64-7.0.9
 	microsoft.aspnetcore.app.runtime.win-x64-7.0.9
@@ -53,9 +57,10 @@ NUGETS="avalonia-0.10.21
 	microsoft.codeanalysis.common-3.4.0
 	microsoft.codeanalysis.common-4.6.0
 	microsoft.codeanalysis.csharp-3.4.0
+	microsoft.codeanalysis.csharp-3.8.0
 	microsoft.codeanalysis.csharp-4.6.0
-	microsoft.codeanalysis.csharp.scripting-3.4.0
-	microsoft.codeanalysis.scripting.common-3.4.0
+	microsoft.codeanalysis.csharp.scripting-3.8.0
+	microsoft.codeanalysis.scripting.common-3.8.0
 	microsoft.codecoverage-17.6.3
 	microsoft.csharp-4.3.0
 	microsoft.csharp-4.5.0
@@ -161,7 +166,7 @@ NUGETS="avalonia-0.10.21
 	ryujinx.sdl2-cs-2.28.1-build28
 	shaderc.net-0.1.0
 	sharpziplib-1.4.2
-	shimskiasharp-0.5.18
+	shimskiasharp-1.0.0
 	silk.net.core-2.16.0
 	silk.net.vulkan-2.16.0
 	silk.net.vulkan.extensions.ext-2.16.0
@@ -169,16 +174,16 @@ NUGETS="avalonia-0.10.21
 	sixlabors.fonts-1.0.0-beta0013
 	sixlabors.imagesharp-1.0.4
 	sixlabors.imagesharp.drawing-1.0.0-beta11
-	skiasharp-2.88.1-preview.108
-	skiasharp.harfbuzz-2.88.1-preview.108
-	skiasharp.nativeassets.linux-2.88.1-preview.108
-	skiasharp.nativeassets.macos-2.88.1-preview.108
-	skiasharp.nativeassets.webassembly-2.88.1-preview.108
-	skiasharp.nativeassets.win32-2.88.1-preview.108
+	skiasharp-2.88.3
+	skiasharp.harfbuzz-2.88.3
+	skiasharp.nativeassets.linux-2.88.3
+	skiasharp.nativeassets.macos-2.88.3
+	skiasharp.nativeassets.webassembly-2.88.3
+	skiasharp.nativeassets.win32-2.88.3
 	spb-0.0.4-build28
-	svg.custom-0.5.18
-	svg.model-0.5.18
-	svg.skia-0.5.18
+	svg.custom-1.0.0
+	svg.model-1.0.0
+	svg.skia-1.0.0
 	system.appcontext-4.1.0
 	system.buffers-4.0.0
 	system.buffers-4.3.0
@@ -211,6 +216,7 @@ NUGETS="avalonia-0.10.21
 	system.io.filesystem-4.0.1
 	system.io.filesystem.primitives-4.0.1
 	system.io.hashing-7.0.0
+	system.io.pipelines-6.0.0
 	system.linq-4.1.0
 	system.linq-4.3.0
 	system.linq.expressions-4.1.0
@@ -302,7 +308,8 @@ NUGETS="avalonia-0.10.21
 	system.valuetuple-4.5.0
 	system.xml.readerwriter-4.0.11
 	system.xml.xdocument-4.0.11
-	tmds.dbus-0.9.0
+	tmds.dbus.protocol-0.15.0
+	tmds.dbus-0.15.0
 	unicornengine.unicorn-2.0.2-rc1-fb78016
 	xamlnamereferencegenerator-1.6.1"
 SRC_URI="https://github.com/${MY_PN}/${MY_PN}/archive/${SHA}.tar.gz -> ${P}.tar.gz

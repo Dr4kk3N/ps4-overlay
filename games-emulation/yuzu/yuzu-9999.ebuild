@@ -16,7 +16,7 @@ LICENSE="|| ( Apache-2.0 GPL-2+ ) 0BSD BSD GPL-2+ ISC MIT
 	!system-vulkan? ( Apache-2.0 )"
 SLOT="0"
 KEYWORDS=""
-IUSE="+compatibility-list +cubeb discord +qt5 sdl +system-libfmt +system-vulkan test webengine +webservice"
+IUSE="+compatibility-list +cubeb discord +qt5 sdl +system-libfmt +system-vulkan test webengine +webservice lto"
 
 RDEPEND="
 	<net-libs/mbedtls-3.1[cmac]
@@ -163,6 +163,7 @@ src_configure() {
 		-DYUZU_USE_EXTERNAL_SDL2=OFF
 		-DYUZU_CHECK_SUBMODULES=false
 		-DYUZU_USE_QT_WEB_ENGINE=$(usex webengine)
+		-DYUZU_ENABLE_LTO=$(usex lto)
 	)
 
 	cmake_src_configure
