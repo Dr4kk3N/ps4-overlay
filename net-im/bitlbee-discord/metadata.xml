@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<longdescription lang="en">
+		Bitlbee plugin for discord (http://discordapp.com)
+	</longdescription>
+	<maintainer type="person">
+		<email>adrien.sohier@art-software.fr</email>
+		<name>Adrien Sohier</name>
+	</maintainer>
+	<upstream>
+		<maintainer status="active">
+			<email>artem.savkov@gmail.com</email>
+			<name>Artem Savkov</name>
+		</maintainer>
+		<bugs-to>https://github.com/sm00th/bitlbee-discord</bugs-to>
+		<remote-id type="github">sm00th/bitlbee-discord</remote-id>
+	</upstream>
+</pkgmetadata>
