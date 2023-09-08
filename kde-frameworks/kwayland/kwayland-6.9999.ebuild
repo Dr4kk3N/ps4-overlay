@@ -19,7 +19,7 @@ RESTRICT="test"
 
 RDEPEND="
 	>=dev-libs/wayland-1.15.0
-	>=dev-qt/qtbase-${QTMIN}:6[concurrent,gui,egl]
+	>=dev-qt/qtbase-${QTMIN}:6[concurrent,gui]
 	>=dev-qt/qtwayland-${QTMIN}:6
 	media-libs/libglvnd
 "
