@@ -63,7 +63,7 @@ _KDE_SRC_URI="mirror://kde/"
 case ${KDE_BUILD_TYPE} in
 	live)
 		if [[ ${PV} == 6.9999 ]]; then
-			EGIT_BRANCH="kf6"
+			EGIT_BRANCH="master"
 		fi
 		;;
 	*)
