@@ -8,13 +8,14 @@
 # Andrew Udvare <audvare@gmail.com>
 # @BLURB: Install a Node-based package offline with Yarn.
 # @DESCRIPTION:
+# Install a Node-based package offline with Yarn.
 
 case ${EAPI:-0} in
 	8) ;;
 	*) die "${ECLASS}: EAPI ${EAPI:-0} unsupported." ;;
 esac
 
-inherit edo
+inherit edo multiprocessing
 
 EXPORT_FUNCTIONS src_unpack src_prepare src_configure src_compile src_install
 
@@ -29,11 +30,13 @@ if [[ -z ${_YARN_ECLASS} ]]; then
 	# @CODE
 
 	# @ECLASS_VARIABLE: _YARN_DISTFILES
-	# @_INTERNAL:
+	# @INTERNAL
 	# @DESCRIPTION:
 	# Array of distfile basenames. The output path for a tarball may be
 	# different than the basename taken off the URI.
 	_YARN_DISTFILES=()
+
+	WANT_GYP=${WANT_GYP:-0}
 
 	# @FUNCTION: yarn_set_globals
 	# @DESCRIPTION:
@@ -43,7 +46,10 @@ if [[ -z ${_YARN_ECLASS} ]]; then
 	# after calling this.
 	yarn_set_globals() {
 		# shellcheck disable=SC2034
-		BDEPEND="sys-apps/yarn dev-util/node-gyp"
+		BDEPEND="sys-apps/yarn"
+		if [ "${WANT_GYP}" -ne 0 ]; then
+			BDEPEND+=" dev-util/node-gyp"
+		fi
 		# shellcheck disable=SC2034
 		RDEPEND="net-libs/nodejs:="
 		# shellcheck disable=SC2034
@@ -76,6 +82,8 @@ if [[ -z ${_YARN_ECLASS} ]]; then
 	}
 
 	# @FUNCTION: yarn_src_unpack
+	# @DESCRIPTION:
+	# Unpacks normal packages but ignores those ending in .tgz.
 	yarn_src_unpack() {
 		local archive
 		for archive in ${A}; do
@@ -90,6 +98,8 @@ if [[ -z ${_YARN_ECLASS} ]]; then
 	}
 
 	# @FUNCTION: yarn_src_prepare
+	# @DESCRIPTION:
+	# Prepares up the offline Yarn package files.
 	yarn_src_prepare() {
 		if [[ ! ${_YARN_SET_GLOBALS_CALLED} ]]; then
 			die "yarn_set_globals must be called in global scope"
@@ -104,12 +114,17 @@ if [[ -z ${_YARN_ECLASS} ]]; then
 	}
 
 	# @FUNCTION: yarn_src_configure
+	# @DESCRIPTION:
+	# Sets up the offline Yarn environment.
 	yarn_src_configure() {
 		edo yarn config set prefix "${HOME}/.node"
 		edo yarn config set yarn-offline-mirror "$(realpath "${WORKDIR}/packages")"
 	}
 
 	# @FUNCTION: yarn_src_compile
+	# @DESCRIPTION:
+	# Using Yarn's offline mode, this function installs the package as it would normally and
+	# compiles anything that needs to be.
 	yarn_src_compile() {
 		cd lib || die
 		cp "${YARN_PACKAGE_JSON:-${FILESDIR}/${PN}-package.json}" package.json || die
@@ -133,6 +148,8 @@ if [[ -z ${_YARN_ECLASS} ]]; then
 	}
 
 	# @FUNCTION: yarn_src_install
+	# @DESCRIPTION:
+	# Installs the package into /usr/$(get_libdir)/${PN}/node_modules and installs docs.
 	yarn_src_install() {
 		find . -type f -iregex '.*/license\(\.\(md\|rtf\|txt\)\)?' -delete || die
 		insinto "/usr/$(get_libdir)/${PN}/node_modules"
