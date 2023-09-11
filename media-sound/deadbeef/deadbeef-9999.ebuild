@@ -70,9 +70,9 @@ BDEPEND="
 	virtual/pkgconfig
 "
 
-PATCHES=(
-	"${FILESDIR}/deadbeef-9999-drop-Werror.patch"
-)
+#PATCHES=(
+#	"${FILESDIR}/deadbeef-9999-drop-Werror.patch"
+#)
 
 src_prepare() {
 	default
