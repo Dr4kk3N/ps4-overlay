@@ -11,7 +11,7 @@ else
 	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86"
 fi
 
-QTMIN=5.15.2
+QTMIN=6.5.2
 inherit cmake linux-info systemd tmpfiles
 
 DESCRIPTION="Simple Desktop Display Manager"
@@ -27,11 +27,8 @@ RESTRICT="!test? ( test )"
 COMMON_DEPEND="
 	acct-group/sddm
 	acct-user/sddm
-	>=dev-qt/qtcore-${QTMIN}:5
-	>=dev-qt/qtdbus-${QTMIN}:5
-	>=dev-qt/qtdeclarative-${QTMIN}:5
-	>=dev-qt/qtgui-${QTMIN}:5
-	>=dev-qt/qtnetwork-${QTMIN}:5
+	>=dev-qt/qtbase-${QTMIN}:6[dbus,gui,network]
+	>=dev-qt/qtdeclarative-${QTMIN}:6
 	sys-libs/pam
 	x11-libs/libXau
 	x11-libs/libxcb:=
@@ -40,7 +37,7 @@ COMMON_DEPEND="
 	!systemd? ( sys-power/upower )
 "
 DEPEND="${COMMON_DEPEND}
-	test? ( >=dev-qt/qttest-${QTMIN}:5 )
+	test? ( >=dev-qt/qtbase-${QTMIN}:6 )
 "
 RDEPEND="${COMMON_DEPEND}
 	X? ( x11-base/xorg-server )
@@ -48,8 +45,8 @@ RDEPEND="${COMMON_DEPEND}
 "
 BDEPEND="
 	dev-python/docutils
-	>=dev-qt/linguist-tools-${QTMIN}:5
-	kde-frameworks/extra-cmake-modules:5
+	>=dev-qt/qttools-${QTMIN}:6[linguist]
+	kde-frameworks/extra-cmake-modules:6
 	virtual/pkgconfig
 "
 
