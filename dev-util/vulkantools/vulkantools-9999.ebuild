@@ -46,6 +46,7 @@ DEPEND="${RDEPEND}
 	~dev-util/vulkan-headers-${PV}
 	~media-libs/vulkan-layers-${PV}
 	>=dev-libs/jsoncpp-1.9.5
+	>=dev-cpp/valijson-1.0
 	>=dev-qt/qtcore-${QT_PV}
         >=dev-qt/qtgui-${QT_PV}
         >=dev-qt/qtwidgets-${QT_PV}
@@ -72,6 +73,7 @@ multilib_src_configure() {
 		-DCMAKE_SKIP_RPATH=ON
 #		-DBUILD_VULKANINFO=ON
 #		-DBUILD_CUBE=$(usex cube)
+		-BUILD_VKJSON=OFF
 		-DBUILD_WERROR=OFF
 		-DBUILD_WSI_WAYLAND_SUPPORT=$(usex wayland)
 		-DBUILD_WSI_XCB_SUPPORT=$(usex X)
