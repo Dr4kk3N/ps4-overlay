@@ -77,7 +77,7 @@ NUGETS="avalonia@11.0.3
 	microsoft.netcore.platforms@2.1.2
 	microsoft.netcore.targets@1.0.1
 	microsoft.netcore.targets@1.1.0
-	microsoft.net.test.sdk@17.6.3
+	microsoft.net.test.sdk@17.7.2
 	microsoft.testplatform.objectmodel@17.6.3
 	microsoft.testplatform.testhost@17.6.3
 	microsoft.win32.primitives@4.0.1
