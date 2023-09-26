@@ -55,7 +55,7 @@ NUGETS="avalonia@11.0.3
 	microsoft.codeanalysis.csharp@4.6.0
 	microsoft.codeanalysis.csharp.scripting@3.8.0
 	microsoft.codeanalysis.scripting.common@3.8.0
-	microsoft.codecoverage@17.6.3
+	microsoft.codecoverage@17.7.2
 	microsoft.csharp@4.3.0
 	microsoft.csharp@4.5.0
 	microsoft.csharp@4.7.0
@@ -78,8 +78,8 @@ NUGETS="avalonia@11.0.3
 	microsoft.netcore.targets@1.0.1
 	microsoft.netcore.targets@1.1.0
 	microsoft.net.test.sdk@17.7.2
-	microsoft.testplatform.objectmodel@17.6.3
-	microsoft.testplatform.testhost@17.6.3
+	microsoft.testplatform.objectmodel@17.7.2
+	microsoft.testplatform.testhost@17.7.2
 	microsoft.win32.primitives@4.0.1
 	microsoft.win32.registry@4.5.0
 	microsoft.win32.systemevents@7.0.0
