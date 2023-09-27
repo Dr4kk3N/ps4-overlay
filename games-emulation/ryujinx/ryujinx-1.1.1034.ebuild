@@ -61,10 +61,10 @@ NUGETS="avalonia@11.0.3
 	microsoft.csharp@4.7.0
 	microsoft.dotnet.platformabstractions@3.1.6
 	microsoft.extensions.dependencymodel@6.0.0
-	microsoft.identitymodel.abstractions@6.31.0
-	microsoft.identitymodel.jsonwebtokens@6.31.0
-	microsoft.identitymodel.logging@6.31.0
-	microsoft.identitymodel.tokens@6.31.0
+	microsoft.identitymodel.abstractions@7.0.0
+	microsoft.identitymodel.jsonwebtokens@7.0.0
+	microsoft.identitymodel.logging@7.0.0
+	microsoft.identitymodel.tokens@7.0.0
 	microsoft.io.recyclablememorystream@2.3.2
 	microsoft.netcore.app.host.osx-x64@7.0.11
 	microsoft.netcore.app.host.win-x64@7.0.11
@@ -202,7 +202,7 @@ NUGETS="avalonia@11.0.3
 	system.globalization@4.3.0
 	system.globalization.calendars@4.0.1
 	system.globalization.extensions@4.0.1
-	system.identitymodel.tokens.jwt@6.31.0
+	system.identitymodel.tokens.jwt@7.0.0
 	system.io@4.1.0
 	system.io@4.3.0
 	system.io.compression@4.1.0
@@ -303,7 +303,7 @@ inherit desktop dotnet-pkg xdg
 
 DESCRIPTION="Experimental Nintendo Switch emulator written in C#"
 HOMEPAGE="https://ryujinx.org/ https://github.com/Ryujinx/Ryujinx"
-SHA="e63157cc3355489fa35b952ebd7bb769f6a29ff7"
+SHA="01c2b8097c2d66839105470d82405a12d57d196f"
 MY_PN="R${PN:1}"
 SRC_URI="https://github.com/${MY_PN}/${MY_PN}/archive/${SHA}.tar.gz -> ${P}.tar.gz
 	${NUGET_URIS}"
