@@ -22,20 +22,21 @@ inherit python-any-r1 qmake-utils readme.gentoo-r1 toolchain-funcs xdg-utils
 
 DESCRIPTION="Modifications to Chromium for removing Google integration and enhancing privacy"
 HOMEPAGE="https://github.com/ungoogled-software/ungoogled-chromium"
-PATCHSET_URI_PPC64="https://quickbuild.io/~raptor-engineering-public"
-PATCHSET_NAME_PPC64="chromium_114.0.5735.106-1raptor0~deb11u1.debian"
+PATCHSET="2"
+PATCHSET_NAME="chromium-116-patchset-${PATCHSET}"
+PATCHSET_PPC64="117.0.5938.62-1raptor0~deb12u1"
 SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/chromium-${PV/_*}.tar.xz
-	https://dev.gentoo.org/~sam/distfiles/www-client/chromium/chromium-112-gcc-13-patches.tar.xz
+	https://github.com/stha09/chromium-patches/releases/download/${PATCHSET_NAME}/${PATCHSET_NAME}.tar.xz
 	ppc64? (
-		${PATCHSET_URI_PPC64}/+archive/ubuntu/chromium/+files/${PATCHSET_NAME_PPC64}.tar.xz
-		https://dev.gentoo.org/~sultan/distfiles/www-client/chromium/chromium-ppc64le-gentoo-patches-1.tar.xz
+		https://quickbuild.io/~raptor-engineering-public/+archive/ubuntu/chromium/+files/chromium_${PATCHSET_PPC64}.debian.tar.xz
+		https://deps.gentoo.zip/chromium-ppc64le-gentoo-patches-1.tar.xz
 	)
 "
 
 LICENSE="BSD uazo-bromite? ( GPL-3 )"
 SLOT="0"
-# KEYWORDS="amd64 ~arm64 ~ppc64 ~x86"
-IUSE="+X cfi +clang convert-dict cups cpu_flags_arm_neon custom-cflags debug enable-driver gtk4 hangouts headless hevc kerberos nvidia +official optimize-thinlto optimize-webui pax-kernel pgo pic +proprietary-codecs pulseaudio qt5 screencast selinux suid system-abseil-cpp system-av1 system-brotli system-crc32c system-double-conversion +system-ffmpeg +system-harfbuzz +system-icu +system-jsoncpp +system-libevent +system-libusb system-libvpx +system-openh264 system-openjpeg +system-png +system-re2 +system-snappy system-woff2 thinlto uazo-bromite vaapi wayland widevine"
+KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
+IUSE="+X bluetooth cfi +clang convert-dict cups cpu_flags_arm_neon custom-cflags debug enable-driver gtk4 hangouts headless hevc kerberos nvidia +official optimize-thinlto optimize-webui override-data-dir pax-kernel pgo pic +proprietary-codecs pulseaudio qt5 qt6 screencast selinux suid system-abseil-cpp system-av1 system-brotli system-crc32c system-double-conversion +system-ffmpeg +system-harfbuzz +system-icu +system-jsoncpp +system-libevent +system-libusb system-libvpx +system-openh264 system-openjpeg +system-png system-re2 +system-snappy system-woff2 thinlto uazo-bromite vaapi wayland widevine"
 RESTRICT="
 	!system-ffmpeg? ( proprietary-codecs? ( bindist ) )
 	!system-openh264? ( bindist )
@@ -52,21 +53,19 @@ REQUIRED_USE="
 	!proprietary-codecs? ( !hevc )
 	hevc? ( system-ffmpeg )
 	vaapi? ( !system-av1 !system-libvpx )
+	qt6? ( qt5 )
 "
 
-#UGC_COMMIT_ID="939a50695adfc40b9dd8c9eac17a1a9af90e6caf"
-UGC_PR_COMMITS=(
-	c917e096342e5b90eeea91ab1f8516447c8756cf
-	5794e9d12bf82620d5f24505798fecb45ca5a22d
-)
+#UGC_COMMIT_ID="834ec0dbb1f3a8c6eb0c1ab195428dc38d39f73d"
+# UGC_PR_COMMITS=(
+# 	c917e096342e5b90eeea91ab1f8516447c8756cf
+# 	5794e9d12bf82620d5f24505798fecb45ca5a22d
+# )
 
-UAZO_BROMITE_COMMIT_ID="af55aa0ddfc47fbaffafd60c385d4c43c7c5ad0c"
+UAZO_BROMITE_COMMIT_ID="9fdf65383f548d60c8837ad63a0fa6ab72ec88d6"
 
 CHROMIUM_COMMITS=(
-	2914039316d4ed3f53c3393dc2ba48f637807689
-	-54969766fd2029c506befc46e9ce14d67c7ed02a
-	a1fec6273f3ad7c73b35bb420a5540355df35b74
-	2af2d08972d14d5bdd91e0515eb5b15b4444aee9
+	5a8dfcaf84b5af5aeb738702651e98bfc43d6d45
 )
 
 UGC_PV="${PV/_p/-}"
@@ -86,19 +85,19 @@ SRC_URI+="${UGC_URL}
 
 if [ ! -z "${UGC_PR_COMMITS[*]}" ]; then
 	for i in "${UGC_PR_COMMITS[@]}"; do
-		SRC_URI+="https://github.com/ungoogled-software/${PN}/commit/$i.patch -> ${PN}-$i.patch
+		SRC_URI+="https://github.com/ungoogled-software/${PN}/commit/$i.patch?full_index=true -> ${PN}-$i.patch
 		"
 	done
 fi
 
 if [ ! -z "${CHROMIUM_COMMITS[*]}" ]; then
 	for i in "${CHROMIUM_COMMITS[@]}"; do
-		SRC_URI+="https://github.com/chromium/chromium/commit/${i/-}.patch -> chromium-${i/-}.patch
+		SRC_URI+="https://github.com/chromium/chromium/commit/${i/-}.patch?full_index=true -> chromium-${i/-}.patch
 		"
 	done
 fi
 
-SRC_URI+="uazo-bromite? ( https://github.com/uazo/bromite/archive/${UAZO_BROMITE_COMMIT_ID}.tar.gz -> bromite-${UAZO_BROMITE_COMMIT_ID}.tar.gz )
+SRC_URI+="uazo-bromite? ( https://github.com/uazo/cromite/archive/${UAZO_BROMITE_COMMIT_ID}.tar.gz -> cromite-${UAZO_BROMITE_COMMIT_ID}.tar.gz )
 "
 
 COMMON_X_DEPEND="
@@ -115,7 +114,7 @@ COMMON_X_DEPEND="
 
 COMMON_SNAPSHOT_DEPEND="
 	system-abseil-cpp? ( >=dev-cpp/abseil-cpp-20230125.2 )
-	system-brotli? ( app-arch/brotli )
+	system-brotli? ( >=app-arch/brotli-9999 )
 	system-crc32c? ( dev-libs/crc32c )
 	system-double-conversion? ( dev-libs/double-conversion )
 	system-woff2? ( media-libs/woff2 )
@@ -199,6 +198,7 @@ COMMON_DEPEND="
 			dev-qt/qtcore:5
 			dev-qt/qtwidgets:5
 		)
+		qt6? ( dev-qt/qtbase:6[gui,widgets] )
 	)
 "
 
@@ -209,12 +209,16 @@ RDEPEND="${COMMON_DEPEND}
 			gui-libs/gtk:4[X?,wayland?]
 		)
 		qt5? ( dev-qt/qtgui:5[X?,wayland?] )
+		qt6? ( dev-qt/qtbase:6[X?,wayland?] )
 	)
 	virtual/ttf-fonts
 	selinux? ( sec-policy/selinux-chromium )
-	!www-client/chromium
-	!www-client/chromium-bin
-	!www-client/ungoogled-chromium-bin
+	!override-data-dir? (
+		!www-client/chromium
+		!www-client/chromium-bin
+		!www-client/ungoogled-chromium-bin
+		!www-client/cromite[-override-data-dir]
+	)
 "
 
 DEPEND="${COMMON_DEPEND}
@@ -233,9 +237,10 @@ BDEPEND="
 	>=app-arch/gzip-1.7
 	!headless? (
 		qt5? ( dev-qt/qtcore:5 )
+		qt6? ( dev-qt/qtbase:6 )
 	)
 	dev-lang/perl
-	>=dev-util/gn-0.1807
+	>=dev-util/gn-0.2114
 	>=dev-util/gperf-3.0.3
 	>=dev-util/ninja-1.7.2
 	dev-vcs/git
@@ -292,8 +297,8 @@ python_check_deps() {
 pre_build_checks() {
 	# Check build requirements, bug #541816 and bug #471810 .
 	CHECKREQS_MEMORY="4G"
-	CHECKREQS_DISK_BUILD="12G"
-	tc-is-cross-compiler && CHECKREQS_DISK_BUILD="14G"
+	CHECKREQS_DISK_BUILD="14G"
+	tc-is-cross-compiler && CHECKREQS_DISK_BUILD="16G"
 	if is-flagq '-g?(gdb)?([1-9])'; then
 		CHECKREQS_DISK_BUILD="16G"
 	fi
@@ -319,7 +324,7 @@ pkg_pretend() {
 		ewarn
 		ewarn "uazo-bromite patches are very experimental and unstable"
 		ewarn "Please consider testing them and giving feedback upstream:"
-		ewarn "https://github.com/uazo/bromite-buildtools/issues"
+		ewarn "https://github.com/uazo/cromite/issues"
 		ewarn "Not all patches are applied, let me know if any other are worthy of inclusion"
 		ewarn
 	fi
@@ -333,7 +338,7 @@ pkg_pretend() {
 	pre_build_checks
 
 	if use headless; then
-		local headless_unused_flags=("cups" "kerberos" "pulseaudio" "qt5" "vaapi" "wayland")
+		local headless_unused_flags=("cups" "kerberos" "pulseaudio" "qt5" "qt6" "vaapi" "wayland")
 		for myiuse in ${headless_unused_flags[@]}; do
 			use ${myiuse} && ewarn "Ignoring USE=${myiuse} since USE=headless is set."
 		done
@@ -350,52 +355,37 @@ src_prepare() {
 	# Calling this here supports resumption via FEATURES=keepwork
 	python_setup
 
-	# if ! use custom-cflags; then #See #25 #92
-	# 	sed -i '/default_stack_frames/Q' ${WORKDIR}/patches/chromium-*-compiler.patch || die
-	# fi
+	if ! use custom-cflags; then #See #25 #92
+		sed -i '/default_stack_frames/Q' ${WORKDIR}/patches/chromium-*-compiler.patch || die
+	fi
 
 	# disable global media controls, crashes with libstdc++
 	sed -i -e \
 		"/\"GlobalMediaControlsCastStartStop\",/{n;s/ENABLED/DISABLED/;}" \
 		"chrome/browser/media/router/media_router_feature.cc" || die
 
-	# Tis lazy, but tidy this up in 115.
-	pushd "${WORKDIR}/chromium-112-gcc-13-patches/" || die
-		rm chromium-112-gcc-13-0002-perfetto.patch || die
-		rm chromium-112-gcc-13-0004-swiftshader.patch || die
-		rm chromium-112-gcc-13-0007-misc.patch || die
-		rm chromium-112-gcc-13-0008-dawn.patch || die
-		rm chromium-112-gcc-13-0009-base.patch || die
-		rm chromium-112-gcc-13-0010-components.patch || die
-		rm chromium-112-gcc-13-0011-s2cellid.patch || die
-		rm chromium-112-gcc-13-0012-webrtc-base64.patch || die
-		rm chromium-112-gcc-13-0013-quiche.patch || die
-		rm chromium-112-gcc-13-0015-net.patch || die
-		rm chromium-112-gcc-13-0016-cc-targetproperty.patch || die
-		rm chromium-112-gcc-13-0017-gpu_feature_info.patch || die
-		rm chromium-112-gcc-13-0018-encounteredsurfacetracker.patch || die
-		rm chromium-112-gcc-13-0019-documentattachmentinfo.patch  || die
-		rm chromium-112-gcc-13-0020-pdfium.patch || die
-		rm chromium-112-gcc-13-0021-gcc-copy-list-init-net-HostCache.patch || die
-		rm chromium-112-gcc-13-0022-gcc-ambiguous-ViewTransitionElementId-type.patch || die
-		rm chromium-112-gcc-13-0023-gcc-incomplete-type-v8-subtype.patch || die
-	popd || die
+	rm ${WORKDIR}/patches/chromium-116-abseil-arm64.patch
+	rm ${WORKDIR}/patches/chromium-116-object_paint_properties_sparse-include.patch
+	rm ${WORKDIR}/patches/chromium-116-profile_view_utils-include.patch
+	rm ${WORKDIR}/patches/chromium-116-url_load_stats-include.patch
 
+		# "${FILESDIR}/chromium-qt6.patch"
+		# "${FILESDIR}/chromium-114-remove-evdev-dep.patch"
+		# "${FILESDIR}/chromium-115-binutils-2.41.patch"
+		# "${FILESDIR}/chromium-98-gtk4-build.patch"
 	local PATCHES=(
+		"${WORKDIR}/patches"
 		"${FILESDIR}/chromium-cross-compile.patch"
 		"${FILESDIR}/chromium-use-oauth2-client-switches-as-default.patch"
-		"${FILESDIR}/chromium-98-gtk4-build.patch"
 		"${FILESDIR}/chromium-108-EnumTable-crash.patch"
 		"${FILESDIR}/chromium-109-system-openh264.patch"
 		"${FILESDIR}/chromium-109-system-zlib.patch"
 		"${FILESDIR}/chromium-111-InkDropHost-crash.patch"
-		"${WORKDIR}/chromium-112-gcc-13-patches"
-		"${FILESDIR}/chromium-113-gcc-13-0001-vulkanmemoryallocator.patch"
-		"${FILESDIR}/chromium-113-swiftshader-cstdint.patch"
-		"${FILESDIR}/clang-15-fixes.patch"
 		"${FILESDIR}/perfetto-system-zlib.patch"
 		"${FILESDIR}/gtk-fix-prefers-color-scheme-query.diff"
 		"${FILESDIR}/restore-x86-r2.patch"
+		"${FILESDIR}/chromium-117-material_color_utilities.patch"
+		"${FILESDIR}/chromium-117-later-gtk4-version.patch"
 	)
 
 	if [ ! -z "${CHROMIUM_COMMITS[*]}" ]; then
@@ -406,12 +396,6 @@ src_prepare() {
 				PATCHES+=( "${DISTDIR}/chromium-$i.patch" )
 			fi
 		done
-	fi
-
-	if use custom-cflags; then #See #25 #92
-		PATCHES+=( "${FILESDIR}/chromium-114-compiler-custom-cflags.patch" )
-	else
-		PATCHES+=( "${FILESDIR}/chromium-114-compiler.patch" )
 	fi
 
 	if use ppc64 ; then
@@ -427,7 +411,11 @@ src_prepare() {
 	default
 
 	if use uazo-bromite ; then
-		BR_PA_PATH="${WORKDIR}/bromite-${UAZO_BROMITE_COMMIT_ID}/build/patches"
+		BR_PA_PATH="${WORKDIR}/cromite-${UAZO_BROMITE_COMMIT_ID}/build/patches"
+
+		#! conflicting patches
+		sed -i '/kMediaFoundationClearKeyCdmPathForTesting/,+8d' "${BR_PA_PATH}/00Disable-speechSynthesis-getVoices-API.patch" || die
+
 		BROMITE_PATCHES=(
 			"${BR_PA_PATH}/Battery-API-return-nothing.patch"
 			"${BR_PA_PATH}/Multiple-fingerprinting-mitigations.patch"
@@ -441,8 +429,6 @@ src_prepare() {
 			"${BR_PA_PATH}/Disable-idle-detection.patch"
 			"${BR_PA_PATH}/Disable-TLS-resumption.patch"
 			"${BR_PA_PATH}/Remove-navigator.connection-info.patch"
-
-			"${BR_PA_PATH}/00WIN-ADDTO-Add-a-proxy-configuration-page.patch"
 
 			"${BR_PA_PATH}/AudioBuffer-AnalyserNode-fp-mitigations.patch"
 			"${BR_PA_PATH}/00Fonts-fingerprinting-mitigation.patch"
@@ -459,6 +445,9 @@ src_prepare() {
 			"${BR_PA_PATH}/Timezone-customization.patch"
 			"${BR_PA_PATH}/00Disable-speechSynthesis-getVoices-API.patch"
 			"${BR_PA_PATH}/00Remove-support-for-device-memory-and-cpu-recovery.patch"
+			"${BR_PA_PATH}/00Disable-Feeback-Collector.patch"
+			"${BR_PA_PATH}/00Disable-remote-altsvc-for-h3-connections.patch"
+			"${BR_PA_PATH}/00Disable-PartnerCustomizations.patch"
 		)
 		for i in "${BROMITE_PATCHES[@]}"; do
 			if [[ "$i" =~ "Add-autoplay-site-setting.patch" ]] ||
@@ -486,11 +475,18 @@ src_prepare() {
 	sed -i '/^.*deps.*third_party\/jsoncpp.*$/{s++public_deps = [ "//third_party/jsoncpp" ]+;h};${x;/./{x;q0};x;q1}' \
 		third_party/webrtc/rtc_base/BUILD.gn || die
 
+	use bluetooth || eapply "${FILESDIR}/disable-bluez.patch"
+
 	use convert-dict && eapply "${FILESDIR}/chromium-ucf-dict-utility.patch"
 
 	if use hevc; then
 		sed -i '/^bool IsHevcProfileSupported(const VideoType& type) {$/{s++bool IsHevcProfileSupported(const VideoType\& type) { return true;+;h};${x;/./{x;q0};x;q1}' \
 			media/base/supported_types.cc || die
+	fi
+
+	if use override-data-dir; then
+		sed -i '/"chromium";/{s++"ungoogled-chromium";+;h};${x;/./{x;q0};x;q1}' \
+			chrome/common/chrome_paths_linux.cc || die
 	fi
 
 	if use system-abseil-cpp; then
@@ -499,6 +495,8 @@ src_prepare() {
 		sed -i '/^#define ABSL_OPTION_USE_STD_OPTIONAL.*$/{s++#define ABSL_OPTION_USE_STD_OPTIONAL 0+;h};${x;/./{x;q0};x;q1}' \
 			third_party/abseil-cpp/absl/base/options.h || die
 	fi
+
+	use system-brotli && eapply "${FILESDIR}/chromium-system-brotli.patch"
 
 	use system-ffmpeg && eapply "${FILESDIR}/chromium-99-opus.patch"
 
@@ -516,8 +514,6 @@ src_prepare() {
 	fi
 
 	use system-openjpeg && eapply "${FILESDIR}/chromium-system-openjpeg-r4.patch"
-
-	use vaapi && eapply "${FILESDIR}/vaapi-av1.diff"
 
 	#* Applying UGC PRs here
 	if [ ! -z "${UGC_PR_COMMITS[*]}" ]; then
@@ -624,7 +620,6 @@ src_prepare() {
 		third_party/angle/src/third_party/libXNVCtrl
 	)
 	keeplibs+=(
-		third_party/angle/src/third_party/systeminfo
 		third_party/angle/src/third_party/volk
 		third_party/apple_apsl
 		third_party/axe-core
@@ -667,6 +662,7 @@ src_prepare() {
 	)
 	keeplibs+=(
 		third_party/cros_system_api
+		third_party/d3
 		third_party/dawn
 		third_party/dawn/third_party/gn/webgpu-cts
 		third_party/dawn/third_party/khronos
@@ -687,6 +683,7 @@ src_prepare() {
 		third_party/devtools-frontend/src/front_end/third_party/marked
 		third_party/devtools-frontend/src/front_end/third_party/puppeteer
 		third_party/devtools-frontend/src/front_end/third_party/puppeteer/package/lib/esm/third_party/mitt
+		third_party/devtools-frontend/src/front_end/third_party/puppeteer/package/lib/esm/third_party/rxjs
 		third_party/devtools-frontend/src/front_end/third_party/vscode.web-custom-data
 		third_party/devtools-frontend/src/front_end/third_party/wasmparser
 		third_party/devtools-frontend/src/test/unittests/front_end/third_party/i18n
@@ -791,7 +788,6 @@ src_prepare() {
 	)
 	keeplibs+=(
 		third_party/pdfium/third_party/libtiff
-		third_party/pdfium/third_party/skia_shared
 		third_party/perfetto
 		third_party/perfetto/protos/third_party/chromium
 		third_party/pffft
@@ -801,6 +797,7 @@ src_prepare() {
 		third_party/private_membership
 		third_party/protobuf
 		third_party/pthreadpool
+		third_party/puffin
 		third_party/pyjson5
 		third_party/pyyaml
 		third_party/qcms
@@ -860,6 +857,7 @@ src_prepare() {
 		third_party/xnnpack
 		third_party/zxcvbn-cpp
 		third_party/zlib/google
+		third_party/zstd
 		url/third_party/mozilla
 		v8/src/third_party/siphash
 		v8/src/third_party/valgrind
@@ -1110,9 +1108,6 @@ src_configure() {
 	# See dependency logic in third_party/BUILD.gn
 	myconf_gn+=" use_system_harfbuzz=$(usex system-harfbuzz true false)"
 
-	# Disable deprecated libgnome-keyring dependency, bug #713012
-	myconf_gn+=" use_gnome_keyring=false"
-
 	# Optional dependencies.
 	myconf_gn+=" enable_hangout_services_extension=$(usex hangouts true false)"
 	myconf_gn+=" enable_widevine=$(usex widevine true false)"
@@ -1136,6 +1131,8 @@ src_configure() {
 
 	myconf_gn+=" disable_fieldtrial_testing_config=true"
 
+	myconf_gn+=" use_bluez=$(usex bluetooth true false)"
+
 	myconf_gn+=" is_cfi=$(usex cfi true false)"
 
 	if use cfi; then
@@ -1145,6 +1142,7 @@ src_configure() {
 
 	if use pgo; then
 		myconf_gn+=" chrome_pgo_phase=2"
+		myconf_gn+=" v8_enable_builtins_optimization=true"
 	else
 		myconf_gn+=" chrome_pgo_phase=0"
 	fi
@@ -1159,6 +1157,7 @@ src_configure() {
 	myconf_gn+=" enable_hevc_parser_and_hw_decoder=$(usex hevc true false)"
 
 	# Ungoogled flags
+	myconf_gn+=" build_with_tflite_lib=false"
 	myconf_gn+=" enable_mdns=false"
 	myconf_gn+=" enable_mse_mpeg2ts_stream_parser=$(usex proprietary-codecs true false)"
 	myconf_gn+=" enable_reading_list=false"
@@ -1166,17 +1165,17 @@ src_configure() {
 	myconf_gn+=" enable_reporting=false"
 	myconf_gn+=" enable_service_discovery=false"
 	myconf_gn+=" exclude_unwind_tables=true"
-	myconf_gn+=" use_official_google_api_keys=false"
 	myconf_gn+=" google_api_key=\"\""
 	myconf_gn+=" google_default_client_id=\"\""
 	myconf_gn+=" google_default_client_secret=\"\""
 	myconf_gn+=" safe_browsing_mode=0"
+	myconf_gn+=" use_official_google_api_keys=false"
 	myconf_gn+=" use_unofficial_version_number=false"
+
 	myconf_gn+=" blink_symbol_level=0"
 	myconf_gn+=" symbol_level=0"
 	myconf_gn+=" enable_iterator_debugging=false"
 	myconf_gn+=" enable_swiftshader=false"
-	myconf_gn+=" build_with_tflite_lib=false"
 
 	# Additional flags
 	myconf_gn+=" perfetto_use_system_zlib=true"
@@ -1331,17 +1330,30 @@ src_configure() {
 		myconf_gn+=" use_system_libdrm=true"
 		myconf_gn+=" use_system_minigbm=true"
 		myconf_gn+=" use_xkbcommon=true"
-		if use qt5; then
-			local moc_dir="$(qt5_get_bindir)"
+		if use qt5 || use qt6; then
+			local cbuild_libdir=$(get_libdir)
 			if tc-is-cross-compiler; then
 				# Hack to workaround get_libdir not being able to handle CBUILD, bug #794181
 				local cbuild_libdir=$($(tc-getBUILD_PKG_CONFIG) --keep-system-libs --libs-only-L libxslt)
 				cbuild_libdir=${cbuild_libdir:2}
-				moc_dir="${EPREFIX}"/${cbuild_libdir/% }/qt5/bin
+				cbuild_libdir=${cbuild_libdir/% }
 			fi
-			export PATH="${PATH}:${moc_dir}"
+			if use qt5; then
+				if tc-is-cross-compiler; then
+					myconf_gn+=" moc_qt5_path=\"${EPREFIX}/${cbuild_libdir}/qt5/bin\""
+				else
+					myconf_gn+=" moc_qt5_path=\"$(qt5_get_bindir)\""
+				fi
+			fi
+			if use qt6; then
+				myconf_gn+=" moc_qt6_path=\"${EPREFIX}/usr/${cbuild_libdir}/qt6/libexec\""
+			fi
+
+			myconf_gn+=" use_qt=true"
+			myconf_gn+=" use_qt6=$(usex qt6 true false)"
+		else
+			myconf_gn+=" use_qt=false"
 		fi
-		myconf_gn+=" use_qt=$(usex qt5 true false)"
 		myconf_gn+=" ozone_platform_x11=$(usex X true false)"
 		myconf_gn+=" ozone_platform_wayland=$(usex wayland true false)"
 		myconf_gn+=" ozone_platform=$(usex wayland \"wayland\" \"x11\")"
@@ -1596,6 +1608,12 @@ pkg_postinst() {
 		if use widevine; then
 			elog "widevine requires binary plugins, which are distributed separately"
 			elog "Make sure you have www-plugins/chrome-binary-plugins installed"
+		fi
+		if use qt5 && use qt6; then
+			elog "Chromium automatically selects Qt5 or Qt6 based on your desktop"
+			elog "environment. To override you need to pass --qt-version=5 or"
+			elog "--qt-version=6, e.g. by adding it to CHROMIUM_FLAGS in"
+			elog "/etc/chromium/default."
 		fi
 	fi
 }
