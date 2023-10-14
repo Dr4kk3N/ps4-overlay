@@ -3,24 +3,24 @@
 
 EAPI=8
 
-FIREFOX_PATCHSET="firefox-102esr-patches-10j.tar.xz"
+FIREFOX_PATCHSET="firefox-115esr-patches-06.tar.xz"
 
-LLVM_MAX_SLOT=15
+LLVM_MAX_SLOT=16
 
-PYTHON_COMPAT=( python3_{9..11} )
+PYTHON_COMPAT=( python3_{10..11} )
 PYTHON_REQ_USE="ncurses,sqlite,ssl"
 
 WANT_AUTOCONF="2.1"
 
-# Convert the ebuild version to the upstream mozilla version, used by mozlinguas
+# Convert the ebuild version to the upstream Mozilla version
 MOZ_PV="${PV/_p*}esr"
 
-# see https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/maint-12.5/projects/firefox/config#L14
-# and https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/maint-12.5/projects/browser/config#L106
+# see https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/maint-13.0/projects/firefox/config?ref_type=heads#L17
+# and https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/maint-13.0/projects/browser/config?ref_type=heads#L91
 # and https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/tags
-TOR_PV="12.5.3"
-TOR_TAG="${TOR_PV%.*}-1-build2"
-NOSCRIPT_VERSION="11.4.26"
+TOR_PV="13.0"
+TOR_TAG="${TOR_PV%a*}-1-build2"
+NOSCRIPT_VERSION="11.4.28"
 CHANGELOG_TAG="${TOR_PV}-build1"
 
 inherit autotools check-reqs desktop flag-o-matic linux-info \
@@ -30,14 +30,14 @@ TOR_SRC_BASE_URI="https://dist.torproject.org/torbrowser/${TOR_PV}"
 TOR_SRC_ARCHIVE_URI="https://archive.torproject.org/tor-package-archive/torbrowser/${TOR_PV}"
 
 PATCH_URIS=(
-	https://dev.gentoo.org/~{juippis,whissi,slashbeast}/mozilla/patchsets/${FIREFOX_PATCHSET}
+	https://dev.gentoo.org/~juippis/mozilla/patchsets/${FIREFOX_PATCHSET}
 )
 
 SRC_URI="
 	${TOR_SRC_BASE_URI}/src-firefox-tor-browser-${MOZ_PV}-${TOR_TAG}.tar.xz
 	${TOR_SRC_ARCHIVE_URI}/src-firefox-tor-browser-${MOZ_PV}-${TOR_TAG}.tar.xz
-	${TOR_SRC_BASE_URI}/tor-browser-linux64-${TOR_PV}_ALL.tar.xz
-	${TOR_SRC_ARCHIVE_URI}/tor-browser-linux64-${TOR_PV}_ALL.tar.xz
+	${TOR_SRC_BASE_URI}/tor-browser-linux-x86_64-${TOR_PV}.tar.xz
+	${TOR_SRC_ARCHIVE_URI}/tor-browser-linux-x86_64-${TOR_PV}.tar.xz
 	https://addons.mozilla.org/firefox/downloads/file/3954910/noscript-${NOSCRIPT_VERSION}.xpi
 	https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/raw/tbb-${CHANGELOG_TAG}/projects/browser/Bundle-Data/Docs-TBB/ChangeLog.txt -> ${P}-ChangeLog.txt
 	${PATCH_URIS[@]}"
@@ -52,10 +52,18 @@ LICENSE="BSD CC-BY-3.0 MPL-2.0 GPL-2 LGPL-2.1"
 IUSE="+clang dbus hardened"
 IUSE+=" pulseaudio"
 IUSE+=" +system-av1 +system-harfbuzz +system-icu +system-jpeg +system-libevent +system-libvpx system-png system-python-libs +system-webp"
-IUSE+=" wayland"
+IUSE+=" wayland +X"
 
 BDEPEND="${PYTHON_DEPS}
 	|| (
+		(
+			sys-devel/clang:16
+			sys-devel/llvm:16
+			clang? (
+				sys-devel/lld:16
+				virtual/rust:0/llvm-16
+			)
+		)
 		(
 			sys-devel/clang:15
 			sys-devel/llvm:15
@@ -64,21 +72,14 @@ BDEPEND="${PYTHON_DEPS}
 				virtual/rust:0/llvm-15
 			)
 		)
-		(
-			sys-devel/clang:14
-			sys-devel/llvm:14
-			clang? (
-				sys-devel/lld:14
-				virtual/rust:0/llvm-14
-			)
-		)
 	)
-	!clang? ( virtual/rust )
+	app-alternatives/awk
 	app-arch/unzip
 	app-arch/zip
 	>=dev-util/cbindgen-0.24.3
 	net-libs/nodejs
 	virtual/pkgconfig
+	!clang? ( >=virtual/rust-1.65 )
 	>=dev-lang/nasm-2.14"
 
 COMMON_DEPEND="
@@ -86,8 +87,8 @@ COMMON_DEPEND="
 	dev-libs/expat
 	dev-libs/glib:2
 	dev-libs/libffi:=
-	>=dev-libs/nss-3.79.2
-	>=dev-libs/nspr-4.34
+	>=dev-libs/nss-3.90
+	>=dev-libs/nspr-4.35
 	media-libs/alsa-lib
 	media-libs/fontconfig
 	media-libs/freetype
@@ -95,19 +96,8 @@ COMMON_DEPEND="
 	media-video/ffmpeg
 	sys-libs/zlib
 	virtual/freedesktop-icon-theme
-	virtual/opengl
-	x11-libs/cairo[X]
+	x11-libs/cairo
 	x11-libs/gdk-pixbuf
-	x11-libs/gtk+:3[X]
-	x11-libs/libX11
-	x11-libs/libXcomposite
-	x11-libs/libXdamage
-	x11-libs/libXext
-	x11-libs/libXfixes
-	x11-libs/libXrandr
-	x11-libs/libXtst
-	x11-libs/libxcb:=
-	x11-libs/libxkbcommon[X]
 	x11-libs/pango
 	x11-libs/pixman
 	dbus? (
@@ -116,8 +106,8 @@ COMMON_DEPEND="
 	)
 	pulseaudio? (
 		|| (
-			media-sound/pulseaudio
-			>=media-sound/apulse-0.1.12-r4
+			media-libs/libpulse
+			>=media-sound/apulse-0.1.12-r4[sdk]
 		)
 	)
 	system-av1? (
@@ -128,25 +118,40 @@ COMMON_DEPEND="
 		>=media-gfx/graphite2-1.3.13
 		>=media-libs/harfbuzz-2.8.1:0=
 	)
-	system-icu? ( >=dev-libs/icu-71.1:= )
+	system-icu? ( >=dev-libs/icu-73.1:= )
 	system-jpeg? ( >=media-libs/libjpeg-turbo-1.2.1 )
 	system-libevent? ( >=dev-libs/libevent-2.1.12:0=[threads(+)] )
 	system-libvpx? ( >=media-libs/libvpx-1.8.2:0=[postproc] )
 	system-png? ( >=media-libs/libpng-1.6.35:0=[apng] )
 	system-webp? ( >=media-libs/libwebp-1.1.0:0= )
 	wayland? (
+		>=media-libs/libepoxy-1.5.10-r1
 		x11-libs/gtk+:3[wayland]
-		x11-libs/libdrm
 		x11-libs/libxkbcommon[wayland]
+	)
+	X? (
+		virtual/opengl
+		x11-libs/cairo[X]
+		x11-libs/gtk+:3[X]
+		x11-libs/libX11
+		x11-libs/libXcomposite
+		x11-libs/libXdamage
+		x11-libs/libXext
+		x11-libs/libXfixes
+		x11-libs/libxkbcommon[X]
+		x11-libs/libXrandr
+		x11-libs/libXtst
+		x11-libs/libxcb:=
 	)"
-
 RDEPEND="${COMMON_DEPEND}
 	!www-client/torbrowser-launcher"
 
 DEPEND="${COMMON_DEPEND}
-	x11-base/xorg-proto
-	x11-libs/libICE
-	x11-libs/libSM"
+	X? (
+		x11-base/xorg-proto
+		x11-libs/libICE
+		x11-libs/libSM
+	)"
 
 S="${WORKDIR}/firefox-tor-browser-${MOZ_PV}-${TOR_TAG}"
 
@@ -156,7 +161,7 @@ llvm_check_deps() {
 		return 1
 	fi
 
-	if use clang ; then
+	if use clang && ! tc-ld-is-mold ; then
 		if ! has_version -b "sys-devel/lld:${LLVM_SLOT}" ; then
 			einfo "sys-devel/lld:${LLVM_SLOT} is missing! Cannot use LLVM slot ${LLVM_SLOT} ..." >&2
 			return 1
@@ -276,9 +281,43 @@ mozconfig_use_with() {
 	mozconfig_add_options_ac "$(use ${1} && echo +${1} || echo -${1})" "${flag}"
 }
 
+# This is a straight copypaste from toolchain-funcs.eclass's 'tc-ld-is-lld', and is temporarily
+# placed here until toolchain-funcs.eclass gets an official support for mold linker.
+# Please see:
+# https://github.com/gentoo/gentoo/pull/28366 ||
+# https://github.com/gentoo/gentoo/pull/28355
+tc-ld-is-mold() {
+	local out
+
+	# Ensure ld output is in English.
+	local -x LC_ALL=C
+
+	# First check the linker directly.
+	out=$($(tc-getLD "$@") --version 2>&1)
+	if [[ ${out} == *"mold"* ]] ; then
+		return 0
+	fi
+
+	# Then see if they're selecting mold via compiler flags.
+	# Note: We're assuming they're using LDFLAGS to hold the
+	# options and not CFLAGS/CXXFLAGS.
+	local base="${T}/test-tc-linker"
+	cat <<-EOF > "${base}.c"
+	int main() { return 0; }
+	EOF
+	out=$($(tc-getCC "$@") ${CFLAGS} ${CPPFLAGS} ${LDFLAGS} -Wl,--version "${base}.c" -o "${base}" 2>&1)
+	rm -f "${base}"*
+	if [[ ${out} == *"mold"* ]] ; then
+		return 0
+	fi
+
+	# No mold here!
+	return 1
+}
+
 pkg_pretend() {
 	# Ensure we have enough disk space to compile
-	CHECKREQS_DISK_BUILD="6400M"
+	CHECKREQS_DISK_BUILD="6600M"
 
 	check-reqs_pkg_pretend
 }
@@ -321,7 +360,6 @@ pkg_setup() {
 }
 
 src_prepare() {
-	rm "${WORKDIR}/firefox-patches/0035-bgo-902025-gcc-13-fixes.patch"
 	eapply "${WORKDIR}/firefox-patches"
 
 	# https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/20497#note_2873088
@@ -361,9 +399,6 @@ src_prepare() {
 	einfo "Removing pre-built binaries ..."
 	find "${S}"/third_party -type f \( -name '*.so' -o -name '*.o' \) -print -delete || die
 
-	# Clearing crate checksums where we have applied patches
-	moz_clear_vendor_checksums bindgen
-
 	# Create build dir
 	BUILD_DIR="${WORKDIR}/${PN}_build"
 	mkdir -p "${BUILD_DIR}" || die
@@ -383,12 +418,17 @@ src_configure() {
 	if use clang; then
 		# Force clang
 		einfo "Enforcing the use of clang due to USE=clang ..."
+
+		local version_clang=$(clang --version 2>/dev/null | grep -F -- 'clang version' | awk '{ print $3 }')
+		[[ -n ${version_clang} ]] && version_clang=$(ver_cut 1 "${version_clang}")
+		[[ -z ${version_clang} ]] && die "Failed to read clang version!"
+
 		if tc-is-gcc; then
 			have_switched_compiler=yes
 		fi
 		AR=llvm-ar
-		CC=${CHOST}-clang
-		CXX=${CHOST}-clang++
+		CC=${CHOST}-clang-${version_clang}
+		CXX=${CHOST}-clang++-${version_clang}
 		NM=llvm-nm
 		RANLIB=llvm-ranlib
 	elif ! use clang && ! tc-is-gcc ; then
@@ -408,7 +448,8 @@ src_configure() {
 		strip-unsupported-flags
 	fi
 
-	# Ensure we use correct toolchain
+	# Ensure we use correct toolchain,
+	# AS is used in a non-standard way by upstream, #bmo1654031
 	export HOST_CC="$(tc-getBUILD_CC)"
 	export HOST_CXX="$(tc-getBUILD_CXX)"
 	export AS="$(tc-getCC) -c"
@@ -433,6 +474,7 @@ src_configure() {
 
 	# Initialize MOZCONFIG
 	mozconfig_add_options_ac '' --enable-application=browser
+	mozconfig_add_options_ac '' --enable-project=browser
 
 	# Set Gentoo defaults
 	export MOZILLA_OFFICIAL=1
@@ -445,6 +487,7 @@ src_configure() {
 		--disable-install-strip \
 		--disable-parental-controls \
 		--disable-strip \
+		--disable-tests \
 		--disable-updater \
 		--enable-negotiateauth \
 		--enable-new-pass-manager \
@@ -500,8 +543,10 @@ src_configure() {
 
 	mozconfig_add_options_ac '' --disable-necko-wifi
 
-	if use wayland ; then
+	if use X && use wayland ; then
 		mozconfig_add_options_ac '+x11+wayland' --enable-default-toolkit=cairo-gtk3-x11-wayland
+	elif ! use X && use wayland ; then
+		mozconfig_add_options_ac '+wayland' --enable-default-toolkit=cairo-gtk3-wayland-only
 	else
 		mozconfig_add_options_ac '+x11' --enable-default-toolkit=cairo-gtk3
 	fi
@@ -509,34 +554,26 @@ src_configure() {
 	# see https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/issues/40745
 	export MOZ_APP_BASENAME="TorBrowser"
 
-	# see https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/maint-12.5/projects/firefox/build?ref_type=heads#L174
+	# see https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/maint-13.0/projects/firefox/build?ref_type=heads#L164
 	mozconfig_add_options_ac 'torbrowser' \
 		--with-base-browser-version=${TOR_PV} \
 		--enable-update-channel=release \
 		--with-branding=browser/branding/tb-release
 
-	# see https://gitlab.torproject.org/tpo/applications/tor-browser/-/blob/tor-browser-102.9.0esr-12.5-1/browser/config/mozconfigs/tor-browser
+	# see https://gitlab.torproject.org/tpo/applications/tor-browser/-/blob/tor-browser-115.3.1esr-13.0-1/browser/config/mozconfigs/tor-browser?ref_type=heads
 	mozconfig_add_options_mk 'torbrowser' "MOZ_APP_DISPLAYNAME=\"Tor Browser\""
 	mozconfig_add_options_ac 'torbrowser' \
 		--without-relative-data-dir \
 		--with-distribution-id=org.torproject
 
-	# see https://gitlab.torproject.org/tpo/applications/tor-browser/-/blob/tor-browser-102.9.0esr-12.5-1/browser/config/mozconfigs/base-browser
+	# see https://gitlab.torproject.org/tpo/applications/tor-browser/-/blob/tor-browser-115.3.1esr-13.0-1/browser/config/mozconfigs/base-browser?ref_type=heads
 	export MOZILLA_OFFICIAL=1
 	mozconfig_add_options_ac 'torbrowser' \
-		--enable-official-branding
+		--enable-official-branding \
 
-	# see https://gitlab.torproject.org/tpo/applications/tor-browser/-/blob/tor-browser-102.9.0esr-12.5-1/mozconfig-linux-x86_64
-	mozconfig_add_options_ac 'torbrowser' \
-		--disable-strip \
-		--disable-install-strip
-
-	# see https://gitlab.torproject.org/tpo/applications/tor-browser/-/blob/tor-browser-102.9.0esr-12.5-1/browser/config/mozconfigs/base-browser
-	mozconfig_add_options_ac 'torbrowser' \
 		--enable-optimize \
 		--enable-rust-simd \
-		--enable-verify-mar \
-		--enable-nss-mar \
+		--disable-unverified-updates \
 		--disable-base-browser-update \
 		--enable-bundled-fonts \
 		--disable-tests \
@@ -549,7 +586,7 @@ src_configure() {
 		--disable-system-policies \
 		--disable-backgroundtasks \
 		MOZ_TELEMETRY_REPORTING= \
-		--without-wasm-sandboxed-libraries
+		--disable-legacy-profile-creation
 
 	# Avoid auto-magic on linker
 	if use clang ; then
@@ -777,7 +814,7 @@ src_install() {
 	# https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/main/projects/browser/RelativeLink/start-browser#L340
 	# https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/tree/main/projects/fonts
 	sed -i -e 's|<dir>fonts</dir>|<dir>/usr/share/torbrowser/fonts</dir>|' \
-		${WORKDIR}/tor-browser/Browser/fontconfig/fonts.conf || die
+		"${WORKDIR}"/tor-browser/Browser/fontconfig/fonts.conf || die
 	insinto /usr/share/torbrowser/
 	doins -r "${WORKDIR}/tor-browser/Browser/fontconfig"
 	doins -r "${WORKDIR}/tor-browser/Browser/fonts"

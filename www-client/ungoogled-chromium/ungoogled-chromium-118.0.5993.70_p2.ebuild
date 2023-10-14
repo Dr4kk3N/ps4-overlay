@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{10..12} )
+PYTHON_COMPAT=( python3_{10..11} )
 PYTHON_REQ_USE="xml(+)"
 
 CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu he
@@ -22,11 +22,9 @@ inherit python-any-r1 qmake-utils readme.gentoo-r1 toolchain-funcs xdg-utils
 
 DESCRIPTION="Modifications to Chromium for removing Google integration and enhancing privacy"
 HOMEPAGE="https://github.com/ungoogled-software/ungoogled-chromium"
-PATCHSET="2"
-PATCHSET_NAME="chromium-116-patchset-${PATCHSET}"
-PATCHSET_PPC64="117.0.5938.62-1raptor0~deb12u1"
+PATCHSET_PPC64="118.0.5993.70-1raptor0~deb11u1"
 SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/chromium-${PV/_*}.tar.xz
-	https://github.com/stha09/chromium-patches/releases/download/${PATCHSET_NAME}/${PATCHSET_NAME}.tar.xz
+	https://gitlab.com/Matt.Jolly/chromium-patches/-/archive/${PV%%\.*}/chromium-patches-${PV%%\.*}.tar.bz2
 	ppc64? (
 		https://quickbuild.io/~raptor-engineering-public/+archive/ubuntu/chromium/+files/chromium_${PATCHSET_PPC64}.debian.tar.xz
 		https://deps.gentoo.zip/chromium-ppc64le-gentoo-patches-1.tar.xz
@@ -36,7 +34,7 @@ SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/chro
 LICENSE="BSD uazo-bromite? ( GPL-3 )"
 SLOT="0"
 KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
-IUSE="+X bluetooth cfi +clang convert-dict cups cpu_flags_arm_neon custom-cflags debug enable-driver gtk4 hangouts headless hevc kerberos nvidia +official optimize-thinlto optimize-webui override-data-dir pax-kernel pgo pic +proprietary-codecs pulseaudio qt5 qt6 screencast selinux suid system-abseil-cpp system-av1 system-brotli system-crc32c system-double-conversion +system-ffmpeg +system-harfbuzz +system-icu +system-jsoncpp +system-libevent +system-libusb system-libvpx +system-openh264 system-openjpeg +system-png system-re2 +system-snappy system-woff2 thinlto uazo-bromite vaapi wayland widevine"
+IUSE="+X bluetooth cfi +clang convert-dict cups cpu_flags_arm_neon custom-cflags debug enable-driver gtk4 hangouts headless hevc kerberos nvidia +official optimize-thinlto optimize-webui override-data-dir pax-kernel pgo +proprietary-codecs pulseaudio qt5 qt6 screencast selinux system-abseil-cpp system-av1 system-brotli system-crc32c system-double-conversion system-ffmpeg +system-harfbuzz +system-icu +system-jsoncpp +system-libevent +system-libusb system-libvpx +system-openh264 system-openjpeg +system-png system-re2 +system-snappy system-woff2 +system-zstd thinlto uazo-bromite vaapi wayland widevine"
 RESTRICT="
 	!system-ffmpeg? ( proprietary-codecs? ( bindist ) )
 	!system-openh264? ( bindist )
@@ -56,17 +54,17 @@ REQUIRED_USE="
 	qt6? ( qt5 )
 "
 
-#UGC_COMMIT_ID="834ec0dbb1f3a8c6eb0c1ab195428dc38d39f73d"
+UGC_COMMIT_ID="a10f85f230cb80cb7fa5dc17860478e33f0632f5"
 # UGC_PR_COMMITS=(
 # 	c917e096342e5b90eeea91ab1f8516447c8756cf
 # 	5794e9d12bf82620d5f24505798fecb45ca5a22d
 # )
 
-UAZO_BROMITE_COMMIT_ID="9fdf65383f548d60c8837ad63a0fa6ab72ec88d6"
+UAZO_BROMITE_COMMIT_ID="c3d74a36a850c466bb60d6385625b1fe345c50ce"
 
-CHROMIUM_COMMITS=(
-	5a8dfcaf84b5af5aeb738702651e98bfc43d6d45
-)
+# CHROMIUM_COMMITS=(
+# 	5a8dfcaf84b5af5aeb738702651e98bfc43d6d45
+# )
 
 UGC_PV="${PV/_p/-}"
 UGC_PF="${PN}-${UGC_PV}"
@@ -135,6 +133,7 @@ COMMON_SNAPSHOT_DEPEND="
 	system-harfbuzz? ( >=media-libs/harfbuzz-3:0=[icu(-)] )
 	media-libs/libjpeg-turbo:=
 	system-png? ( media-libs/libpng:= )
+	system-zstd? ( >=app-arch/zstd-1.5.5:= )
 	>=media-libs/libwebp-0.4.0:=
 	media-libs/mesa:=[gbm(+)]
 	>=media-libs/openh264-1.6.0:=
@@ -295,13 +294,25 @@ python_check_deps() {
 }
 
 pre_build_checks() {
-	# Check build requirements, bug #541816 and bug #471810 .
-	CHECKREQS_MEMORY="4G"
-	CHECKREQS_DISK_BUILD="14G"
-	tc-is-cross-compiler && CHECKREQS_DISK_BUILD="16G"
-	if is-flagq '-g?(gdb)?([1-9])'; then
-		CHECKREQS_DISK_BUILD="16G"
+	# Check build requirements: bugs #471810, #541816, #914220
+	# We're going to start doing maths here on the size of an unpacked source tarball,
+	# this should make updates easier as chromium continues to balloon in size.
+	local BASE_DISK=18
+	local EXTRA_DISK=1
+	local CHECKREQS_MEMORY="4G"
+	tc-is-cross-compiler && EXTRA_DISK=2
+	if use thinlto || use pgo; then
+		CHECKREQS_MEMORY="9G"
+		tc-is-cross-compiler && EXTRA_DISK=4
+		use pgo && EXTRA_DISK=8
 	fi
+	if is-flagq '-g?(gdb)?([1-9])'; then
+		if use custom-cflags; then
+			EXTRA_DISK=13
+		fi
+		CHECKREQS_MEMORY="16G"
+	fi
+	CHECKREQS_DISK_BUILD="$((BASE_DISK + EXTRA_DISK))G"
 	check-reqs_${EBUILD_PHASE_FUNC}
 }
 
@@ -356,7 +367,7 @@ src_prepare() {
 	python_setup
 
 	if ! use custom-cflags; then #See #25 #92
-		sed -i '/default_stack_frames/Q' ${WORKDIR}/patches/chromium-*-compiler.patch || die
+		sed -i '/default_stack_frames/Q' ${WORKDIR}/chromium-patches-${PV%%.*}/chromium-*-compiler.patch || die
 	fi
 
 	# disable global media controls, crashes with libstdc++
@@ -364,17 +375,8 @@ src_prepare() {
 		"/\"GlobalMediaControlsCastStartStop\",/{n;s/ENABLED/DISABLED/;}" \
 		"chrome/browser/media/router/media_router_feature.cc" || die
 
-	rm ${WORKDIR}/patches/chromium-116-abseil-arm64.patch
-	rm ${WORKDIR}/patches/chromium-116-object_paint_properties_sparse-include.patch
-	rm ${WORKDIR}/patches/chromium-116-profile_view_utils-include.patch
-	rm ${WORKDIR}/patches/chromium-116-url_load_stats-include.patch
-
-		# "${FILESDIR}/chromium-qt6.patch"
-		# "${FILESDIR}/chromium-114-remove-evdev-dep.patch"
-		# "${FILESDIR}/chromium-115-binutils-2.41.patch"
-		# "${FILESDIR}/chromium-98-gtk4-build.patch"
 	local PATCHES=(
-		"${WORKDIR}/patches"
+		"${WORKDIR}/chromium-patches-${PV%%.*}"
 		"${FILESDIR}/chromium-cross-compile.patch"
 		"${FILESDIR}/chromium-use-oauth2-client-switches-as-default.patch"
 		"${FILESDIR}/chromium-108-EnumTable-crash.patch"
@@ -384,8 +386,6 @@ src_prepare() {
 		"${FILESDIR}/perfetto-system-zlib.patch"
 		"${FILESDIR}/gtk-fix-prefers-color-scheme-query.diff"
 		"${FILESDIR}/restore-x86-r2.patch"
-		"${FILESDIR}/chromium-117-material_color_utilities.patch"
-		"${FILESDIR}/chromium-117-later-gtk4-version.patch"
 	)
 
 	if [ ! -z "${CHROMIUM_COMMITS[*]}" ]; then
@@ -502,10 +502,10 @@ src_prepare() {
 
 	if use system-ffmpeg; then
 		if has_version "<media-video/ffmpeg-5.0"; then
-			eapply "${FILESDIR}/chromium-93-ffmpeg-4.4.patch"
+			eapply "${FILESDIR}/chromium-118-ffmpeg.patch"
 			eapply "${FILESDIR}/unbundle-ffmpeg-av_stream_get_first_dts.patch"
 		else
-			ewarn "You need to expose "av_stream_get_first_dts" in ffmpeg via user patch"
+			ewarn "You need to expose \"av_stream_get_first_dts\" in ffmpeg via user patch"
 		fi
 		if has_version "<media-video/ffmpeg-6.0"; then
 			eapply "${FILESDIR}/reverse-roll-src-third_party-ffmpeg.patch"
@@ -857,7 +857,6 @@ src_prepare() {
 		third_party/xnnpack
 		third_party/zxcvbn-cpp
 		third_party/zlib/google
-		third_party/zstd
 		url/third_party/mozilla
 		v8/src/third_party/siphash
 		v8/src/third_party/valgrind
@@ -879,6 +878,9 @@ src_prepare() {
 	fi
 	if ! use system-png; then
 		keeplibs+=( third_party/libpng )
+	fi
+	if ! use system-zstd; then
+		keeplibs+=( third_party/zstd )
 	fi
 	if ! use system-av1; then
 		keeplibs+=(
@@ -1016,6 +1018,10 @@ src_configure() {
 	myconf_gn+=" dcheck_always_on=$(usex debug true false)"
 	myconf_gn+=" dcheck_is_configurable=$(usex debug true false)"
 
+	# Component build isn't generally intended for use by end users. It's mostly useful
+	# for development and debugging.
+	myconf_gn+=" is_component_build=false"
+
 	# Disable nacl, we can't build without pnacl (http://crbug.com/269560).
 	myconf_gn+=" enable_nacl=false"
 
@@ -1081,6 +1087,9 @@ src_configure() {
 	if use system-png; then
 		gn_system_libraries+=( libpng )
 		myconf_gn+=" use_system_libpng=true"
+	fi
+	if use system-zstd; then
+		gn_system_libraries+=( zstd )
 	fi
 	if use system-av1; then
 		gn_system_libraries+=( dav1d libaom )
@@ -1284,23 +1293,6 @@ src_configure() {
 	# https://bugs.gentoo.org/654216
 	addpredict /dev/dri/ #nowarn
 
-	#if ! use system-ffmpeg; then
-	if false; then
-		local build_ffmpeg_args=""
-		if use pic && [[ "${ffmpeg_target_arch}" == "ia32" ]]; then
-			build_ffmpeg_args+=" --disable-asm"
-		fi
-
-		# Re-configure bundled ffmpeg. See bug #491378 for example reasons.
-		einfo "Configuring bundled ffmpeg..."
-		pushd third_party/ffmpeg > /dev/null || die
-		chromium/scripts/build_ffmpeg.py linux ${ffmpeg_target_arch} \
-			--branding ${ffmpeg_branding} -- ${build_ffmpeg_args} || die
-		chromium/scripts/copy_config.sh || die
-		chromium/scripts/generate_gn.py || die
-		popd > /dev/null || die
-	fi
-
 	# Disable unknown warning message from clang.
 	if tc-is-clang; then
 		append-flags -Wno-unknown-warning-option
@@ -1448,7 +1440,7 @@ src_compile() {
 	eninja -C out/Release chrome
 
 	use enable-driver && eninja -C out/Release chromedriver
-	use suid && eninja -C out/Release chrome_sandbox
+	#use suid && eninja -C out/Release chrome_sandbox
 
 	pax-mark m out/Release/chrome
 
@@ -1486,10 +1478,10 @@ src_install() {
 		doexe out/Release/convert_dict
 	fi
 
-	if use suid; then
-		newexe out/Release/chrome_sandbox chrome-sandbox
-		fperms 4755 "${CHROMIUM_HOME}/chrome-sandbox"
-	fi
+	#if use suid; then
+	#	newexe out/Release/chrome_sandbox chrome-sandbox
+	#	fperms 4755 "${CHROMIUM_HOME}/chrome-sandbox"
+	#fi
 
 	use enable-driver && doexe out/Release/chromedriver
 	#doexe out/Release/chrome_crashpad_handler
