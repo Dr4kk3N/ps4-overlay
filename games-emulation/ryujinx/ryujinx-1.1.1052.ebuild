@@ -286,7 +286,8 @@ NUGETS="avalonia@11.0.4
 	system.xml.readerwriter@4.0.11
 	system.xml.xdocument@4.0.11
 	tmds.dbus.protocol@0.15.0
-	unicornengine.unicorn@2.0.2-rc1-fb78016"
+	unicornengine.unicorn@2.0.2-rc1-fb78016
+"
 inherit desktop dotnet-pkg xdg
 
 DESCRIPTION="Experimental Nintendo Switch emulator written in C#"
