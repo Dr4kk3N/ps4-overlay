@@ -21,7 +21,7 @@ fi
 LICENSE="GPL-3"
 SLOT="0"
 
-IUSE="test"
+IUSE="test llvm-libunwind"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 RESTRICT="!test? ( test )"
 
@@ -54,11 +54,27 @@ RDEPEND="
 	gui-libs/gtksourceview[introspection]
 	media-gfx/imagemagick
 	>=sys-libs/glibc-2.32
-	virtual/wine
 	x11-apps/xdpyinfo
+	llvm-libunwind? (
+		|| (
+			app-emulation/wine-vanilla[X,llvm-libunwind]
+			app-emulation/wine-staging[X,llvm-libunwind]
+		)
+	)
+	!llvm-libunwind? (
+		|| (
+			app-emulation/wine-vanilla[X,-llvm-libunwind]
+			app-emulation/wine-staging[X,-llvm-libunwind]
+			app-emulation/wine-proton[X(+),-llvm-libunwind]
+		)
+	)
 	$(python_gen_cond_dep '
 		app-arch/patool[${PYTHON_USEDEP}]
+		dev-python/certifi[${PYTHON_USEDEP}]
+		dev-python/chardet[${PYTHON_USEDEP}]
+		dev-python/charset-normalizer[${PYTHON_USEDEP}]
 		dev-python/FVS[${PYTHON_USEDEP}]
+		dev-python/idna[${PYTHON_USEDEP}]
 		dev-python/icoextract[${PYTHON_USEDEP}]
 		dev-python/markdown[${PYTHON_USEDEP}]
 		dev-python/orjson[${PYTHON_USEDEP}]
@@ -69,6 +85,7 @@ RDEPEND="
 		dev-python/pygobject[${PYTHON_USEDEP}]
 		dev-python/pyyaml[${PYTHON_USEDEP}]
 		dev-python/requests[${PYTHON_USEDEP}]
+		dev-python/urllib3[${PYTHON_USEDEP}]
 		dev-python/vkbasalt-cli[${PYTHON_USEDEP}]
 		dev-python/wheel[${PYTHON_USEDEP}]
 	')
@@ -85,12 +102,20 @@ BDEPEND="
 	)
 "
 
+EPYTEST_DESELECT=(
+	# tests that check execution time are flaky in the right circumstances
+	# (like compiling llvm at the same time type circumstance)
+	"bottles/tests/backend/state/test_events.py::test_set_reset"
+	"bottles/tests/backend/state/test_events.py::test_simple_event"
+	"bottles/tests/backend/state/test_events.py::test_wait_after_done_event"
+)
+
 pkg_setup() {
 	python-single-r1_pkg_setup
 }
 
 src_configure() {
-	if  [[ "${PV}" == "9999" ]]; then
+	if [[ "${PV}" == "9999" ]]; then
 		local emesonargs=(
 			-Ddevel=true
 		)
@@ -121,4 +146,9 @@ pkg_postinst() {
 	optfeature "vmtouch support" dev-utils/vmtouch
 	#optfeature "MangoHub support" games-util/mangohub
 	#optfeature "obs-vkcapture support" media-video/obs-vkcapture
+	if !use llvm-libunwind; then
+		ewarn "When using llvm-libunwind useflag all wine version besides\n"
+		ewarn "wine-vanilla and wine-staging are broken (including the runner dowloading from bottles itself)\n"
+		ewarn "So when using llvm-libunwind system wide is recommended to stick only to system wine mentioned above\n"
+	fi
 }
