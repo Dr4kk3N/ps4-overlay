@@ -17,16 +17,16 @@ SRC_URI="
 "
 
 REPO="https://github.com/microsoft/vscode"
-ELECTRON_SLOT_DEFAULT="22"
+ELECTRON_SLOT_DEFAULT="25"
 #CODE_COMMIT_ID="ae245c9b1f06e79cec4829f8cd1555206b0ec8f2"
+IUSE="api-proposals badge-providers electron-19 electron-20 electron-21 electron-22 electron-23 electron-24 electron-26 electron-27 openvsx reh reh-web substitute-urls +temp-fix"
 
 if [[ ${PV} = *9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="${REPO}.git"
 	DOWNLOAD=""
-	IUSE="badge-providers +build-online electron-19 electron-20 electron-21 electron-23 electron-24 electron-25 insiders liveshare openvsx substitute-urls"
+	IUSE+=" +build-online"
 else
-	IUSE="badge-providers build-online electron-19 electron-20 electron-21 electron-23 electron-24 electron-25 insiders liveshare openvsx substitute-urls"
 	KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
 	DOWNLOAD="${REPO}/archive/"
 	if [ -z "$CODE_COMMIT_ID" ]; then
@@ -35,42 +35,51 @@ else
 		DOWNLOAD+="${CODE_COMMIT_ID}.tar.gz -> ${PN}-${CODE_COMMIT_ID}.tar.gz"
 		S="${WORKDIR}/${PN}-${CODE_COMMIT_ID}"
 	fi
+	IUSE+=" build-online"
 fi
 
 SRC_URI+="${DOWNLOAD}"
 
 RESTRICT="mirror build-online? ( network-sandbox )"
 
+REQUIRED_USE=""
+
 COMMON_DEPEND="
 	>=app-crypt/libsecret-0.18.8:=
 	>=x11-libs/libX11-1.6.9:=
 	>=x11-libs/libxkbfile-1.1.0:=
+	virtual/krb5
 	sys-apps/ripgrep
 	electron-19? ( dev-util/electron:19 )
 	electron-20? ( dev-util/electron:20 )
 	electron-21? ( dev-util/electron:21 )
+	electron-22? ( dev-util/electron:22 )
 	electron-23? ( dev-util/electron:23 )
 	electron-24? ( dev-util/electron:24 )
-	electron-25? ( dev-util/electron:25 )
+	electron-26? ( dev-util/electron:26 )
+	electron-27? ( dev-util/electron:27 )
 	!electron-19? (
 	!electron-20? (
 	!electron-21? (
+	!electron-22? (
 	!electron-23? (
 	!electron-24? (
-	!electron-25? (
+	!electron-26? (
+	!electron-27? (
 		dev-util/electron:${ELECTRON_SLOT_DEFAULT}
-	) ) ) ) ) )
+	) ) ) ) ) ) ) )
 "
 #TODO: oniguruma?
 
 RDEPEND="${COMMON_DEPEND}
 "
+
 DEPEND="${COMMON_DEPEND}
 "
 
 BDEPEND="
 	${PYTHON_DEPS}
-	net-libs/nodejs
+	!temp-fix? ( net-libs/nodejs )
 	sys-apps/yarn
 "
 
@@ -81,12 +90,16 @@ src_unpack() {
 		export ELECTRON_SLOT=20
 	elif use electron-21; then
 		export ELECTRON_SLOT=21
+	elif use electron-22; then
+		export ELECTRON_SLOT=22
 	elif use electron-23; then
 		export ELECTRON_SLOT=23
 	elif use electron-24; then
 		export ELECTRON_SLOT=24
-	elif use electron-25; then
-		export ELECTRON_SLOT=25
+	elif use electron-26; then
+		export ELECTRON_SLOT=26
+	elif use electron-27; then
+		export ELECTRON_SLOT=27
 	else
 		export ELECTRON_SLOT=$ELECTRON_SLOT_DEFAULT
 	fi
@@ -121,7 +134,7 @@ src_prepare() {
 	einfo "Allowing any nodejs version"
 	sed -i 's/if (majorNodeVersion < 16.*/if (false){/' build/npm/preinstall.js || die
 
-	ewarn "Removing extensions/npm"
+	ewarn "Removing extensions/npm, see #203"
 	ewarn "Please poke Microsoft here: https://github.com/microsoft/vscode/issues/181598"
 	rm -r extensions/npm
 	sed -i '/extensions\/npm/d' build/npm/dirs.js || die
@@ -142,7 +155,9 @@ src_prepare() {
 	sed -i '/git config pull/d' build/npm/postinstall.js || die
 
 	einfo "Editing dirs.js"
-	sed -i '/remote/d' build/npm/dirs.js || die
+	if ! ( use reh || use reh-web ); then
+		sed -i '/remote/d' build/npm/dirs.js || die
+	fi
 	sed -i '/test\/automation/d' build/npm/dirs.js || die
 	sed -i '/test\/integration\/browser/d' build/npm/dirs.js || die
 	sed -i '/test\/smoke/d' build/npm/dirs.js || die
@@ -166,15 +181,8 @@ src_prepare() {
 	mv product.json product.json.bak || die
 	sed -i '1d' product.json.bak || die
 
-	if use liveshare; then
-		sed -i 's/"ms-vscode.vscode-js-profile-flame",/"ms-vscode.vscode-js-profile-flame", "ms-vsliveshare.vsliveshare",/' product.json.bak || die
-	fi
-
-	if use insiders; then
-		sed -i 's/"ms-vscode.vscode-js-profile-flame",/"ms-vscode.references-view", "ms-vsliveshare.vsliveshare", "ms-vsliveshare.cloudenv", "ms-vsliveshare.cloudenv-explorer", "ms-vsonline.vsonline", "GitHub.vscode-pull-request-github", "GitHub.vscode-pull-request-github-insiders", "Microsoft.vscode-nmake-tools", "ms-vscode-remote.remote-containers", "ms-vscode-remote.remote-containers-nightly", "ms-vscode-remote.remote-ssh", "ms-vscode-remote.remote-ssh-nightly", "ms-vscode-remote.remote-ssh-edit", "ms-vscode-remote.remote-ssh-edit-nightly", "ms-vscode-remote.remote-wsl", "ms-vscode-remote.remote-wsl-nightly", "ms-vscode-remote.vscode-remote-extensionpack", "ms-vscode-remote.vscode-remote-extensionpack-nightly", "ms-azuretools.vscode-docker", "ms-vscode.azure-account", "ms-vscode.js-debug", "ms-vscode.js-debug-nightly", "ms-vscode.vscode-js-profile-table", "ms-vscode.vscode-js-profile-flame", "ms-vscode.vscode-github-issue-notebooks", "ms-vscode.vscode-markdown-notebook", "ms-azuretools.vscode-azurestaticwebapps", "ms-dotnettools.dotnet-interactive-vscode", "ms-python.python", "ms-ai-tools.notebook-renderers",/' product.json.bak || die
-	fi
-
 	cat "${FILESDIR}/heading.json" > product.json
+
 	if use openvsx; then
 		cat "${FILESDIR}/openvsx.json" >> product.json
 	else
@@ -183,6 +191,10 @@ src_prepare() {
 
 	if use badge-providers; then
 		cat "${FILESDIR}/badge_prov.json" >> product.json
+	fi
+
+	if use api-proposals; then
+		cat "${FILESDIR}/api-proposals.json" >> product.json
 	fi
 
 	cat product.json.bak >> product.json
@@ -221,12 +233,12 @@ src_configure() {
 	#TODO: exported but unavailable if emerge/ebuild restarted
 	export VSCODE_ARCH
 
-	#TODO: should work starting with electron-22
-	if use electron-20 || use electron-21 || use electron-23 || use electron-24; then
-		CPPFLAGS="${CPPFLAGS} -std=c++17";
-		use build-online || eerror "build-online should be enabled for nan substitution to work" || die;
-		sed -i 's$"resolutions": {$"resolutions": {"nan": "^2.17.0",$' package.json || die;
-	fi
+	# #TODO: should work starting with electron-22
+	# if use electron-20 || use electron-21 || use electron-23 || use electron-24; then
+	# 	CPPFLAGS="${CPPFLAGS} -std=c++17";
+	# 	use build-online || eerror "build-online should be enabled for nan substitution to work" || die;
+	# 	sed -i 's$"resolutions": {$"resolutions": {"nan": "^2.17.0",$' package.json || die;
+	# fi
 
 	ebegin "Installing node_modules"
 	# yarn config set yarn-offline-mirror ${T}/yarn_cache || die
@@ -304,8 +316,30 @@ src_compile() {
 	PATH="/usr/$(get_libdir)/electron-${ELECTRON_SLOT}:$PATH"
 	export PATH
 
+	if use temp-fix; then
+	node --max_old_space_size=8192 node_modules/gulp/bin/gulp.js vscode-linux-${VSCODE_ARCH}-min || die
+	else
 	# Real nodejs needed (/usr/bin/node). See https://github.com/microsoft/vscode-l10n/issues/104
 	/usr/bin/node --max_old_space_size=8192 node_modules/gulp/bin/gulp.js vscode-linux-${VSCODE_ARCH}-min || die
+	fi
+
+	#TODO: make reh use the same node at runtime as main vscode
+	if use reh; then
+		if use temp-fix; then
+		node --max_old_space_size=8192 node_modules/gulp/bin/gulp.js vscode-reh-linux-${VSCODE_ARCH}-min || die
+		else
+		# Real nodejs needed (/usr/bin/node). See https://github.com/microsoft/vscode-l10n/issues/104
+		/usr/bin/node --max_old_space_size=8192 node_modules/gulp/bin/gulp.js vscode-reh-linux-${VSCODE_ARCH}-min || die
+		fi
+	fi
+	if use reh-web; then
+		if use temp-fix; then
+		node --max_old_space_size=8192 node_modules/gulp/bin/gulp.js vscode-reh-web-linux-${VSCODE_ARCH}-min || die
+		else
+		# Real nodejs needed (/usr/bin/node). See https://github.com/microsoft/vscode-l10n/issues/104
+		/usr/bin/node --max_old_space_size=8192 node_modules/gulp/bin/gulp.js vscode-reh-web-linux-${VSCODE_ARCH}-min || die
+		fi
+	fi
 
 	export PATH=${OLD_PATH}
 }
@@ -317,8 +351,12 @@ src_install() {
 	PATH="/usr/$(get_libdir)/electron-${ELECTRON_SLOT}:$PATH"
 	export PATH
 
+	if use temp-fix; then
+	YARN_CACHE_FOLDER="${T}/.yarn-cache" node node_modules/gulp/bin/gulp.js vscode-linux-${VSCODE_ARCH}-prepare-deb || die
+	else
 	# Real nodejs needed (/usr/bin/node). See https://github.com/microsoft/vscode-l10n/issues/104
 	YARN_CACHE_FOLDER="${T}/.yarn-cache" /usr/bin/node node_modules/gulp/bin/gulp.js vscode-linux-${VSCODE_ARCH}-prepare-deb || die
+	fi
 	local VSCODE_HOME="/usr/$(get_libdir)/vscode"
 
 	exeinto "${VSCODE_HOME}"
@@ -345,6 +383,15 @@ src_install() {
 	doins -r "${WORKDIR}"/VSCode-linux-${VSCODE_ARCH}/node_modules.asar.unpacked
 	fperms +x ${VSCODE_HOME}/out/vs/base/node/cpuUsage.sh
 	# fperms +x ${VSCODE_HOME}/node_modules.asar.unpacked/node-pty/build/Release/spawn-helper
+
+	if use reh; then
+		tar cf vscode-server-linux-x64.tar.gz -C "${WORKDIR}/vscode-reh-linux-x64/" .
+		doins vscode-server-linux-x64.tar.gz
+	fi
+	if use reh-web; then
+		tar cf vscode-server-linux-x64-web.tar.gz -C "${WORKDIR}/vscode-reh-web-linux-x64/" .
+		doins vscode-server-linux-x64-web.tar.gz
+	fi
 
 	pushd .build/linux/deb/*/code-oss-*/usr/share/ > /dev/null || die
 
