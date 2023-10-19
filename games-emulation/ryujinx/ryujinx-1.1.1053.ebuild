@@ -292,7 +292,7 @@ inherit desktop dotnet-pkg xdg
 
 DESCRIPTION="Experimental Nintendo Switch emulator written in C#"
 HOMEPAGE="https://ryujinx.org/ https://github.com/Ryujinx/Ryujinx"
-SHA="1e06b28b22848706014b18bffcec7553cdab2b2b"
+SHA="28dd7d80af56701887dbb538b56aa58edaf39d91"
 MY_PN="R${PN:1}"
 SRC_URI="https://github.com/${MY_PN}/${MY_PN}/archive/${SHA}.tar.gz -> ${P}.tar.gz
 	${NUGET_URIS}"
