@@ -9,7 +9,7 @@ DESCRIPTION="VMware kernel modules"
 HOMEPAGE="https://github.com/mkubecek/vmware-host-modules"
 
 # Highest kernel version known to work:
-MY_KERNEL_VERSION="6.4"
+MY_KERNEL_VERSION="6.5"
 
 # Upstream does not want to tag versions or anything that looks like properly
 # releasing the software, so we need to just pick a commit from
@@ -17,25 +17,17 @@ MY_KERNEL_VERSION="6.4"
 # and test it ourselves.
 #
 # Details: https://github.com/mkubecek/vmware-host-modules/issues/158#issuecomment-1228341760
-MY_COMMIT="650fb3abeb82f2b7d3a14f9579a7529d153636b7"
+MY_COMMIT="f29c1d7df4a26417a06c7bf1dd4ea43e013668dc"
 
 SRC_URI=" https://github.com/mkubecek/vmware-host-modules/archive/${MY_COMMIT}.tar.gz -> ${P}-${MY_COMMIT}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE=""
-
-RDEPEND=""
-DEPEND=""
 
 RESTRICT="mirror"
 
 S="${WORKDIR}/vmware-host-modules-${MY_COMMIT}"
-
-PATCHES=(
-	"${FILESDIR}/vmware-modules-16.2.5-kernel-6.4.10.patch"
-)
 
 pkg_setup() {
 	CONFIG_CHECK="~HIGH_RES_TIMERS"
