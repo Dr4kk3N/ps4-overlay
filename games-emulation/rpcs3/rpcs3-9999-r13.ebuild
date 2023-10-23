@@ -103,6 +103,7 @@ src_configure() {
 		-DUSE_SYSTEM_ZLIB=ON
 		-DUSE_VULKAN=$(usex vulkan ON OFF)
 		-DWITH_LLVM=$(usex llvm ON OFF)
+		-DDISABLE_LTO=TRUE
 	)
 	# https://github.com/RPCS3/rpcs3/pull/8609
 	if use vulkan; then
