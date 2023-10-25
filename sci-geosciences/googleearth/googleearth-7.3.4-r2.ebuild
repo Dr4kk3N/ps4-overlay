@@ -7,7 +7,7 @@ inherit desktop pax-utils unpacker wrapper xdg-utils
 
 DESCRIPTION="A 3D interface to the planet"
 HOMEPAGE="https://www.google.com/earth/desktop/"
-SRC_URI="https://dl.google.com/dl/linux/direct/google-earth-pro-stable_${PV}_amd64.deb"
+SRC_URI="https://dl.google.com/dl/linux/direct/google-earth-pro-stable_${PV}_amd64.deb -> google-earth-pro-stable_${PV}-r1_amd64.deb"
 LICENSE="googleearth GPL-2"
 SLOT="0"
 KEYWORDS="~amd64"
@@ -61,6 +61,7 @@ src_prepare() {
 		# Use \x7fELF header to separate ELF executables and libraries
 		[[ -f ${x} && $(od -t x1 -N 4 "${x}") == *"7f 45 4c 46"* ]] || continue
 		chmod u+w "${x}" || die
+		[[ ${x} != libicudata.so.* ]] || continue
 		patchelf --set-rpath '$ORIGIN' "${x}" || \
 			die "patchelf failed on ${x}"
 	done
