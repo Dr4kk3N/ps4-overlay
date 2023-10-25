@@ -26,7 +26,8 @@ PATCHES=(
 
 pkg_setup() {
 	linux-info_pkg_setup
-	KV_SRC=${KV_MAJOR}.${KV_MINOR}
+#	KV_SRC=${KV_MAJOR}.${KV_MINOR}.${KV_PATCH}${KV_EXTRA}
+	KV_SRC=6.5
 	LINUX_SRC=linux-${KV_SRC}
 	S="${WORKDIR}/${LINUX_SRC}"
 }
@@ -54,7 +55,7 @@ src_compile() {
 		AR="$(tc-getAR)"
 		CC="$(tc-getCC)"
 		LD="$(tc-getCC)"
-		VERSION=${KV_SRC}
+		VERSION=${KV_FULL}
 	)
 
 	cd tools/power/cpupower || die
