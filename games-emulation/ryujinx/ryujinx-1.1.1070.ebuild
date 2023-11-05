@@ -7,17 +7,20 @@ DOTNET_PKG_COMPAT="7.0"
 NUGETS="avalonia@11.0.5
 	avalonia.angle.windows.natives@2.1.0.2023020321
 	avalonia.buildservices@0.0.29
+	avalonia.controls.colorpicker@11.0.4
 	avalonia.controls.colorpicker@11.0.5
 	avalonia.controls.datagrid@11.0.5
 	avalonia.controls.itemsrepeater@11.0.0-rc2.1
-	avalonia.controls.itemsrepeater@11.0.5
+	avalonia.controls.itemsrepeater@11.0.4
 	avalonia.desktop@11.0.5
 	avalonia.diagnostics@11.0.5
 	avalonia.freedesktop@11.0.5
 	avalonia.markup.xaml.loader@11.0.5
 	avalonia.native@11.0.5
+	avalonia.remote.protocol@11.0.4
 	avalonia.remote.protocol@11.0.5
 	avalonia.skia@11.0.0
+	avalonia.skia@11.0.4
 	avalonia.skia@11.0.5
 	avalonia.svg@11.0.0.3
 	avalonia.svg.skia@11.0.0.3
@@ -29,19 +32,24 @@ NUGETS="avalonia@11.0.5
 	discordrichpresence@1.2.1.24
 	dynamicdata@7.14.2
 	excss@4.2.3
-	fizzler@1.2.1
 	fluentavaloniaui@2.0.4
 	fsharp.core@7.0.200
 	gtksharp.dependencies@1.1.1
+	harfbuzzsharp@2.8.2.3
 	harfbuzzsharp@7.3.0
-	harfbuzzsharp.nativeassets.linux@7.3.0
+	harfbuzzsharp.nativeassets.linux@2.8.2.3
+	harfbuzzsharp.nativeassets.macos@2.8.2.3
 	harfbuzzsharp.nativeassets.macos@7.3.0
-	harfbuzzsharp.nativeassets.webassembly@7.3.0
+	harfbuzzsharp.nativeassets.webassembly@2.8.2.3
+	harfbuzzsharp.nativeassets.win32@2.8.2.3
 	harfbuzzsharp.nativeassets.win32@7.3.0
 	jp2masa.avalonia.flexbox@0.3.0-beta.4
 	libhac@0.19.0
 	microcom.codegenerator.msbuild@0.11.0
 	microcom.runtime@0.11.0
+	microsoft.aspnetcore.app.runtime.linux-x64@7.0.12
+	microsoft.aspnetcore.app.runtime.osx-x64@7.0.12
+	microsoft.aspnetcore.app.runtime.win-x64@7.0.12
 	microsoft.codeanalysis.analyzers@3.0.0
 	microsoft.codeanalysis.analyzers@3.3.4
 	microsoft.codeanalysis.common@3.8.0
@@ -60,8 +68,11 @@ NUGETS="avalonia@11.0.5
 	microsoft.identitymodel.logging@7.0.0
 	microsoft.identitymodel.tokens@7.0.0
 	microsoft.io.recyclablememorystream@2.3.2
-	microsoft.netcore.app.host.osx-x64@7.0.11
-	microsoft.netcore.app.host.win-x64@7.0.11
+	microsoft.netcore.app.host.osx-x64@7.0.12
+	microsoft.netcore.app.host.win-x64@7.0.12
+	microsoft.netcore.app.runtime.linux-x64@7.0.12
+	microsoft.netcore.app.runtime.osx-x64@7.0.12
+	microsoft.netcore.app.runtime.win-x64@7.0.12
 	microsoft.netcore.platforms@1.0.1
 	microsoft.netcore.platforms@1.1.0
 	microsoft.netcore.platforms@2.0.0
@@ -75,6 +86,7 @@ NUGETS="avalonia@11.0.5
 	microsoft.win32.registry@4.5.0
 	microsoft.win32.systemevents@7.0.0
 	msgpack.cli@1.0.1
+	netcoreserver@7.0.0
 	netstandard.library@1.6.0
 	netstandard.library@2.0.0
 	netstandard.library@2.0.3
@@ -149,6 +161,8 @@ NUGETS="avalonia@11.0.5
 	ryujinx.gtksharp@3.24.24.59-ryujinx
 	ryujinx.pangosharp@3.24.24.59-ryujinx
 	ryujinx.sdl2-cs@2.28.1-build28
+	securifybv.propertystore@0.1.0
+	securifybv.shelllink@0.1.0
 	shaderc.net@0.1.0
 	sharpziplib@1.4.2
 	shimskiasharp@1.0.0.3
@@ -159,11 +173,16 @@ NUGETS="avalonia@11.0.5
 	sixlabors.fonts@1.0.0-beta0013
 	sixlabors.imagesharp@1.0.4
 	sixlabors.imagesharp.drawing@1.0.0-beta11
+	skiasharp@2.88.3
 	skiasharp@2.88.6
 	skiasharp.harfbuzz@2.88.6
+	skiasharp.nativeassets.linux@2.88.3
 	skiasharp.nativeassets.linux@2.88.6
+	skiasharp.nativeassets.macos@2.88.3
 	skiasharp.nativeassets.macos@2.88.6
+	skiasharp.nativeassets.webassembly@2.88.3
 	skiasharp.nativeassets.webassembly@2.88.6
+	skiasharp.nativeassets.win32@2.88.3
 	skiasharp.nativeassets.win32@2.88.6
 	spb@0.0.4-build28
 	svg.custom@1.0.0.3
@@ -254,8 +273,6 @@ NUGETS="avalonia@11.0.5
 	system.runtime.interopservices.runtimeinformation@4.0.0
 	system.runtime.numerics@4.0.1
 	system.security.accesscontrol@4.5.0
-	securifybv.ShellLink@0.1.0
-	securifybv.PropertyStore@0.1.0
 	system.security.claims@4.3.0
 	system.security.cryptography.algorithms@4.2.0
 	system.security.cryptography.cng@4.2.0
@@ -284,17 +301,15 @@ NUGETS="avalonia@11.0.5
 	system.threading.tasks.extensions@4.5.4
 	system.threading.threadpool@4.3.0
 	system.threading.timer@4.0.1
-	system.valuetuple@4.5.0
 	system.xml.readerwriter@4.0.11
 	system.xml.xdocument@4.0.11
 	tmds.dbus.protocol@0.15.0
-	unicornengine.unicorn@2.0.2-rc1-fb78016
-"
+	unicornengine.unicorn@2.0.2-rc1-fb78016"
 inherit desktop dotnet-pkg xdg
 
 DESCRIPTION="Experimental Nintendo Switch emulator written in C#"
 HOMEPAGE="https://ryujinx.org/ https://github.com/Ryujinx/Ryujinx"
-SHA="b1f8f868f6fdec87bd3342ac379594bd695cbbfd"
+SHA="617c5700ca520d80fd25fc0fc9f2389394a46150"
 MY_PN="R${PN:1}"
 SRC_URI="https://github.com/${MY_PN}/${MY_PN}/archive/${SHA}.tar.gz -> ${P}.tar.gz
 	${NUGET_URIS}"
