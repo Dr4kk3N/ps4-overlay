@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Source: Written from scratch for sunset-repo overlay -->
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>sunsetsergal@gmail.com</email>
+	</maintainer>
+	<upstream>
+		<remote-id type="github">galkinvv/aura-gpu</remote-id>
+	</upstream>
+	<longdescription lang="en">
+	This is an I2C driver for Asus GPUs that contain Asus AURA RGB lighting.
+
+	All nVidia GPUs by Asus with a compatible AURA chip should work, but AMD GPUs
+	require manually starting their I2C so have to be hardcoded, and very few are
+	hardcoded.
+	</longdescription>
+</pkgmetadata>
