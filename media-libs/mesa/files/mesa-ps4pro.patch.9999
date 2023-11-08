@@ -172,12 +172,3 @@ index 18eb60b6ac2..ef8c6063403 100644
           ws->info.max_se = 4;
           break;
        }
-@@ -601,6 +607,8 @@ static bool do_winsys_init(struct radeon_drm_winsys *ws)
-    case CHIP_VERDE:
-    case CHIP_HAINAN:
-    case CHIP_BONAIRE:
-+   case CHIP_LIVERPOOL:
-+   case CHIP_GLADIUS:
-    case CHIP_KAVERI:
-       ws->info.l2_cache_size = ws->info.num_tcc_blocks * 128 * 1024;
-       break;
