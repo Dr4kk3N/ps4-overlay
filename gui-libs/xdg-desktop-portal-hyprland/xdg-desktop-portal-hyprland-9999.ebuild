@@ -1,33 +1,39 @@
-# Copyright 2022 Julien Roy <julien@jroy.ca>
-# Distributed under the terms of the ISC License
+# Copyright 1999-2023 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-inherit meson
+inherit meson toolchain-funcs
 
 DESCRIPTION="xdg-desktop-portal backend for hyprland"
 HOMEPAGE="https://github.com/hyprwm/xdg-desktop-portal-hyprland"
 
 if [[ ${PV} == 9999 ]]; then
-	EGIT_REPO_URI="https://github.com/hyprwm/${PN}.git"
+	EGIT_REPO_URI="https://github.com/hyprwm/xdg-desktop-portal-hyprland.git"
 	inherit git-r3
 else
-	SRC_URI="https://github.com/hyprwm/${PN}/releases/download/v${PV}/${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm64 ~ppc64 ~riscv ~x86"
+	KEYWORDS="~amd64"
+	SRC_URI="https://github.com/hyprwm/xdg-desktop-portal-hyprland/archive/refs/tags/v${PV}.tar.gz \
+		-> xdg-desktop-hyprland-${PV}.tar.gz"
 fi
 
-LICENSE="BSD"
-SLOT="0"
+LICENSE="MIT"
+SLOT="0/9999"
 IUSE="elogind systemd"
 REQUIRED_USE="?? ( elogind systemd )"
 
 DEPEND="
+	>=media-video/pipewire-0.3.41:=
+	dev-cpp/sdbus-c++
 	dev-libs/inih
 	dev-libs/wayland
 	dev-qt/qtbase
+	dev-qt/qtcore
+	dev-qt/qtgui
 	dev-qt/qtwayland:6
+	dev-qt/qtwidgets
 	media-libs/mesa
-	>=media-video/pipewire-0.3.41:=
+	sys-apps/util-linux
 	x11-libs/libdrm
 	|| (
 		systemd? ( >=sys-apps/systemd-237 )
@@ -35,27 +41,29 @@ DEPEND="
 		sys-libs/basu
 	)
 "
-# mesa is needed for gbm dep (which it hards sets to 'on')
 RDEPEND="
 	${DEPEND}
 	sys-apps/xdg-desktop-portal
 "
 BDEPEND="
 	>=dev-libs/wayland-protocols-1.24
+	dev-libs/hyprland-protocols
 	virtual/pkgconfig
+	|| ( >=sys-devel/gcc-13:* >=sys-devel/clang-17:* )
 "
 
-src_configure() {
-	local emesonargs=()
+pkg_setup() {
+		[[ ${MERGE_TYPE} == binary ]] && return
 
-	if use systemd; then
-		emesonargs+=(-Dsd-bus-provider=libsystemd)
-	elif use elogind; then
-		emesonargs+=(-Dsd-bus-provider=libelogind)
-	else
-		emesonargs+=(-Dsd-bus-provider=basu)
+	if tc-is-gcc && ver_test $(gcc-version) -lt 13 ; then
+		eerror "XDPH needs >=gcc-13 or >=clang-17 to compile."
+		eerror "Please upgrade GCC: emerge -v1 sys-devel/gcc"
+		die "GCC version is too old to compile XDPH!"
+	elif tc-is-clang && ver_test $(clang-version) -lt 17 ; then
+		eerror "XDPH needs >=gcc-13 or >=clang-17 to compile."
+		eerror "Please upgrade Clang: emerge -v1 sys-devel/clang"
+		die "Clang version is too old to compile XDPH!"
 	fi
-	meson_src_configure
 }
 
 src_compile() {
