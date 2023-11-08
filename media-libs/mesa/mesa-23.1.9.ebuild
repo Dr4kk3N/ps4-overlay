@@ -34,7 +34,7 @@ IUSE="${IUSE_VIDEO_CARDS}
 	cpu_flags_x86_sse2 d3d9 debug gles1 +gles2 +llvm
 	lm-sensors opencl osmesa +proprietary-codecs selinux
 	test unwind vaapi valgrind vdpau vulkan
-	vulkan-overlay wayland +X xa zink +zstd"
+	vulkan-overlay wayland +X xa zink +zstd lto"
 
 REQUIRED_USE="
 	d3d9? (
