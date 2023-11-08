@@ -34,7 +34,7 @@ IUSE="${IUSE_VIDEO_CARDS}
 	cpu_flags_x86_sse2 d3d9 debug gles1 +gles2 +llvm
 	lm-sensors opencl osmesa +proprietary-codecs selinux
 	test unwind vaapi valgrind vdpau vulkan
-	vulkan-overlay wayland +X xa zink +zstd"
+	vulkan-overlay wayland +X xa zink +zstd lto"
 
 REQUIRED_USE="
 	d3d9? (
@@ -203,13 +203,10 @@ llvm_check_deps() {
 }
 
 PATCHES=(
-	# Temporary rusticl workaround: https://gitlab.freedesktop.org/mesa/mesa/-/issues/7717#note_1832122
-#	"${FILESDIR}/clang_resource_dir.patch"
-
 	# Workaround the CMake dependency lookup returning a different LLVM to llvm-config, bug #907965
-#	"${FILESDIR}/clang_config_tool.patch"
+	"${FILESDIR}/clang_config_tool.patch"
 
-        "${FILESDIR}/mesa-ps4pro.patch.23.3.0_rc2"
+#        "${FILESDIR}/mesa-ps4pro.patch.23.3.0_rc2"
 )
 
 pkg_pretend() {
@@ -440,6 +437,7 @@ multilib_src_configure() {
 		-Dvulkan-drivers=$(driver_list "${VULKAN_DRIVERS[*]}")
 		--buildtype $(usex debug debug plain)
 		-Db_ndebug=$(usex debug false true)
+		-Db_lto=$(usex lto false true)
 	)
 	meson_src_configure
 }
