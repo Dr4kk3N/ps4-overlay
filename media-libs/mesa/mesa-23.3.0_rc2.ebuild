@@ -206,7 +206,7 @@ PATCHES=(
 	# Workaround the CMake dependency lookup returning a different LLVM to llvm-config, bug #907965
 	"${FILESDIR}/clang_config_tool.patch"
 
-#        "${FILESDIR}/mesa-ps4pro.patch.23.3.0_rc2"
+        "${FILESDIR}/mesa-ps4pro.patch.23.3.0_rc2"
 )
 
 pkg_pretend() {
@@ -437,7 +437,7 @@ multilib_src_configure() {
 		-Dvulkan-drivers=$(driver_list "${VULKAN_DRIVERS[*]}")
 		--buildtype $(usex debug debug plain)
 		-Db_ndebug=$(usex debug false true)
-		-Db_lto=$(usex lto false true)
+		-Db_lto=$(usex lto true false)
 	)
 	meson_src_configure
 }
