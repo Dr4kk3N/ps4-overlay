@@ -204,12 +204,12 @@ llvm_check_deps() {
 
 PATCHES=(
 	# Temporary rusticl workaround: https://gitlab.freedesktop.org/mesa/mesa/-/issues/7717#note_1832122
-#	"${FILESDIR}/clang_resource_dir.patch"
+	"${FILESDIR}/clang_resource_dir.patch"
 
 	# Workaround the CMake dependency lookup returning a different LLVM to llvm-config, bug #907965
-#	"${FILESDIR}/clang_config_tool.patch"
+	"${FILESDIR}/clang_config_tool.patch"
 
-        "${FILESDIR}/mesa-ps4pro.patch.23.1.8"
+        "${FILESDIR}/mesa-ps4pro.patch.23.1.9"
 )
 
 pkg_pretend() {
