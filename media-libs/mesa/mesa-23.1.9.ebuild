@@ -17,7 +17,7 @@ if [[ ${PV} == 9999 ]]; then
 	inherit git-r3
 else
 	SRC_URI="https://archive.mesa3d.org/${MY_P}.tar.xz"
-	KEYWORDS="~alpha amd64 arm arm64 ~hppa ~ia64 ~loong ~mips ppc ppc64 ~riscv ~s390 sparc x86 ~amd64-linux ~x86-linux ~x64-solaris"
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~loong ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86 ~amd64-linux ~x86-linux ~x64-solaris"
 fi
 
 LICENSE="MIT SGI-B-2.0"
@@ -132,7 +132,14 @@ PER_SLOT_DEPSTR="
 		!opencl? ( sys-devel/llvm:@SLOT@[${LLVM_USE_DEPS}] )
 		opencl? ( sys-devel/clang:@SLOT@[${LLVM_USE_DEPS}] )
 		opencl? ( dev-util/spirv-llvm-translator:@SLOT@ )
-		vulkan? ( video_cards_intel? ( amd64? ( dev-util/spirv-llvm-translator:@SLOT@ ) ) )
+		vulkan? (
+			video_cards_intel? (
+				amd64? (
+					dev-util/spirv-llvm-translator:@SLOT@
+					sys-devel/clang:@SLOT@[${LLVM_USE_DEPS}]
+				)
+			)
+		)
 	)
 "
 LLVM_DEPSTR="
@@ -209,7 +216,7 @@ PATCHES=(
 	# Workaround the CMake dependency lookup returning a different LLVM to llvm-config, bug #907965
 	"${FILESDIR}/clang_config_tool.patch"
 
-        "${FILESDIR}/mesa-ps4pro.patch.23.1.9"
+	"${FILESDIR}/mesa-ps4pro.patch.23.1.9"
 )
 
 pkg_pretend() {
@@ -440,6 +447,7 @@ multilib_src_configure() {
 		-Dvulkan-drivers=$(driver_list "${VULKAN_DRIVERS[*]}")
 		--buildtype $(usex debug debug plain)
 		-Db_ndebug=$(usex debug false true)
+		-Db_lto=$(usex lto false true)
 	)
 	meson_src_configure
 }
