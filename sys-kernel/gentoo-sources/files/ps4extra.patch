@@ -1,0 +1,139 @@
+diff --git a/drivers/gpu/drm/amd/amdgpu/cik.c b/drivers/gpu/drm/amd/amdgpu/cik.c
+index 78ab939ae..800efb404 100644
+--- a/drivers/gpu/drm/amd/amdgpu/cik.c
++++ b/drivers/gpu/drm/amd/amdgpu/cik.c
+@@ -1888,6 +1888,62 @@ static int cik_common_early_init(void *handle)
+ 		} else
+ 			adev->external_rev_id = adev->rev_id + 0xa1;
+ 		break;
++	case CHIP_LIVERPOOL:
++			adev->cg_flags =
++				AMD_CG_SUPPORT_GFX_MGCG |
++				AMD_CG_SUPPORT_GFX_MGLS |
++				/*AMD_CG_SUPPORT_GFX_CGCG |*/
++				AMD_CG_SUPPORT_GFX_CGLS |
++				AMD_CG_SUPPORT_GFX_CGTS |
++				AMD_CG_SUPPORT_GFX_CGTS_LS |
++				AMD_CG_SUPPORT_GFX_CP_LS |
++				AMD_CG_SUPPORT_SDMA_MGCG |
++				AMD_CG_SUPPORT_SDMA_LS |
++				AMD_CG_SUPPORT_BIF_LS |
++				AMD_CG_SUPPORT_VCE_MGCG |
++				AMD_CG_SUPPORT_UVD_MGCG |
++				AMD_CG_SUPPORT_HDP_LS |
++				AMD_CG_SUPPORT_HDP_MGCG;
++			adev->pg_flags =
++				/*AMD_PG_SUPPORT_GFX_PG |
++				  AMD_PG_SUPPORT_GFX_SMG | */
++				/*AMD_PG_SUPPORT_UVD | */
++				/*AMD_PG_SUPPORT_VCE |
++				  AMD_PG_SUPPORT_CP |
++				  AMD_PG_SUPPORT_GDS |
++				  AMD_PG_SUPPORT_RLC_SMU_HS |
++				  AMD_PG_SUPPORT_SAMU |*/
++				0;
++			adev->external_rev_id = adev->rev_id + 0x61;
++			break;
++	case CHIP_GLADIUS:
++			adev->cg_flags =
++				AMD_CG_SUPPORT_GFX_MGCG |
++				AMD_CG_SUPPORT_GFX_MGLS |
++				AMD_CG_SUPPORT_GFX_CGCG |
++				AMD_CG_SUPPORT_GFX_CGLS |
++				AMD_CG_SUPPORT_GFX_CGTS |
++				AMD_CG_SUPPORT_GFX_CGTS_LS |
++				AMD_CG_SUPPORT_GFX_CP_LS |
++				AMD_CG_SUPPORT_SDMA_MGCG |
++				AMD_CG_SUPPORT_SDMA_LS |
++				AMD_CG_SUPPORT_BIF_LS |
++				AMD_CG_SUPPORT_VCE_MGCG |
++				AMD_CG_SUPPORT_UVD_MGCG |
++				AMD_CG_SUPPORT_HDP_LS |
++				AMD_CG_SUPPORT_HDP_MGCG;
++			adev->pg_flags =
++				/*AMD_PG_SUPPORT_GFX_PG |
++					AMD_PG_SUPPORT_GFX_SMG | */
++				/*AMD_PG_SUPPORT_UVD | */
++				/*AMD_PG_SUPPORT_VCE |
++					AMD_PG_SUPPORT_CP |
++					AMD_PG_SUPPORT_GDS |
++					AMD_PG_SUPPORT_RLC_SMU_HS |
++					AMD_PG_SUPPORT_SAMU |*/
++				0;
++			adev->external_rev_id = adev->rev_id + 0x71;
++			break;
+ 	default:
+ 		/* FIXME: not supported yet */
+ 		return -EINVAL;
+diff --git a/drivers/gpu/drm/amd/amdgpu/gfx_v7_0.c b/drivers/gpu/drm/amd/amdgpu/gfx_v7_0.c
+index 95452c5a9..25ea25ec4 100644
+--- a/drivers/gpu/drm/amd/amdgpu/gfx_v7_0.c
++++ b/drivers/gpu/drm/amd/amdgpu/gfx_v7_0.c
+@@ -1634,6 +1634,7 @@ static u32 gfx_v7_0_get_rb_active_bitmap(struct amdgpu_device *adev)
+ }
+ 
+ static void
++
+ gfx_v7_0_raster_config(struct amdgpu_device *adev, u32 *rconf, u32 *rconf1)
+ {
+ 	switch (adev->asic_type) {
+@@ -1659,6 +1660,17 @@ gfx_v7_0_raster_config(struct amdgpu_device *adev, u32 *rconf, u32 *rconf1)
+ 		*rconf |= 0x0;
+ 		*rconf1 |= 0x0;
+ 		break;
++	case CHIP_LIVERPOOL:
++		*rconf |= RB_MAP_PKR0(2) | RB_MAP_PKR1(2) |
++			  RB_XSEL2(1) | PKR_MAP(2) | PKR_XSEL(1) |
++			  PKR_YSEL(1) | SE_MAP(2) | SE_XSEL(2) |
++			  SE_YSEL(2);
++		*rconf1 |= 0x0;
++		break;
++	case CHIP_GLADIUS:
++		*rconf |= 0x2a00161a;
++		*rconf1 |= 0x0000002e;
++		break;
+ 	default:
+ 		DRM_ERROR("unknown asic: 0x%x\n", adev->asic_type);
+ 		break;
+@@ -4379,6 +4391,41 @@ static void gfx_v7_0_gpu_early_init(struct amdgpu_device *adev)
+ 		adev->gfx.config.sc_earlyz_tile_fifo_size = 0x130;
+ 		gb_addr_config = BONAIRE_GB_ADDR_CONFIG_GOLDEN;
+ 		break;
++	case CHIP_LIVERPOOL:
++		adev->gfx.config.max_shader_engines = 2; // Verified
++		adev->gfx.config.max_tile_pipes = 8; // Verified
++		adev->gfx.config.max_cu_per_sh = 9; // Probably OK
++		adev->gfx.config.max_sh_per_se = 1; // Verified
++		adev->gfx.config.max_backends_per_se = 1; // Probably OK?
++		adev->gfx.config.max_backends_per_se = 2; // Probably OK?
++		adev->gfx.config.max_texture_channel_caches = 4; // ??
++		adev->gfx.config.max_gprs = 256;
++		adev->gfx.config.max_gs_threads = 32; // ??
++		adev->gfx.config.max_hw_contexts = 8;
++
++		adev->gfx.config.sc_prim_fifo_size_frontend = 0x20;
++		adev->gfx.config.sc_prim_fifo_size_backend = 0x100;
++		adev->gfx.config.sc_hiz_tile_fifo_size = 0x30;
++		adev->gfx.config.sc_earlyz_tile_fifo_size = 0x130;
++		gb_addr_config = HAWAII_GB_ADDR_CONFIG_GOLDEN;
++		break;
++	case CHIP_GLADIUS:
++		adev->gfx.config.max_shader_engines = 4; // Verified
++		adev->gfx.config.max_tile_pipes = 8; // Verified
++		adev->gfx.config.max_cu_per_sh = 9; // Probably OK
++		adev->gfx.config.max_sh_per_se = 1; // Verified
++		adev->gfx.config.max_backends_per_se = 2; // Probably OK?
++		adev->gfx.config.max_texture_channel_caches = 8; // ??
++		adev->gfx.config.max_gprs = 256;
++		adev->gfx.config.max_gs_threads = 32; // ??
++		adev->gfx.config.max_hw_contexts = 8;
++
++		adev->gfx.config.sc_prim_fifo_size_frontend = 0x20;
++		adev->gfx.config.sc_prim_fifo_size_backend = 0x100;
++		adev->gfx.config.sc_hiz_tile_fifo_size = 0x30;
++		adev->gfx.config.sc_earlyz_tile_fifo_size = 0x130;
++		gb_addr_config = 0x10000000; //0x22011003; //0x12011003;
++		break;
+ 	case CHIP_KABINI:
+ 	case CHIP_MULLINS:
+ 	default:

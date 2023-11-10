@@ -1,48 +1,34 @@
---- linux-6.1.13-xanmod-rt7/arch/x86/Kconfig	2023-04-10 01:19:18.827217078 +0200
-+++ PS4linux-6.1.13-xanmod-rt7/arch/x86/Kconfig	2023-04-10 01:28:24.808495897 +0200
-@@ -563,6 +563,30 @@
+diff -ruN a/arch/x86/Kconfig b/arch/x86/Kconfig
+--- a/arch/x86/Kconfig	2023-11-10 04:40:44.737990718 +0100
++++ b/arch/x86/Kconfig	2023-11-10 04:36:25.920812281 +0100
+@@ -515,6 +515,14 @@
+ 	  Adds support for Numascale NumaChip large-SMP systems. Needed to
  	  enable more than ~168 cores.
  	  If you don't have one of these, you should say N here.
- 
++		
 +config X86_PS4
-+       bool "Sony PlayStation 4"
-+       depends on X86_64
-+       depends on X86_EXTENDED_PLATFORM
-+       depends on PCI
-+       help
-+         Select to include support for the Sony PlayStation 4 game console.
-+
-+
-+choice
-+       prompt "Platform:" if X86_PS4
-+       default X86_PS4_AEOLIA_BELIZE
-+       depends on X86_64
-+    depends on X86_EXTENDED_PLATFORM
-+    depends on PCI
-+       help
-+         Select the desired ps4 platform to build this kernel for.
-+
-+       config X86_PS4_AEOLIA_BELIZE
-+               bool "aeolia/belize"
-+       config X86_PS4_BAIKAL
-+               bool "baikal"
-+endchoice
-+
++	bool "Sony PlayStation 4"
++	depends on X86_64
++	depends on X86_EXTENDED_PLATFORM
++	depends on PCI
++	---help---
++	  Select to include support for the Sony PlayStation 4 game console.
+ 
  config X86_VSMP
  	bool "ScaleMP vSMP"
- 	select HYPERVISOR_GUEST
---- linux-6.1.13-xanmod-rt7/arch/x86/include/asm/irqdomain.h	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/arch/x86/include/asm/irqdomain.h	2023-04-10 01:30:56.403023043 +0200
-@@ -14,6 +14,7 @@
+diff -ruN a/arch/x86/include/asm/msi.h b/arch/x86/include/asm/msi.h
+--- a/arch/x86/include/asm/msi.h	2023-11-10 04:40:44.814001343 +0100
++++ b/arch/x86/include/asm/msi.h	2023-11-10 04:36:26.340870998 +0100
+@@ -11,4 +11,6 @@
  
- extern int x86_fwspec_is_ioapic(struct irq_fwspec *fwspec);
- extern int x86_fwspec_is_hpet(struct irq_fwspec *fwspec);
-+extern int x86_fwspec_is_aeolia(struct irq_fwspec *fwspec);
+ void pci_msi_set_desc(msi_alloc_info_t *arg, struct msi_desc *desc);
  
- extern struct irq_domain *x86_vector_domain;
- 
---- linux-6.1.13-xanmod-rt7/arch/x86/include/asm/ps4.h	1970-01-01 01:00:00.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/arch/x86/include/asm/ps4.h	2023-04-10 01:32:51.046142599 +0200
++void irq_msi_compose_msg(struct irq_data *data, struct msi_msg *msg);
++
+ #endif /* _ASM_X86_MSI_H */
+diff -ruN a/arch/x86/include/asm/ps4.h b/arch/x86/include/asm/ps4.h
+--- a/arch/x86/include/asm/ps4.h	1970-01-01 01:00:00.000000000 +0100
++++ b/arch/x86/include/asm/ps4.h	2023-11-10 04:36:26.333870020 +0100
 @@ -0,0 +1,60 @@
 +/*
 + * ps4.h: Sony PS4 platform setup code
@@ -104,9 +90,10 @@
 +
 +#endif
 +#endif
---- linux-6.1.13-xanmod-rt7/arch/x86/include/asm/setup.h	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/arch/x86/include/asm/setup.h	2023-04-10 01:35:37.411726374 +0200
-@@ -66,6 +66,12 @@
+diff -ruN a/arch/x86/include/asm/setup.h b/arch/x86/include/asm/setup.h
+--- a/arch/x86/include/asm/setup.h	2023-11-10 04:40:44.826003021 +0100
++++ b/arch/x86/include/asm/setup.h	2023-11-10 04:36:26.329869460 +0100
+@@ -59,6 +59,12 @@
  static inline void x86_ce4100_early_setup(void) { }
  #endif
  
@@ -119,9 +106,10 @@
  #ifndef _SETUP
  
  #include <asm/espfix.h>
---- linux-6.1.13-xanmod-rt7/arch/x86/include/uapi/asm/bootparam.h	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/arch/x86/include/uapi/asm/bootparam.h	2023-04-10 01:37:59.527170435 +0200
-@@ -276,6 +276,7 @@
+diff -ruN a/arch/x86/include/uapi/asm/bootparam.h b/arch/x86/include/uapi/asm/bootparam.h
+--- a/arch/x86/include/uapi/asm/bootparam.h	2023-11-10 04:40:44.839004838 +0100
++++ b/arch/x86/include/uapi/asm/bootparam.h	2023-11-10 04:36:26.359873654 +0100
+@@ -241,6 +241,7 @@
  	X86_SUBARCH_XEN,
  	X86_SUBARCH_INTEL_MID,
  	X86_SUBARCH_CE4100,
@@ -129,9 +117,10 @@
  	X86_NR_SUBARCHS,
  };
  
---- linux-6.1.13-xanmod-rt7/arch/x86/kernel/amd_nb.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/arch/x86/kernel/amd_nb.c	2023-04-10 01:25:43.716795831 +0200
-@@ -66,6 +66,7 @@
+diff -ruN a/arch/x86/kernel/amd_nb.c b/arch/x86/kernel/amd_nb.c
+--- a/arch/x86/kernel/amd_nb.c	2023-11-10 04:40:44.847005957 +0100
++++ b/arch/x86/kernel/amd_nb.c	2023-11-10 04:36:25.969819131 +0100
+@@ -47,6 +47,7 @@
  	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_15H_M60H_NB_F3) },
  	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_16H_NB_F3) },
  	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_16H_M30H_NB_F3) },
@@ -139,7 +128,7 @@
  	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_17H_DF_F3) },
  	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_17H_M10H_DF_F3) },
  	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_17H_M30H_DF_F3) },
-@@ -88,6 +89,7 @@
+@@ -63,6 +64,7 @@
  	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_15H_M60H_NB_F4) },
  	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_16H_NB_F4) },
  	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_16H_M30H_NB_F4) },
@@ -147,95 +136,53 @@
  	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_17H_DF_F4) },
  	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_17H_M10H_DF_F4) },
  	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_17H_M30H_DF_F4) },
---- linux-6.1.13-xanmod-rt7/arch/x86/kernel/apic/apic.c	2023-04-10 01:19:18.858217489 +0200
-+++ PS4linux-6.1.13-xanmod-rt7/arch/x86/kernel/apic/apic.c	2023-04-10 01:42:00.256472484 +0200
-@@ -2581,6 +2581,13 @@
- 		msg->arch_addr_lo.virt_destid_8_14 = cfg->dest_apicid >> 8;
- 	else
- 		WARN_ON_ONCE(cfg->dest_apicid > 0xFF);
-+
-+       pr_info("apcie_irq_msi_compose_msg %x %x %x %x %x\n", msg->data,
-+               msg->address_hi,
-+               msg->arch_addr_lo.base_address,
-+               msg->arch_addr_lo.destid_0_7,
-+               cfg->vector);
-+
+diff -ruN a/arch/x86/kernel/apic/msi.c b/arch/x86/kernel/apic/msi.c
+--- a/arch/x86/kernel/apic/msi.c	2023-11-10 04:40:44.851006516 +0100
++++ b/arch/x86/kernel/apic/msi.c	2023-11-10 04:36:26.011825003 +0100
+@@ -48,7 +48,7 @@
+ 		MSI_DATA_VECTOR(cfg->vector);
  }
  
- u32 x86_msi_msg_get_destid(struct msi_msg *msg, bool extid)
---- linux-6.1.13-xanmod-rt7/arch/x86/kernel/apic/vector.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/arch/x86/kernel/apic/vector.c	2023-04-10 01:59:25.542340068 +0200
-@@ -676,6 +676,15 @@
- 	return 0;
- }
- 
-+int x86_fwspec_is_aeolia(struct irq_fwspec *fwspec)
-+{
-+       if (is_fwnode_irqchip(fwspec->fwnode)) {
-+               const char *fwname = fwnode_get_name(fwspec->fwnode);
-+               return fwname && !strncmp(fwname, "Aeolia-MSI", 10);
-+       }
-+       return 0;
-+}
-+
- static int x86_vector_select(struct irq_domain *d, struct irq_fwspec *fwspec,
- 			     enum irq_domain_bus_token bus_token)
+-static void irq_msi_compose_msg(struct irq_data *data, struct msi_msg *msg)
++void irq_msi_compose_msg(struct irq_data *data, struct msi_msg *msg)
  {
-@@ -687,7 +696,7 @@
- 	if (apic->apic_id_valid(32768))
- 		return 0;
- 
--	return x86_fwspec_is_ioapic(fwspec) || x86_fwspec_is_hpet(fwspec);
-+	return x86_fwspec_is_ioapic(fwspec) || x86_fwspec_is_hpet(fwspec) || x86_fwspec_is_aeolia(fwspec);
+ 	__irq_msi_compose_msg(irqd_cfg(data), msg);
  }
- 
- static const struct irq_domain_ops x86_vector_domain_ops = {
---- linux-6.1.13-xanmod-rt7/arch/x86/kernel/head64.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/arch/x86/kernel/head64.c	2023-04-10 02:01:30.199484887 +0200
-@@ -549,6 +549,9 @@
- 	case X86_SUBARCH_INTEL_MID:
- 		x86_intel_mid_early_setup();
- 		break;
-+	case X86_SUBARCH_PS4:
-+                x86_ps4_early_setup();
-+                break;
+diff -ruN a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
+--- a/arch/x86/kernel/head64.c	2023-11-10 04:40:44.875009871 +0100
++++ b/arch/x86/kernel/head64.c	2023-11-10 04:36:25.974819830 +0100
+@@ -488,6 +488,11 @@
  	default:
  		break;
  	}
---- linux-6.1.13-xanmod-rt7/arch/x86/mm/init_64.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/arch/x86/mm/init_64.c	2023-04-10 02:05:59.011915829 +0200
-@@ -1368,8 +1368,15 @@
- 
- int kernel_set_to_readonly;
- 
-+static int first = true;
-+void icc_do_pulse_orange_with_white(void);
- void mark_rodata_ro(void)
- {
-+    if(first) {
-+        first = false;
-+        icc_do_pulse_orange_with_white();
-+    }
-+
- 	unsigned long start = PFN_ALIGN(_text);
- 	unsigned long rodata_start = PFN_ALIGN(__start_rodata);
- 	unsigned long end = (unsigned long)__end_rodata_hpage_align;
---- linux-6.1.13-xanmod-rt7/arch/x86/platform/Makefile	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/arch/x86/platform/Makefile	2023-04-10 02:20:17.177402445 +0200
-@@ -9,6 +9,7 @@
+-
++	/* Call the subarch specific early setup function */
++	switch (boot_params.hdr.hardware_subarch) {
++	case X86_SUBARCH_PS4:
++		x86_ps4_early_setup();
++		break;
++	}
+ 	start_kernel();
+ }
+diff -ruN a/arch/x86/platform/Makefile b/arch/x86/platform/Makefile
+--- a/arch/x86/platform/Makefile	2023-11-10 04:40:44.949020217 +0100
++++ b/arch/x86/platform/Makefile	2023-11-10 04:36:26.215853523 +0100
+@@ -10,6 +10,7 @@
  obj-y	+= intel-mid/
  obj-y	+= intel-quark/
  obj-y	+= olpc/
-+obj-y   += ps4/
++obj-y	+= ps4/
  obj-y	+= scx200/
+ obj-y	+= sfi/
  obj-y	+= ts5500/
- obj-y	+= uv/
---- linux-6.1.13-xanmod-rt7/arch/x86/platform/ps4/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/arch/x86/platform/ps4/Makefile	2023-04-10 02:23:34.171963257 +0200
+diff -ruN a/arch/x86/platform/ps4/Makefile b/arch/x86/platform/ps4/Makefile
+--- a/arch/x86/platform/ps4/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ b/arch/x86/platform/ps4/Makefile	2023-11-10 04:36:26.225854921 +0100
 @@ -0,0 +1 @@
 +obj-$(CONFIG_X86_PS4) += ps4.o calibrate.o
---- linux-6.1.13-xanmod-rt7/arch/x86/platform/ps4/calibrate.c	1970-01-01 01:00:00.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/arch/x86/platform/ps4/calibrate.c	2023-04-10 02:25:56.955852731 +0200
+diff -ruN a/arch/x86/platform/ps4/calibrate.c b/arch/x86/platform/ps4/calibrate.c
+--- a/arch/x86/platform/ps4/calibrate.c	1970-01-01 01:00:00.000000000 +0100
++++ b/arch/x86/platform/ps4/calibrate.c	2023-11-10 04:36:26.225854921 +0100
 @@ -0,0 +1,116 @@
 +/*
 + * calibrate.c: Sony PS4 TSC/LAPIC calibration
@@ -349,13 +296,14 @@
 +		tsc_freq = PS4_DEFAULT_TSC_FREQ;
 +	}
 +
-+	lapic_timer_period = (tsc_freq + 8 * HZ) / (16 * HZ);
++	lapic_timer_frequency = (tsc_freq + 8 * HZ) / (16 * HZ);
 +
 +	return (tsc_freq + 500) / 1000;
 +}
---- linux-6.1.13-xanmod-rt7/arch/x86/platform/ps4/ps4.c	1970-01-01 01:00:00.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/arch/x86/platform/ps4/ps4.c	2023-04-10 02:27:43.273835076 +0200
-@@ -0,0 +1,74 @@
+diff -ruN a/arch/x86/platform/ps4/ps4.c b/arch/x86/platform/ps4/ps4.c
+--- a/arch/x86/platform/ps4/ps4.c	1970-01-01 01:00:00.000000000 +0100
++++ b/arch/x86/platform/ps4/ps4.c	2023-11-10 04:36:26.226855061 +0100
+@@ -0,0 +1,76 @@
 +/*
 + * ps4.c: Sony PS4 platform setup code
 + *
@@ -371,6 +319,7 @@
 +#include <linux/kernel.h>
 +#include <linux/interrupt.h>
 +#include <linux/scatterlist.h>
++#include <linux/sfi.h>
 +#include <linux/irq.h>
 +#include <linux/module.h>
 +#include <linux/notifier.h>
@@ -382,6 +331,7 @@
 +#include <asm/io_apic.h>
 +#include <asm/io.h>
 +#include <asm/i8259.h>
++#include <asm/apb_timer.h>
 +#include <asm/reboot.h>
 +#include <asm/msr.h>
 +#include <asm/ps4.h>
@@ -430,19 +380,21 @@
 +	legacy_pic = &null_legacy_pic;
 +	machine_ops.emergency_restart = icc_reboot;
 +}
---- linux-6.1.13-xanmod-rt7/drivers/Makefile	2023-04-10 01:19:18.907218137 +0200
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/Makefile	2023-04-10 02:31:31.995739670 +0200
-@@ -86,6 +86,7 @@
+diff -ruN a/drivers/Makefile b/drivers/Makefile
+--- a/drivers/Makefile	2023-11-10 04:40:45.090039929 +0100
++++ b/drivers/Makefile	2023-11-10 04:36:27.626050645 +0100
+@@ -85,6 +85,7 @@
  obj-$(CONFIG_SPMI)		+= spmi/
  obj-$(CONFIG_HSI)		+= hsi/
  obj-$(CONFIG_SLIMBUS)		+= slimbus/
-+obj-$(CONFIG_X86_PS4)           += ps4/
++obj-$(CONFIG_X86_PS4)		+= ps4/
  obj-y				+= net/
  obj-$(CONFIG_ATM)		+= atm/
  obj-$(CONFIG_FUSION)		+= message/
---- linux-6.1.13-xanmod-rt7/drivers/ata/ahci.c	2023-04-10 01:19:18.925218376 +0200
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/ata/ahci.c	2023-04-10 03:12:29.842787511 +0200
-@@ -34,6 +34,10 @@
+diff -ruN a/drivers/ata/ahci.c b/drivers/ata/ahci.c
+--- a/drivers/ata/ahci.c	2023-11-10 04:40:45.170051113 +0100
++++ b/drivers/ata/ahci.c	2023-11-10 04:36:38.933631262 +0100
+@@ -50,6 +50,10 @@
  #include <linux/io-64-nonatomic-lo-hi.h>
  #include "ahci.h"
  
@@ -453,15 +405,7 @@
  #define DRV_NAME	"ahci"
  #define DRV_VERSION	"3.0"
  
-@@ -44,6 +48,7 @@
- 	AHCI_PCI_BAR_ENMOTUS	= 2,
- 	AHCI_PCI_BAR_CAVIUM_GEN5	= 4,
- 	AHCI_PCI_BAR_STANDARD	= 5,
-+	
- };
- 
- enum board_ids {
-@@ -615,6 +620,11 @@
+@@ -595,6 +599,11 @@
  	/* Enmotus */
  	{ PCI_DEVICE(0x1c44, 0x8000), board_ahci },
  
@@ -470,71 +414,60 @@
 +	{ PCI_VDEVICE(SONY, PCI_DEVICE_ID_SONY_BELIZE_AHCI), board_ahci },
 +	{ PCI_VDEVICE(SONY, PCI_DEVICE_ID_SONY_BAIKAL_AHCI), board_ahci },
 +
- 	/* Loongson */
- 	{ PCI_VDEVICE(LOONGSON, 0x7a08), board_ahci },
- 
-@@ -958,6 +968,23 @@
+ 	/* Generic, PCI class code for AHCI */
+ 	{ PCI_ANY_ID, PCI_ANY_ID, PCI_ANY_ID, PCI_ANY_ID,
+ 	  PCI_CLASS_STORAGE_SATA_AHCI, 0xffffff, board_ahci },
+@@ -937,7 +946,22 @@
+ 	 */
  	if (pdev->dma_mask && pdev->dma_mask < DMA_BIT_MASK(32))
  		return 0;
- 
-+        #ifdef CONFIG_X86_PS4
-+        if (pdev->vendor == PCI_VENDOR_ID_SONY) {
-+                rc = dma_set_mask(&pdev->dev, DMA_BIT_MASK(31));
-+                if (rc) {
-+                        dev_err(&pdev->dev, "31-bit DMA enable failed\n");
-+                        return rc;
-+                }
-+                rc = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(31));
-+                if (rc) {
-+                        dev_err(&pdev->dev,
-+                                "31-bit consistent DMA enable failed\n");
-+                        return rc;
-+                }
-+                return 0;
-+        }
-+        #endif
-+
- 	rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(dma_bits));
- 	if (rc)
- 		dev_err(&pdev->dev, "DMA enable failed\n");
-@@ -1576,6 +1603,12 @@
+-
++#ifdef CONFIG_X86_PS4
++	if (pdev->vendor == PCI_VENDOR_ID_SONY) {
++		rc = dma_set_mask(&pdev->dev, DMA_BIT_MASK(31));
++		if (rc) {
++			dev_err(&pdev->dev, "31-bit DMA enable failed\n");
++			return rc;
++		}
++		rc = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(31));
++		if (rc) {
++			dev_err(&pdev->dev,
++				"31-bit consistent DMA enable failed\n");
++			return rc;
++		}
++		return 0;
++	}
++#endif
+ 	if (using_dac &&
+ 	    !dma_set_mask(&pdev->dev, DMA_BIT_MASK(64))) {
+ 		rc = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(64));
+@@ -1578,6 +1602,11 @@
  {
  	int nvec;
  
-+	#ifdef CONFIG_X86_PS4
++#ifdef CONFIG_X86_PS4
 +	if (pdev->vendor == PCI_VENDOR_ID_SONY) {
 +		return apcie_assign_irqs(pdev, n_ports);
 +	}
-+	#endif
-+
++#endif
  	if (hpriv->flags & AHCI_HFLAG_NO_MSI)
  		return -ENODEV;
  
-@@ -1697,6 +1730,12 @@
+@@ -1691,7 +1720,11 @@
+ 	VPRINTK("ENTER\n");
  
  	WARN_ON((int)ATA_MAX_QUEUE > AHCI_MAX_CMDS);
- 
-+        #ifdef CONFIG_X86_PS4
-+        /* This will return negative on non-PS4 platforms */
-+        if (apcie_status() == 0)
-+                return -EPROBE_DEFER;
-+        #endif
-+
+-
++#ifdef CONFIG_X86_PS4
++	/* This will return negative on non-PS4 platforms */
++	if (apcie_status() == 0)
++		return -EPROBE_DEFER;
++#endif
  	ata_print_version_once(&pdev->dev, DRV_VERSION);
  
  	/* The AHCI driver can only drive the SATA ports, the PATA driver
-@@ -1730,7 +1769,8 @@
- 	} else if (pdev->vendor == PCI_VENDOR_ID_LOONGSON) {
- 		if (pdev->device == 0x7a08)
- 			ahci_pci_bar = AHCI_PCI_BAR_LOONGSON;
--	}
-+	} else if (pdev->vendor == PCI_VENDOR_ID_SONY && pdev->device == PCI_DEVICE_ID_SONY_BAIKAL_AHCI)
-+                ahci_pci_bar = AHCI_PCI_BAR0_BAIKAL;
- 
- 	/* acquire resources */
- 	rc = pcim_enable_device(pdev);
-@@ -1944,8 +1984,255 @@
- 				     NULL);
+@@ -1924,6 +1957,11 @@
+ {
  	pm_runtime_get_noresume(&pdev->dev);
  	ata_pci_remove_one(pdev);
 +#ifdef CONFIG_X86_PS4
@@ -542,320 +475,60 @@
 +		apcie_free_irqs(pdev->irq, 1);
 +	}
 +#endif
-+}
-+
-+#ifdef CONFIG_X86_PS4
-+void bpcie_sata_phy_init(struct device *dev, struct ahci_controller *ctlr)
-+{
-+	int i;
-+	u32 v;
-+	u32 v2;
-+	bool is_phy_gen_3;
-+	unsigned int trace_length;
-+
-+  dev_info(dev, "Belize SATA PHY init\n");
-+
-+	for (i = 0; i < 100; i++) {
-+		udelay(10000);
-+	}
-+
-+  //step 1
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x81);
-+
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffff00) | 1);
-+
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0xa5);
-+
-+  //step 2
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+
-+  if (ctlr->dev_id == 0x90ca104d || ctlr->dev_id == 0x909f104d || ctlr->dev_id == 0x90d9104d) {
-+    is_phy_gen_3 = false;
-+    bpcie_ahci_write(ctlr->r_mem, 0x17c, v & 0xfffff3ff);
-+  }else{
-+    u32 v2 = bpcie_ahci_read(ctlr->r_mem, 0);
-+    if ((v2 & 0xf00000) != 0x300000) {
-+      bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff3ff) | 0x400);
-+      is_phy_gen_3 = false;
-+    }else{
-+      dev_info(dev,"PHY SET GEN3\n");
-+      bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff3ff) | 0x800);
-+      is_phy_gen_3 = true;
-+    }
-+  }
-+  //--- step 3 ---
-+  if (ctlr->trace_len == 0) {
-+    trace_length = 6;
-+  }else{
-+    trace_length = ctlr->trace_len & 0x1f;
-+    if (trace_length >= 0x13) {
-+      trace_length = 6;
-+    }
-+  }
-+  dev_info(dev,"Belize SATA PHY Trace length : %d\n",trace_length);
-+
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0xa3);
-+
-+  //--- step 4 ---
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff3ff) | 0x800);
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0xd0);
-+
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff800) | 0x441);
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0xe1);
-+
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffff8f) | 0x60);
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0xd0);
-+
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffff3fff) | 0x8000);
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0xf1);
-+
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff3ff) | 0x400);
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x48);
-+
-+  //--- step 5 ---
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, 0x62d8);
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0xe);
-+
-+  //--- step 6 ---
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, v & 0xffffdfff);
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x8d);
-+
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, v | 1);
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x8f);
-+
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, v | 1);
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x91);
-+
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, v | 1);
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x8d);
-+
-+  //--- step 7 ---
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  if (trace_length >= 0xe) {
-+    bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffffc1) | 0x28);
-+  }else{
-+    if (trace_length < 0xb) {
-+      bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffffc1) | 8);
-+    }else{
-+      bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffffc1) | 0x10);
-+    }
-+  }
-+
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x8f);
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffffc1) | 0x12);
-+
-+  //--- step 8 ---
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x91);
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  if (trace_length < 5) {
-+    bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffffc1) | 0x24);
-+  }else{
-+    bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffffc1) | 0x2a);
-+  }
-+
-+  //--- step 9 ---
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0xff);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, 1);
-+
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x97);
-+
-+  //--- step 10 ---
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  if (is_phy_gen_3) {
-+    bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffff80) | 0xd3);
-+  }else{
-+    bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffff80) | 0xee);
-+  }
-+
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x95);
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffff00) | 0xee);
-+
-+  //--- step 11 ---
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0xff);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, 0);
-+
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x8d);
-+
-+  //--- step 12 ---
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  if (trace_length < 0xe){
-+    bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff87f) | 0x900);
-+  }else{
-+    bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff87f) | 0xe00);
-+  }
-+
-+  //--- step 13 ---
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x8f);
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff07f) | 0x900);
-+
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x91);
-+
-+  //--- step 14 ---
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  if (is_phy_gen_3){
-+    bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff87f) | 0xd00);
-+  }else{
-+    bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff87f) | 0xe80);
-+  }
-+
-+  //--- step 15 ---
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 200);
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, v & 0xffffefff);
-+
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 10);
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, v & 0xffffefff);
-+
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x82);
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, v | 0x1000);
-+
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0xc9);
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, v | 0x1000);
-+
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x84);
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffffc0) | 0xc);
-+
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x8d);
-+
-+  //--- step 16 ---
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  v = v & 0xffff0fff;
-+  if (trace_length < 0xe) {
-+    bpcie_ahci_write(ctlr->r_mem, 0x17c, v | 0x8000);
-+  }else{
-+    bpcie_ahci_write(ctlr->r_mem, 0x17c, v);
-+  }
-+
-+  //--- step 17 ---
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0x8f);
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+  bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffff0fff) | 0x8000);
-+
-+  //--- step 18 ---
-+  bpcie_ahci_write(ctlr->r_mem, 0xa0, 0);
-+  v = bpcie_ahci_read(ctlr->r_mem, 0xa4);
-+  bpcie_ahci_write(ctlr->r_mem, 0xa4, v | 0x40);
-+
-+  //--- step 19 ---
-+  if (ctlr->dev_id != 0x909f104d && ctlr->dev_id != 0x90ca104d && ctlr->dev_id != 0x90d9104d) {
-+    v2 = 0x73000000;
-+  }else{
-+    v2 = 0x30000000;
-+  }
-+
-+  //--- step 20 ---
-+  bpcie_ahci_write(ctlr->r_mem, 0xa0, 4);
-+  v = bpcie_ahci_read(ctlr->r_mem, 0xa4);
-+  bpcie_ahci_write(ctlr->r_mem, 0xa4, (v & 0x88ffffff) | v2);
-+
-+  //--- step 21 ---
-+  v = bpcie_ahci_read(ctlr->r_mem, 0xa4);
-+
-+  //--- step 22 ---
-+	for (i = 0; i < 100; i++) {
-+		udelay(10000);
-+	}
-+
-+  //--- step 23 ---
-+  bpcie_ahci_write(ctlr->r_mem, 0x178, 0xf9);
-+  v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
-+
-+  if (is_phy_gen_3) {
-+    dev_info(dev,"Align 90=0x%02x\n",v & 0x7f);
-+  }
-+  //done!
  }
  
-+EXPORT_SYMBOL_GPL(bpcie_sata_phy_init);
-+#endif
-+
  module_pci_driver(ahci_pci_driver);
- 
- MODULE_AUTHOR("Jeff Garzik");
---- linux-6.1.13-xanmod-rt7/drivers/ata/ahci.h	2023-04-10 01:19:18.926218389 +0200
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/ata/ahci.h	2023-04-10 03:15:26.087353817 +0200
-@@ -454,4 +454,30 @@
- 	return (cap & 0x1f) + 1;
- }
- 
-+#ifdef CONFIG_X86_PS4
-+struct f_resource{
-+	u64 resource_i_ptr;
-+	u64 r_bustag;
-+	void __iomem * r_bushandle;
-+};
-+
-+struct ahci_controller{
-+	void *dev;
-+	int dev_id;
-+	struct f_resource *r_mem;
-+	u32 trace_len;
-+};
-+
-+void bpcie_sata_phy_init(struct device *dev, struct ahci_controller *ctlr);
-+
-+static inline void bpcie_ahci_write(struct f_resource *r_mem, u32 offset, u32 val) {
-+	iowrite32(val, r_mem->r_bushandle + offset);
-+}
-+
-+static inline u32 bpcie_ahci_read(struct f_resource *r_mem, u32 offset) {
-+		return ioread32(r_mem->r_bushandle + offset);
-+}
-+#endif
-+
-+
- #endif /* _AHCI_H */
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/Makefile	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/Makefile	2023-04-10 03:17:12.825326588 +0200
-@@ -251,6 +251,7 @@
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/Makefile b/drivers/gpu/drm/amd/amdgpu/Makefile
+--- a/drivers/gpu/drm/amd/amdgpu/Makefile	2023-11-10 04:40:45.788137512 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/Makefile	2023-11-10 04:36:57.398212310 +0100
+@@ -166,7 +166,7 @@
  amdgpu-$(CONFIG_VGA_SWITCHEROO) += amdgpu_atpx_handler.o
  amdgpu-$(CONFIG_ACPI) += amdgpu_acpi.o
- amdgpu-$(CONFIG_HMM_MIRROR) += amdgpu_mn.o
+ amdgpu-$(CONFIG_MMU_NOTIFIER) += amdgpu_mn.o
+-
 +amdgpu-$(CONFIG_X86_PS4) += ps4_bridge.o
+ include $(FULL_AMD_PATH)/powerplay/Makefile
  
- include $(FULL_AMD_PATH)/pm/Makefile
- 
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/amdgpu.h	2023-04-10 01:19:19.048220003 +0200
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/amdgpu.h	2023-04-10 03:21:17.281312067 +0200
-@@ -278,6 +278,8 @@
+ amdgpu-y += $(AMD_POWERPLAY_FILES)
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/amdgpu.h b/drivers/gpu/drm/amd/amdgpu/amdgpu.h
+--- a/drivers/gpu/drm/amd/amdgpu/amdgpu.h	2023-11-10 04:40:45.789137651 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/amdgpu.h	2023-11-10 04:36:58.261332960 +0100
+@@ -181,7 +181,8 @@
  /* max cursor sizes (in pixels) */
  #define CIK_CURSOR_WIDTH 128
  #define CIK_CURSOR_HEIGHT 128
+-
 +#define LVP_CURSOR_WIDTH 64
 +#define LVP_CURSOR_HEIGHT 64
- 
- /* smart shift bias level limits */
- #define AMDGPU_SMARTSHIFT_MAX_BIAS (100)
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/amdgpu_connectors.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/amdgpu_connectors.c	2023-04-10 03:50:28.213742025 +0200
-@@ -1516,6 +1516,30 @@
- 	.late_register = amdgpu_connector_late_register,
+ struct amdgpu_device;
+ struct amdgpu_ib;
+ struct amdgpu_cs_parser;
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/amdgpu_amdkfd.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_amdkfd.c
+--- a/drivers/gpu/drm/amd/amdgpu/amdgpu_amdkfd.c	2023-11-10 04:40:45.791137931 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_amdkfd.c	2023-11-10 04:36:57.850275501 +0100
+@@ -88,6 +88,8 @@
+ #ifdef CONFIG_DRM_AMDGPU_CIK
+ 	case CHIP_KAVERI:
+ 	case CHIP_HAWAII:
++	case CHIP_GLADIUS:
++	case CHIP_LIVERPOOL:
+ 		kfd2kgd = amdgpu_amdkfd_gfx_7_get_functions();
+ 		break;
+ #endif
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/amdgpu_connectors.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_connectors.c
+--- a/drivers/gpu/drm/amd/amdgpu/amdgpu_connectors.c	2023-11-10 04:40:45.796138630 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_connectors.c	2023-11-10 04:36:57.476223215 +0100
+@@ -1492,7 +1492,29 @@
+ 	.destroy = amdgpu_connector_destroy,
+ 	.force = amdgpu_connector_dvi_force,
  };
- 
 +#ifdef CONFIG_X86_PS4
 +int ps4_bridge_get_modes(struct drm_connector *connector);
 +int ps4_bridge_mode_valid(struct drm_connector *connector,
 +			struct drm_display_mode *mode);
 +enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
 +					  bool force);
-+
+ 
 +
 +static const struct drm_connector_helper_funcs amdgpu_ps4_dp_connector_helper_funcs = {
 +	.get_modes = ps4_bridge_get_modes,
@@ -872,11 +545,10 @@
 +	.force = amdgpu_connector_dvi_force,
 +};
 +#endif
-+
  static const struct drm_connector_funcs amdgpu_connector_edp_funcs = {
  	.dpms = drm_helper_connector_dpms,
  	.detect = amdgpu_connector_dp_detect,
-@@ -1548,6 +1572,7 @@
+@@ -1522,6 +1544,7 @@
  	uint32_t subpixel_order = SubPixelNone;
  	bool shared_ddc = false;
  	bool is_dp_bridge = false;
@@ -884,10 +556,11 @@
  	bool has_aux = false;
  
  	if (connector_type == DRM_MODE_CONNECTOR_Unknown)
-@@ -1595,6 +1620,16 @@
+@@ -1565,7 +1588,16 @@
+ 	amdgpu_connector = kzalloc(sizeof(struct amdgpu_connector), GFP_KERNEL);
  	if (!amdgpu_connector)
  		return;
- 
+-
 +	/* Liverpool (PS4) has an DP bridge which needs a special driver, and
 +	 * a fake HDMI port that doesn't really exist. */
 +	if (adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS) {
@@ -901,32 +574,31 @@
  	connector = &amdgpu_connector->base;
  
  	amdgpu_connector->connector_id = connector_id;
-@@ -1649,12 +1684,22 @@
+@@ -1616,10 +1648,20 @@
  		case DRM_MODE_CONNECTOR_HDMIA:
  		case DRM_MODE_CONNECTOR_HDMIB:
  		case DRM_MODE_CONNECTOR_DisplayPort:
-+			if (is_ps4_bridge) {
- 			drm_connector_init_with_ddc(dev, &amdgpu_connector->base,
- 						    &amdgpu_connector_dp_funcs,
- 						    connector_type,
- 						    ddc);
++		if (is_ps4_bridge) {
+ 			drm_connector_init(dev, &amdgpu_connector->base,
+ 					   &amdgpu_connector_dp_funcs, connector_type);
  			drm_connector_helper_add(&amdgpu_connector->base,
  						 &amdgpu_connector_dp_helper_funcs);
-+			} else {
++		} else {
 +			drm_connector_init(dev, &amdgpu_connector->base,
 +						&amdgpu_ps4_dp_connector_funcs, connector_type);
 +			drm_connector_helper_add(&amdgpu_connector->base,
 +						&amdgpu_ps4_dp_connector_helper_funcs);
 +						//&amdgpu_connector_dp_helper_funcs);
-+
-+
-+			}
++						
++						
++		}
  			drm_object_attach_property(&amdgpu_connector->base.base,
  						      adev->mode_info.underscan_property,
  						      UNDERSCAN_OFF);
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c	2023-04-10 01:19:19.052220056 +0200
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c	2023-04-17 23:32:03.986483462 +0200
-@@ -101,6 +101,8 @@
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c
+--- a/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c	2023-11-10 04:40:45.798138910 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c	2023-11-10 04:36:58.256332261 +0100
+@@ -74,6 +74,8 @@
  	"BONAIRE",
  	"KAVERI",
  	"KABINI",
@@ -935,47 +607,30 @@
  	"HAWAII",
  	"MULLINS",
  	"TOPAZ",
-@@ -2098,6 +2100,8 @@
+@@ -1386,6 +1388,8 @@
  	case CHIP_KAVERI:
  	case CHIP_KABINI:
  	case CHIP_MULLINS:
 +	case CHIP_LIVERPOOL:
 +	case CHIP_GLADIUS:
- 		if (adev->flags & AMD_IS_APU)
- 			adev->family = AMDGPU_FAMILY_KV;
+ #endif
+ 	case CHIP_VEGA20:
+ 	default:
+@@ -1510,6 +1514,8 @@
+ 	case CHIP_KAVERI:
+ 	case CHIP_KABINI:
+ 	case CHIP_MULLINS:
++	case CHIP_LIVERPOOL:
++	case CHIP_GLADIUS:
+ 		if ((adev->asic_type == CHIP_BONAIRE) || (adev->asic_type == CHIP_HAWAII))
+ 			adev->family = AMDGPU_FAMILY_CI;
  		else
-@@ -3327,6 +3331,8 @@
- 	case CHIP_KAVERI:
- 	case CHIP_KABINI:
- 	case CHIP_MULLINS:
-+	case CHIP_LIVERPOOL:
-+	case CHIP_GLADIUS:
- 		/*
- 		 * We have systems in the wild with these ASICs that require
- 		 * VGA support which is not supported with DC.
-@@ -4618,6 +4624,8 @@
- 		case CHIP_KAVERI:
- 		case CHIP_KABINI:
- 		case CHIP_MULLINS:
-+		case CHIP_LIVERPOOL:
-+		case CHIP_GLADIUS:
- #endif
- 		case CHIP_CARRIZO:
- 		case CHIP_STONEY:
-@@ -6087,6 +6095,8 @@
- 	case CHIP_KAVERI:
- 	case CHIP_KABINI:
- 	case CHIP_MULLINS:
-+	case CHIP_LIVERPOOL:
-+	case CHIP_GLADIUS:
- #endif
- 	case CHIP_TONGA:
- 	case CHIP_FIJI:
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c	2023-04-10 01:19:19.054220083 +0200
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c	2023-04-10 04:28:01.222522447 +0200
-@@ -51,6 +51,9 @@
- #include "amdgpu_xgmi.h"
- #include "amdgpu_reset.h"
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
+--- a/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c	2023-11-10 04:40:45.800139189 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c	2023-11-10 04:36:58.241330164 +0100
+@@ -39,6 +39,9 @@
+ 
+ #include "amdgpu_amdkfd.h"
  
 +#ifdef CONFIG_X86_PS4
 +#include <asm/ps4.h>
@@ -983,7 +638,7 @@
  /*
   * KMS wrapper.
   * - 3.0.0 - initial driver
-@@ -1807,6 +1810,12 @@
+@@ -689,6 +692,13 @@
  	{0x1002, 0x985D, PCI_ANY_ID, PCI_ANY_ID, 0, 0, CHIP_MULLINS|AMD_IS_MOBILITY|AMD_IS_APU},
  	{0x1002, 0x985E, PCI_ANY_ID, PCI_ANY_ID, 0, 0, CHIP_MULLINS|AMD_IS_MOBILITY|AMD_IS_APU},
  	{0x1002, 0x985F, PCI_ANY_ID, PCI_ANY_ID, 0, 0, CHIP_MULLINS|AMD_IS_MOBILITY|AMD_IS_APU},
@@ -993,23 +648,15 @@
 +	{0x1002, 0x9923, PCI_ANY_ID, PCI_ANY_ID, 0, 0, CHIP_LIVERPOOL|AMD_IS_APU},
 +	/* gladius */
 +	{0x1002, 0x9924, PCI_ANY_ID, PCI_ANY_ID, 0, 0, CHIP_GLADIUS|AMD_IS_APU},
++
  #endif
  	/* topaz */
  	{0x1002, 0x6900, PCI_ANY_ID, PCI_ANY_ID, 0, 0, CHIP_TOPAZ},
-@@ -2112,6 +2121,8 @@
- 		case CHIP_HAWAII:
- 		case CHIP_KABINI:
- 		case CHIP_MULLINS:
-+		case CHIP_LIVERPOOL:
-+		case CHIP_GLADIUS:
- 			dev_info(&pdev->dev,
- 				 "CIK support provided by radeon.\n");
- 			dev_info(&pdev->dev,
-@@ -2137,6 +2148,16 @@
- 	if (ret)
- 		return ret;
+@@ -888,6 +898,15 @@
+ 	if (supports_atomic)
+ 		kms_driver.driver_features |= DRIVER_ATOMIC;
  
-+	#ifdef CONFIG_X86_PS4
++#ifdef CONFIG_X86_PS4
 +	/* On the PS4 (Liverpool graphics) we have a hard dependency on the
 +	 * Aeolia driver to set up the HDMI encoder which is connected to it,
 +	 * so defer probe until it is ready. This test passes if this isn't
@@ -1017,14 +664,27 @@
 +	 */
 +	if (apcie_status() == 0)
 +		return -EPROBE_DEFER;
-+	#endif
++#endif
+ 	dev = drm_dev_alloc(&kms_driver, &pdev->dev);
+ 	if (IS_ERR(dev))
+ 		return PTR_ERR(dev);
+@@ -940,8 +959,10 @@
+ 	 * torn down properly on reboot/shutdown.
+ 	 * unfortunately we can't detect certain
+ 	 * hypervisors so just do this all the time.
+-	 */
+-	amdgpu_device_ip_suspend(adev);
++	 
 +
- 	pci_set_drvdata(pdev, ddev);
++****
++	amdgpu_device_ip_suspend(adev); */
+ }
  
- 	ret = amdgpu_driver_load_kms(adev, flags);
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/amdgpu_encoders.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/amdgpu_encoders.c	2023-04-10 04:34:57.061641048 +0200
-@@ -32,6 +32,22 @@
+ static int amdgpu_pmops_suspend(struct device *dev)
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/amdgpu_encoders.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_encoders.c
+--- a/drivers/gpu/drm/amd/amdgpu/amdgpu_encoders.c	2023-11-10 04:40:45.800139189 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_encoders.c	2023-11-10 04:36:58.543372385 +0100
+@@ -31,6 +31,22 @@
  #include "atom.h"
  #include "atombios_encoders.h"
  
@@ -1047,31 +707,20 @@
  void
  amdgpu_link_encoder_connector(struct drm_device *dev)
  {
-@@ -49,6 +65,9 @@
+@@ -46,6 +62,9 @@
  		list_for_each_entry(encoder, &dev->mode_config.encoder_list, head) {
  			amdgpu_encoder = to_amdgpu_encoder(encoder);
  			if (amdgpu_encoder->devices & amdgpu_connector->devices) {
-+				#ifdef CONFIG_X86_PS4
++#ifdef CONFIG_X86_PS4
 +				amdgpu_maybe_add_bridge(connector, encoder);
-+				#endif
++#endif
  				drm_connector_attach_encoder(connector, encoder);
  				if (amdgpu_encoder->devices & (ATOM_DEVICE_LCD_SUPPORT)) {
  					amdgpu_atombios_encoder_init_backlight(amdgpu_encoder, connector);
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/amdgpu_ib.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/amdgpu_ib.c	2023-04-10 04:38:07.224482719 +0200
-@@ -380,7 +380,8 @@
- 		tmo_gfx = AMDGPU_IB_TEST_GFX_XGMI_TIMEOUT;
- 	}
- 
--	for (i = 0; i < adev->num_rings; ++i) {
-+	//TODO test if this is needed now
-+	for (i = 0; i < 1 /*adev->num_rings*/; ++i) {
- 		struct amdgpu_ring *ring = adev->rings[i];
- 		long tmo;
- 
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/amdgpu_ucode.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/amdgpu_ucode.c	2023-04-10 04:39:51.397279799 +0200
-@@ -542,6 +542,8 @@
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/amdgpu_ucode.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_ucode.c
+--- a/drivers/gpu/drm/amd/amdgpu/amdgpu_ucode.c	2023-11-10 04:40:45.811140727 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_ucode.c	2023-11-10 04:36:58.256332261 +0100
+@@ -286,6 +286,8 @@
  	case CHIP_KABINI:
  	case CHIP_HAWAII:
  	case CHIP_MULLINS:
@@ -1080,9 +729,10 @@
  		return AMDGPU_FW_LOAD_DIRECT;
  #endif
  	case CHIP_TOPAZ:
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/atombios_dp.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/atombios_dp.c	2023-04-10 04:44:40.760785941 +0200
-@@ -258,12 +258,19 @@
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/atombios_dp.c b/drivers/gpu/drm/amd/amdgpu/atombios_dp.c
+--- a/drivers/gpu/drm/amd/amdgpu/atombios_dp.c	2023-11-10 04:40:45.817141566 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/atombios_dp.c	2023-11-10 04:36:57.614242508 +0100
+@@ -261,12 +261,19 @@
  		amdgpu_atombios_dp_convert_bpc_to_bpp(amdgpu_connector_get_monitor_bpc(connector));
  	static const unsigned link_rates[3] = { 162000, 270000, 540000 };
  	unsigned max_link_rate = drm_dp_max_link_rate(dpcd);
@@ -1094,7 +744,7 @@
 +	struct amdgpu_device *adev = dev->dev_private;
  
 +	/* Liverpool is always connected to an encoder that needs 4 lanes */
-+	if (adev->asic_type == CHIP_LIVERPOOL)
++	if (adev->asic_type == CHIP_LIVERPOOL && adev->asic_type == CHIP_LIVERPOOL)
 +			min_lane_num = 4;
  	if (amdgpu_connector_encoder_get_dp_bridge_encoder_id(connector) ==
  	    ENCODER_OBJECT_ID_NUTMEG) {
@@ -1103,9 +753,10 @@
  			max_pix_clock = (lane_num * 270000 * 8) / bpp;
  			if (max_pix_clock >= pix_clock) {
  				*dp_lanes = lane_num;
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/atombios_encoders.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/atombios_encoders.c	2023-04-10 04:48:07.492707421 +0200
-@@ -442,9 +442,11 @@
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/atombios_encoders.c b/drivers/gpu/drm/amd/amdgpu/atombios_encoders.c
+--- a/drivers/gpu/drm/amd/amdgpu/atombios_encoders.c	2023-11-10 04:40:45.818141706 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/atombios_encoders.c	2023-11-10 04:36:57.580237754 +0100
+@@ -444,9 +444,11 @@
  	struct drm_connector *connector;
  	struct amdgpu_connector *amdgpu_connector;
  	struct amdgpu_connector_atom_dig *dig_connector;
@@ -1119,38 +770,15 @@
  		return ATOM_ENCODER_MODE_DP;
  
  	/* DVO is always DVO */
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/atombios_i2c.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/atombios_i2c.c	2023-04-10 04:58:20.446636029 +0200
-@@ -31,7 +31,7 @@
+@@ -2152,4 +2154,3 @@
  
- #define TARGET_HW_I2C_CLOCK 50
- 
--/* these are a limitation of ProcessI2cChannelTransaction not the hw */
-+/* these are a limitation of ProcessI2cChannelTransaction // ReadEDIDFromHWAssistedI2C not the hw */
- #define ATOM_MAX_HW_I2C_WRITE 3
- #define ATOM_MAX_HW_I2C_READ  255
- 
-@@ -42,7 +42,7 @@
- 	struct drm_device *dev = chan->dev;
- 	struct amdgpu_device *adev = drm_to_adev(dev);
- 	PROCESS_I2C_CHANNEL_TRANSACTION_PS_ALLOCATION args;
--	int index = GetIndexIntoMasterTable(COMMAND, ProcessI2cChannelTransaction);
-+	int index = GetIndexIntoMasterTable(COMMAND, ReadEDIDFromHWAssistedI2C);
- 	unsigned char *base;
- 	u16 out = cpu_to_le16(0);
- 	int r = 0;
-@@ -162,7 +162,7 @@
- void amdgpu_atombios_i2c_channel_trans(struct amdgpu_device *adev, u8 slave_addr, u8 line_number, u8 offset, u8 data)
- {
- 	PROCESS_I2C_CHANNEL_TRANSACTION_PS_ALLOCATION args;
--	int index = GetIndexIntoMasterTable(COMMAND, ProcessI2cChannelTransaction);
-+	int index = GetIndexIntoMasterTable(COMMAND, ReadEDIDFromHWAssistedI2C);
- 
- 	args.ucRegIndex = offset;
- 	args.lpI2CDataOut = data;
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/cik.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/cik.c	2023-04-10 05:16:42.608775156 +0200
-@@ -824,6 +824,206 @@
+ 	return dig;
+ }
+-
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/cik.c b/drivers/gpu/drm/amd/amdgpu/cik.c
+--- a/drivers/gpu/drm/amd/amdgpu/cik.c	2023-11-10 04:40:45.822142265 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/cik.c	2023-11-10 04:36:58.246330863 +0100
+@@ -747,6 +747,206 @@
  	0xc24d, 0xffffffff, 0x00000000
  };
  
@@ -1357,7 +985,7 @@
  static void cik_init_golden_registers(struct amdgpu_device *adev)
  {
  	/* Some of the registers might be dependent on GRBM_GFX_INDEX */
-@@ -900,6 +1100,31 @@
+@@ -823,6 +1023,31 @@
  							hawaii_golden_spm_registers,
  							ARRAY_SIZE(hawaii_golden_spm_registers));
  		break;
@@ -1389,11 +1017,11 @@
  	default:
  		break;
  	}
-@@ -2147,6 +2372,62 @@
+@@ -1888,6 +2113,63 @@
  		} else
  			adev->external_rev_id = adev->rev_id + 0xa1;
  		break;
-+	case CHIP_LIVERPOOL:
++		case CHIP_LIVERPOOL:
 +			adev->cg_flags =
 +				AMD_CG_SUPPORT_GFX_MGCG |
 +				AMD_CG_SUPPORT_GFX_MGLS |
@@ -1421,7 +1049,8 @@
 +				0;
 +			adev->external_rev_id = adev->rev_id + 0x61;
 +			break;
-+	case CHIP_GLADIUS:
++
++		case CHIP_GLADIUS:
 +			adev->cg_flags =
 +				AMD_CG_SUPPORT_GFX_MGCG |
 +				AMD_CG_SUPPORT_GFX_MGLS |
@@ -1447,12 +1076,12 @@
 +					AMD_PG_SUPPORT_RLC_SMU_HS |
 +					AMD_PG_SUPPORT_SAMU |*/
 +				0;
-+			adev->external_rev_id = adev->rev_id + 0x71;
++			adev->external_rev_id = adev->rev_id + 0x61;
 +			break;
  	default:
  		/* FIXME: not supported yet */
  		return -EINVAL;
-@@ -2329,6 +2610,42 @@
+@@ -2077,6 +2359,42 @@
  		amdgpu_device_ip_block_add(adev, &uvd_v4_2_ip_block);
  		amdgpu_device_ip_block_add(adev, &vce_v2_0_ip_block);
  		break;
@@ -1495,9 +1124,10 @@
  	default:
  		/* FIXME: not supported yet */
  		return -EINVAL;
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/cik_sdma.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/cik_sdma.c	2023-04-10 17:30:22.399763466 +0200
-@@ -66,7 +66,10 @@
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/cik_sdma.c b/drivers/gpu/drm/amd/amdgpu/cik_sdma.c
+--- a/drivers/gpu/drm/amd/amdgpu/cik_sdma.c	2023-11-10 04:40:45.823142405 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/cik_sdma.c	2023-11-10 04:36:58.405353092 +0100
+@@ -64,7 +64,10 @@
  MODULE_FIRMWARE("amdgpu/kabini_sdma1.bin");
  MODULE_FIRMWARE("amdgpu/mullins_sdma.bin");
  MODULE_FIRMWARE("amdgpu/mullins_sdma1.bin");
@@ -1509,7 +1139,7 @@
  u32 amdgpu_cik_gpu_check_soft_reset(struct amdgpu_device *adev);
  
  
-@@ -129,6 +132,12 @@
+@@ -127,6 +130,12 @@
  	case CHIP_MULLINS:
  		chip_name = "mullins";
  		break;
@@ -1522,7 +1152,7 @@
  	default: BUG();
  	}
  
-@@ -632,6 +641,20 @@
+@@ -638,6 +647,20 @@
  	amdgpu_ring_write(ring, upper_32_bits(gpu_addr));
  	amdgpu_ring_write(ring, 1); /* number of DWs to follow */
  	amdgpu_ring_write(ring, 0xDEADBEEF);
@@ -1543,9 +1173,18 @@
  	amdgpu_ring_commit(ring);
  
  	for (i = 0; i < adev->usec_timeout; i++) {
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/dce_v8_0.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/dce_v8_0.c	2023-04-10 17:45:10.508292666 +0200
-@@ -403,8 +403,10 @@
+@@ -772,7 +795,6 @@
+ 				  uint32_t incr)
+ {
+ 	unsigned ndw = count * 2;
+-
+ 	ib->ptr[ib->length_dw++] = SDMA_PACKET(SDMA_OPCODE_WRITE,
+ 		SDMA_WRITE_SUB_OPCODE_LINEAR, 0);
+ 	ib->ptr[ib->length_dw++] = lower_32_bits(pe);
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/dce_v8_0.c b/drivers/gpu/drm/amd/amdgpu/dce_v8_0.c
+--- a/drivers/gpu/drm/amd/amdgpu/dce_v8_0.c	2023-11-10 04:40:45.829143243 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/dce_v8_0.c	2023-11-10 04:36:58.243330444 +0100
+@@ -388,8 +388,10 @@
  	switch (adev->asic_type) {
  	case CHIP_BONAIRE:
  	case CHIP_HAWAII:
@@ -1556,7 +1195,7 @@
  	case CHIP_KAVERI:
  		num_crtc = 4;
  		break;
-@@ -1098,8 +1100,9 @@
+@@ -1083,8 +1085,9 @@
  	struct drm_display_mode *mode = NULL;
  	u32 num_heads = 0, lb_size;
  	int i;
@@ -1568,16 +1207,16 @@
  
  	for (i = 0; i < adev->mode_info.num_crtc; i++) {
  		if (adev->mode_info.crtcs[i]->base.enabled)
-@@ -1405,6 +1408,8 @@
+@@ -1378,6 +1381,8 @@
  	else if ((adev->asic_type == CHIP_BONAIRE) ||
  		 (adev->asic_type == CHIP_HAWAII))/* BN/HW: 6 streams, 7 endpoints */
  		adev->mode_info.audio.num_pins = 7;
-+	else if (adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS) /* LVP: 3 streams, 3 endpoints (?) */
-+		adev->mode_info.audio.num_pins = 3;
++		else if (adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS) /* LVP: 3 streams, 3 endpoints (?) */
++			adev->mode_info.audio.num_pins = 3;
  	else
  		adev->mode_info.audio.num_pins = 3;
  
-@@ -1419,7 +1424,12 @@
+@@ -1392,7 +1397,13 @@
  		adev->mode_info.audio.pin[i].id = i;
  		/* disable audio.  it will be set up later */
  		/* XXX remove once we switch to ip funcs */
@@ -1588,25 +1227,29 @@
 +			dce_v8_0_audio_enable(adev, &adev->mode_info.audio.pin[i], true);
 +		else
 +			dce_v8_0_audio_enable(adev, &adev->mode_info.audio.pin[i], false);
++
  	}
  
  	return 0;
-@@ -1995,6 +2005,7 @@
+@@ -1959,7 +1970,8 @@
  	}
  
  	/* Bytes per pixel may have changed */
+-	dce_v8_0_bandwidth_update(adev);
 +	if (adev->asic_type != CHIP_LIVERPOOL && adev->asic_type != CHIP_GLADIUS)
- 	dce_v8_0_bandwidth_update(adev);
++		dce_v8_0_bandwidth_update(adev);
  
  	return 0;
-@@ -2611,11 +2622,17 @@
+ }
+@@ -2573,12 +2585,17 @@
+ 	drm_mode_crtc_set_gamma_size(&amdgpu_crtc->base, 256);
  	amdgpu_crtc->crtc_id = index;
  	adev->mode_info.crtcs[index] = amdgpu_crtc;
- 
+-
 -	amdgpu_crtc->max_cursor_width = CIK_CURSOR_WIDTH;
 -	amdgpu_crtc->max_cursor_height = CIK_CURSOR_HEIGHT;
--	adev_to_drm(adev)->mode_config.cursor_width = amdgpu_crtc->max_cursor_width;
--	adev_to_drm(adev)->mode_config.cursor_height = amdgpu_crtc->max_cursor_height;
+-	adev->ddev->mode_config.cursor_width = amdgpu_crtc->max_cursor_width;
+-	adev->ddev->mode_config.cursor_height = amdgpu_crtc->max_cursor_height;
 -
 +	if (adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS) {
 +		amdgpu_crtc->max_cursor_width = 64;
@@ -1622,7 +1265,7 @@
  	amdgpu_crtc->crtc_offset = crtc_offsets[amdgpu_crtc->crtc_id];
  
  	amdgpu_crtc->pll_id = ATOM_PPLL_INVALID;
-@@ -2641,10 +2658,12 @@
+@@ -2604,10 +2621,12 @@
  	switch (adev->asic_type) {
  	case CHIP_BONAIRE:
  	case CHIP_HAWAII:
@@ -1635,20 +1278,41 @@
  		adev->mode_info.num_hpd = 6;
  		adev->mode_info.num_dig = 7;
  		break;
-@@ -2771,6 +2790,10 @@
+@@ -2616,6 +2635,7 @@
+ 		adev->mode_info.num_hpd = 6;
+ 		adev->mode_info.num_dig = 6; /* ? */
+ 		break;
++
+ 	default:
+ 		/* FIXME: not supported yet */
+ 		return -EINVAL;
+@@ -2728,6 +2748,10 @@
  
  	for (i = 0; i < adev->mode_info.audio.num_pins; i++) {
  		dce_v8_0_audio_enable(adev, &adev->mode_info.audio.pin[i], false);
-+	if (adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS)
++		if (adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS)
 +			dce_v8_0_audio_enable(adev, &adev->mode_info.audio.pin[i], true);
 +		else
-+			dce_v8_0_audio_enable(adev, &adev->mode_info.audio.pin[i], false)
++			dce_v8_0_audio_enable(adev, &adev->mode_info.audio.pin[i], false);
  	}
  
  	dce_v8_0_pageflip_interrupt_init(adev);
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/gfx_v7_0.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/gfx_v7_0.c	2023-04-10 20:13:26.226597145 +0200
-@@ -90,6 +90,20 @@
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/dce_virtual.c b/drivers/gpu/drm/amd/amdgpu/dce_virtual.c
+--- a/drivers/gpu/drm/amd/amdgpu/dce_virtual.c	2023-11-10 04:40:45.830143383 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/dce_virtual.c	2023-11-10 04:36:58.531370707 +0100
+@@ -445,6 +445,8 @@
+ 	case CHIP_KAVERI:
+ 	case CHIP_KABINI:
+ 	case CHIP_MULLINS:
++	case CHIP_LIVERPOOL:
++	case CHIP_GLADIUS:
+ 		dce_v8_0_disable_dce(adev);
+ 		break;
+ #endif
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/gfx_v7_0.c b/drivers/gpu/drm/amd/amdgpu/gfx_v7_0.c
+--- a/drivers/gpu/drm/amd/amdgpu/gfx_v7_0.c	2023-11-10 04:40:45.835144082 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/gfx_v7_0.c	2023-11-10 04:36:58.259332681 +0100
+@@ -88,6 +88,20 @@
  MODULE_FIRMWARE("amdgpu/mullins_rlc.bin");
  MODULE_FIRMWARE("amdgpu/mullins_mec.bin");
  
@@ -1669,7 +1333,7 @@
  static const struct amdgpu_gds_reg_offset amdgpu_gds_reg_offset[] =
  {
  	{mmGDS_VMID0_BASE, mmGDS_VMID0_SIZE, mmGDS_GWS_VMID0, mmGDS_OA_VMID0},
-@@ -882,6 +896,421 @@
+@@ -880,6 +894,420 @@
  	(0x0e00 << 16) | (0x9600 >> 2),
  };
  
@@ -2087,11 +1751,10 @@
 +	1,
 +	(0x0e00 << 16) | (0x8c34 >> 2),
 +};
-+
  static u32 gfx_v7_0_get_csb_size(struct amdgpu_device *adev);
  static void gfx_v7_0_get_csb_buffer(struct amdgpu_device *adev, volatile u32 *buffer);
- static void gfx_v7_0_init_pg(struct amdgpu_device *adev);
-@@ -923,6 +1352,12 @@
+ static void gfx_v7_0_init_cp_pg_table(struct amdgpu_device *adev);
+@@ -922,6 +1350,12 @@
  	case CHIP_MULLINS:
  		chip_name = "mullins";
  		break;
@@ -2104,13 +1767,12 @@
  	default: BUG();
  	}
  
-@@ -957,15 +1392,20 @@
- 	err = amdgpu_ucode_validate(adev->gfx.mec_fw);
+@@ -957,14 +1391,21 @@
  	if (err)
  		goto out;
--
+ 
 -	if (adev->asic_type == CHIP_KAVERI) {
-+	if (adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS) {
++	if (adev->asic_type == CHIP_KAVERI || adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS) {
  		snprintf(fw_name, sizeof(fw_name), "amdgpu/%s_mec2.bin", chip_name);
  		err = request_firmware(&adev->gfx.mec2_fw, fw_name, adev->dev);
  		if (err)
@@ -2124,13 +1786,15 @@
 +			pr_err("gfx7: Failed to validate ucode firmware \"%s\"\n", fw_name);
  			goto out;
 +		}
++
  	}
  
  	snprintf(fw_name, sizeof(fw_name), "amdgpu/%s_rlc.bin", chip_name);
-@@ -1218,6 +1658,150 @@
+@@ -1217,6 +1658,151 @@
  			if (reg_offset != 7)
  				WREG32(mmGB_MACROTILE_MODE0 + reg_offset, macrotile[reg_offset]);
  		break;
++
 +case CHIP_LIVERPOOL:
 +case CHIP_GLADIUS:
 +		tile[0] = (ARRAY_MODE(ARRAY_2D_TILED_THIN1) |
@@ -2278,7 +1942,7 @@
  	case CHIP_HAWAII:
  		tile[0] = (ARRAY_MODE(ARRAY_2D_TILED_THIN1) |
  			   PIPE_CONFIG(ADDR_SURF_P16_32x32_16x16) |
-@@ -1660,6 +2244,17 @@
+@@ -1659,6 +2245,16 @@
  		*rconf |= 0x0;
  		*rconf1 |= 0x0;
  		break;
@@ -2288,7 +1952,6 @@
 +			  PKR_YSEL(1) | SE_MAP(2) | SE_XSEL(2) |
 +			  SE_YSEL(2);
 +		*rconf1 |= 0x0;
-+		break;
 +	case CHIP_GLADIUS:
 +		*rconf |= 0x2a00161a;
 +		*rconf1 |= 0x0000002e;
@@ -2296,7 +1959,38 @@
  	default:
  		DRM_ERROR("unknown asic: 0x%x\n", adev->asic_type);
  		break;
-@@ -2706,7 +3301,7 @@
+@@ -2186,6 +2782,7 @@
+ 				DATA_SEL(write64bit ? 2 : 1) | INT_SEL(int_sel ? 2 : 0));
+ 	amdgpu_ring_write(ring, lower_32_bits(seq));
+ 	amdgpu_ring_write(ring, upper_32_bits(seq));
++
+ }
+ 
+ /**
+@@ -2335,7 +2932,6 @@
+ 	r = amdgpu_ib_schedule(ring, 1, &ib, NULL, &f);
+ 	if (r)
+ 		goto err2;
+-
+ 	r = dma_fence_wait_timeout(f, false, timeout);
+ 	if (r == 0) {
+ 		DRM_ERROR("amdgpu: IB test timed out\n");
+@@ -2347,12 +2943,12 @@
+ 	}
+ 	tmp = RREG32(scratch);
+ 	if (tmp == 0xDEADBEEF) {
+-		DRM_DEBUG("ib test on ring %d succeeded\n", ring->idx);
++		DRM_INFO("ib test on ring %d succeeded in %d us\n", ring->idx, r);
+ 		r = 0;
+ 	} else {
+ 		DRM_ERROR("amdgpu: ib test failed (scratch(0x%04X)=0x%08X)\n",
+ 			  scratch, tmp);
+-		r = -EINVAL;
++		//r = -EINVAL;
+ 	}
+ 
+ err2:
+@@ -2715,7 +3311,7 @@
  		WREG32(mmCP_MEC_ME1_UCODE_DATA, le32_to_cpup(fw_data++));
  	WREG32(mmCP_MEC_ME1_UCODE_ADDR, 0);
  
@@ -2305,7 +1999,7 @@
  		const struct gfx_firmware_header_v1_0 *mec2_hdr;
  
  		if (!adev->gfx.mec2_fw)
-@@ -3271,6 +3866,14 @@
+@@ -3289,6 +3885,14 @@
  			adev->gfx.rlc.reg_list = spectre_rlc_save_restore_register_list;
  			adev->gfx.rlc.reg_list_size =
  				(u32)ARRAY_SIZE(spectre_rlc_save_restore_register_list);
@@ -2320,7 +2014,15 @@
  		} else {
  			adev->gfx.rlc.reg_list = kalindi_rlc_save_restore_register_list;
  			adev->gfx.rlc.reg_list_size =
-@@ -3999,6 +4602,14 @@
+@@ -3916,7 +4520,6 @@
+ 	u32 tmp;
+ 
+ 	WREG32(mmRLC_PG_ALWAYS_ON_CU_MASK, adev->gfx.cu_info.ao_cu_mask);
+-
+ 	tmp = RREG32(mmRLC_MAX_PG_CU);
+ 	tmp &= ~RLC_MAX_PG_CU__MAX_POWERED_UP_CU_MASK;
+ 	tmp |= (adev->gfx.cu_info.number << RLC_MAX_PG_CU__MAX_POWERED_UP_CU__SHIFT);
+@@ -4095,6 +4698,14 @@
  		buffer[count++] = cpu_to_le32(0x3a00161a);
  		buffer[count++] = cpu_to_le32(0x0000002e);
  		break;
@@ -2335,7 +2037,7 @@
  	default:
  		buffer[count++] = cpu_to_le32(0x00000000);
  		buffer[count++] = cpu_to_le32(0x00000000);
-@@ -4298,6 +4909,41 @@
+@@ -4379,6 +4990,41 @@
  		adev->gfx.config.sc_earlyz_tile_fifo_size = 0x130;
  		gb_addr_config = BONAIRE_GB_ADDR_CONFIG_GOLDEN;
  		break;
@@ -2377,7 +2079,7 @@
  	case CHIP_KABINI:
  	case CHIP_MULLINS:
  	default:
-@@ -4423,6 +5069,8 @@
+@@ -4499,6 +5145,8 @@
  
  	switch (adev->asic_type) {
  	case CHIP_KAVERI:
@@ -2386,7 +2088,15 @@
  		adev->gfx.mec.num_mec = 2;
  		break;
  	case CHIP_BONAIRE:
-@@ -4859,7 +5507,6 @@
+@@ -4842,7 +5490,6 @@
+ 		DRM_DEBUG("invalid me %d\n", me);
+ 		return;
+ 	}
+-
+ 	switch (state) {
+ 	case AMDGPU_IRQ_STATE_DISABLE:
+ 		mec_int_cntl = RREG32(mec_int_cntl_reg);
+@@ -4956,7 +5603,6 @@
  	struct amdgpu_ring *ring;
  	int i;
  
@@ -2394,7 +2104,7 @@
  	me_id = (entry->ring_id & 0x0c) >> 2;
  	pipe_id = (entry->ring_id & 0x03) >> 0;
  	switch (me_id) {
-@@ -5137,6 +5784,9 @@
+@@ -5198,6 +5844,9 @@
  	else
  		ao_cu_num = adev->gfx.config.max_cu_per_sh;
  
@@ -2404,9 +2114,10 @@
  	memset(cu_info, 0, sizeof(*cu_info));
  
  	amdgpu_gfx_parse_disable_cu(disable_masks, 4, 2);
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/gmc_v7_0.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/gmc_v7_0.c	2023-04-10 20:35:58.785451254 +0200
-@@ -150,6 +150,8 @@
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/gmc_v7_0.c b/drivers/gpu/drm/amd/amdgpu/gmc_v7_0.c
+--- a/drivers/gpu/drm/amd/amdgpu/gmc_v7_0.c	2023-11-10 04:40:45.839144642 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/gmc_v7_0.c	2023-11-10 04:36:58.302338692 +0100
+@@ -146,6 +146,8 @@
  	case CHIP_KAVERI:
  	case CHIP_KABINI:
  	case CHIP_MULLINS:
@@ -2415,7 +2126,7 @@
  		return 0;
  	default: BUG();
  	}
-@@ -402,6 +404,10 @@
+@@ -396,6 +398,10 @@
  			adev->gmc.gart_size = 256ULL << 20;
  			break;
  #ifdef CONFIG_DRM_AMDGPU_CIK
@@ -2426,12 +2137,12 @@
  		case CHIP_BONAIRE: /* UVD, VCE do not support GPUVM */
  		case CHIP_HAWAII:  /* UVD, VCE do not support GPUVM */
  		case CHIP_KAVERI:  /* UVD, VCE do not support GPUVM */
-@@ -684,7 +690,18 @@
+@@ -671,7 +677,18 @@
  			WREG32(mmVM_CONTEXT8_PAGE_TABLE_BASE_ADDR + i - 8,
- 			       table_addr >> 12);
+ 			       adev->gart.table_addr >> 12);
  	}
 -
-+		if (adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS) {
++	if (adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS) {
 +		for (i = 2; i < 8; i++) {
 +			WREG32(mmVM_CONTEXT0_PAGE_TABLE_START_ADDR + i, 0);
 +			WREG32(mmVM_CONTEXT0_PAGE_TABLE_END_ADDR + i,
@@ -2446,9 +2157,10 @@
  	/* enable context1-15 */
  	WREG32(mmVM_CONTEXT1_PROTECTION_FAULT_DEFAULT_ADDR,
  	       (u32)(adev->dummy_page_addr >> 12));
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/ps4_bridge.c	1970-01-01 01:00:00.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdgpu/ps4_bridge.c	2023-04-10 20:41:06.682148787 +0200
-@@ -0,0 +1,780 @@
+diff -ruN a/drivers/gpu/drm/amd/amdgpu/ps4_bridge.c b/drivers/gpu/drm/amd/amdgpu/ps4_bridge.c
+--- a/drivers/gpu/drm/amd/amdgpu/ps4_bridge.c	1970-01-01 01:00:00.000000000 +0100
++++ b/drivers/gpu/drm/amd/amdgpu/ps4_bridge.c	2023-11-10 04:36:58.476363018 +0100
+@@ -0,0 +1,759 @@
 +/*
 + * Panasonic MN86471A DP->HDMI bridge driver (via PS4 Aeolia ICC interface)
 + *
@@ -2462,23 +2174,13 @@
 + * GNU General Public License for more details.
 + */
 +
-+
-+// TODO (ps4patches): Make functions atomic,
-+//  https://lore.kernel.org/linux-arm-kernel/20211020181901.2114645-5-sam@ravnborg.org/
-+
 +#include <asm/ps4.h>
 +
 +#include <drm/drm_crtc.h>
 +#include <drm/drm_crtc_helper.h>
 +#include <drm/drm_atomic_helper.h>
 +#include <drm/drm_edid.h>
-+
-+#include <drm/drm_bridge.h>
-+#include <drm/drm_encoder.h>
-+
-+#include <linux/i2c.h>
-+#include <linux/i2c-algo-bit.h>
-+
++#include <drm/drmP.h>
 +
 +#include "amdgpu.h"
 +#include "amdgpu_mode.h"
@@ -2493,51 +2195,51 @@
 +#define CMD_WAIT_CLEAR	3, 3
 +
 +#define TSYSCTRL 0x7005
-+#define TSYSCTRL_HDMI BIT(7)
++# define TSYSCTRL_HDMI BIT(7)
 +
 +#define TSRST 0x7006
-+#define TSRST_AVCSRST BIT(0)
-+#define TSRST_ENCSRST BIT(1)
-+#define TSRST_FIFOSRST BIT(2)
-+#define TSRST_CCSRST BIT(3)
-+#define TSRST_HDCPSRST BIT(4)
-+#define TSRST_AUDSRST BIT(6)
-+#define TSRST_VIFSRST BIT(7)
++# define TSRST_AVCSRST BIT(0)
++# define TSRST_ENCSRST BIT(1)
++# define TSRST_FIFOSRST BIT(2)
++# define TSRST_CCSRST BIT(3)
++# define TSRST_HDCPSRST BIT(4)
++# define TSRST_AUDSRST BIT(6)
++# define TSRST_VIFSRST BIT(7)
 +
 +#define TMONREG 0x7008
-+#define TMONREG_HPD BIT(3)
++# define TMONREG_HPD BIT(3)
 +
 +#define TDPCMODE 0x7009
 +
 +
 +#define UPDCTRL 0x7011
-+#define UPDCTRL_ALLUPD BIT(7)
-+#define UPDCTRL_AVIIUPD BIT(6)
-+#define UPDCTRL_AUDIUPD BIT(5)
-+#define UPDCTRL_CLKUPD BIT(4)
-+#define UPDCTRL_HVSIUPD BIT(3)
-+#define UPDCTRL_VIFUPD BIT(2)
-+#define UPDCTRL_AUDUPD BIT(1)
-+#define UPDCTRL_CSCUPD BIT(0)
++# define UPDCTRL_ALLUPD BIT(7)
++# define UPDCTRL_AVIIUPD BIT(6)
++# define UPDCTRL_AUDIUPD BIT(5)
++# define UPDCTRL_CLKUPD BIT(4)
++# define UPDCTRL_HVSIUPD BIT(3)
++# define UPDCTRL_VIFUPD BIT(2)
++# define UPDCTRL_AUDUPD BIT(1)
++# define UPDCTRL_CSCUPD BIT(0)
 +
 +
 +#define VINCNT 0x7040
-+#define VINCNT_VIF_FILEN BIT(6)
++# define VINCNT_VIF_FILEN BIT(6)
 +
 +#define VMUTECNT 0x705f
-+#define VMUTECNT_CCVMUTE BIT(7)
-+#define VMUTECNT_DUMON BIT(6)
-+#define VMUTECNT_LINEWIDTH_80 (0<<4)
-+#define VMUTECNT_LINEWIDTH_90 (1<<4)
-+#define VMUTECNT_LINEWIDTH_180 (2<<4)
-+#define VMUTECNT_LINEWIDTH_360 (3<<4)
-+#define VMUTECNT_VMUTE_MUTE_ASYNC 1
-+#define VMUTECNT_VMUTE_MUTE_NORMAL 2
-+#define VMUTECNT_VMUTE_MUTE_RAMPA 4
-+#define VMUTECNT_VMUTE_MUTE_RAMPB 8
-+#define VMUTECNT_VMUTE_MUTE_COLORBAR_RGB 10
-+#define VMUTECNT_VMUTE_MUTE_TOGGLE 12
-+#define VMUTECNT_VMUTE_MUTE_COLORBAR_YCBCR 14
++# define VMUTECNT_CCVMUTE BIT(7)
++# define VMUTECNT_DUMON BIT(6)
++# define VMUTECNT_LINEWIDTH_80 (0<<4)
++# define VMUTECNT_LINEWIDTH_90 (1<<4)
++# define VMUTECNT_LINEWIDTH_180 (2<<4)
++# define VMUTECNT_LINEWIDTH_360 (3<<4)
++# define VMUTECNT_VMUTE_MUTE_ASYNC 1
++# define VMUTECNT_VMUTE_MUTE_NORMAL 2
++# define VMUTECNT_VMUTE_MUTE_RAMPA 4
++# define VMUTECNT_VMUTE_MUTE_RAMPB 8
++# define VMUTECNT_VMUTE_MUTE_COLORBAR_RGB 10
++# define VMUTECNT_VMUTE_MUTE_TOGGLE 12
++# define VMUTECNT_VMUTE_MUTE_COLORBAR_YCBCR 14
 +
 +#define CSCMOD 0x70c0
 +#define C420SET 0x70c2
@@ -2546,25 +2248,22 @@
 +#define PKTENA 0x7202
 +
 +#define INFENA 0x7203
-+#define INFENA_AVIEN BIT(6)
++# define INFENA_AVIEN BIT(6)
 +
 +#define AKESTA 0x7a84
-+#define AKESTA_BUSY BIT(0)
++# define AKESTA_BUSY BIT(0)
 +
 +#define AKESRST 0x7a88
 +
 +#define HDCPEN 0x7a8b
-+#define HDCPEN_NONE 0x00
-+#define HDCPEN_ENC_EN 0x03
-+#define HDCPEN_ENC_DIS 0x05
++# define HDCPEN_NONE 0x00
++# define HDCPEN_ENC_EN 0x03
++# define HDCPEN_ENC_DIS 0x05
 +
 +#define PCI_DEVICE_ID_CUH_11XX 0x9920
 +#define PCI_DEVICE_ID_CUH_12XX 0x9922
 +#define PCI_DEVICE_ID_CUH_2XXX 0x9923
 +#define PCI_DEVICE_ID_CUH_7XXX 0x9924
-+
-+struct edid *drm_get_edid(struct drm_connector *connector,
-+ 				 struct i2c_adapter *adapter);
 +
 +struct i2c_cmd_hdr {
 +	u8 major;
@@ -2733,9 +2432,9 @@
 +	return container_of(bridge, struct ps4_bridge, bridge);
 +}
 +
-+void ps4_bridge_mode_set(struct drm_bridge *bridge,
-+			 const struct drm_display_mode *mode,
-+			 const struct drm_display_mode *adjusted_mode)
++static void ps4_bridge_mode_set(struct drm_bridge *bridge,
++			      struct drm_display_mode *mode,
++			      struct drm_display_mode *adjusted_mode)
 +{
 +	struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge);
 +
@@ -2822,9 +2521,8 @@
 +	struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge);
 +	struct drm_connector *connector = mn_bridge->connector;
 +	struct drm_device *dev = connector->dev;
-+	struct pci_dev *pdev = to_pci_dev(dev->dev);
++	struct pci_dev *pdev = dev->pdev;
 +	u8 dp[3];
-+
 +	DRM_DEBUG("Enable PS4_BRIDGE_ENABLE\n");
 +	if (!mn_bridge->mode) {
 +		DRM_ERROR("mode not available\n");
@@ -3102,36 +2800,33 @@
 +/* Hardcoded modes, since we don't really know how to do custom modes yet.
 + * Other CEA modes *should* work (and are allowed if externally added) */
 +
-+// TODO (ps4patches): Apparently the vrefresh option is calculated on the fly now
-+// Check if this actually works.
-+
 +/* 1 - 640x480@60Hz */
 +static const struct drm_display_mode mode_480p = {
 +	DRM_MODE("640x480", DRM_MODE_TYPE_DRIVER, 25175, 640, 656,
 +		 752, 800, 0, 480, 490, 492, 525, 0,
 +		 DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC),
-+	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_4_3
++	.vrefresh = 60, .picture_aspect_ratio = HDMI_PICTURE_ASPECT_4_3
 +};
 +/* 4 - 1280x720@60Hz */
 +static const struct drm_display_mode mode_720p = {
 +	DRM_MODE("1280x720", DRM_MODE_TYPE_DRIVER, 74250, 1280, 1390,
 +		 1430, 1650, 0, 720, 725, 730, 750, 0,
 +		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
-+	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
++	.vrefresh = 60, .picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
 +};
 +/* 16 - 1920x1080@60Hz */
 +static const struct drm_display_mode mode_1080p = {
 +	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER, 148500, 1920, 2008,
 +		 2052, 2200, 0, 1080, 1084, 1089, 1125, 0,
 +		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
-+	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
++	.vrefresh = 60, .picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
 +};
 +
 +int ps4_bridge_get_modes(struct drm_connector *connector)
 +{
 +	struct drm_device *dev = connector->dev;
 +	struct drm_display_mode *newmode;
-+	pr_info("ps4_bridge_get_modes\n");
++	DRM_DEBUG_KMS("ps4_bridge_get_modes\n");
 +
 +	newmode = drm_mode_duplicate(dev, &mode_1080p);
 +	drm_mode_probed_add(connector, newmode);
@@ -3190,8 +2885,7 @@
 +	return MODE_OK;
 +}
 +
-+static int ps4_bridge_attach(struct drm_bridge *bridge,
-+			     enum drm_bridge_attach_flags flags)
++static int ps4_bridge_attach(struct drm_bridge *bridge)
 +{
 +	/* struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge); */
 +
@@ -3204,7 +2898,7 @@
 +	.disable = ps4_bridge_disable,
 +	.post_disable = ps4_bridge_post_disable,
 +	.attach = ps4_bridge_attach,
-+	.mode_set = ps4_bridge_mode_set,
++	.mode_set = ps4_bridge_mode_set
 +};
 +
 +int ps4_bridge_register(struct drm_connector *connector,
@@ -3215,106 +2909,42 @@
 +
 +	mn_bridge->encoder = encoder;
 +	mn_bridge->connector = connector;
-+	mn_bridge->bridge.type = DRM_MODE_CONNECTOR_HDMIA;
 +	mn_bridge->bridge.funcs = &ps4_bridge_funcs;
-+
-+	// TODO (ps4patches): This seems to be the new way of adding bridges
-+	drm_bridge_add(&mn_bridge->bridge);
-+
-+	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, DRM_BRIDGE_ATTACH_NO_CONNECTOR);
++	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL);
 +	if (ret) {
 +		DRM_ERROR("Failed to initialize bridge with drm\n");
 +		return -EINVAL;
 +	}
 +
++	encoder->bridge = &mn_bridge->bridge;
++
 +	return 0;
 +}
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdkfd/cik_event_interrupt.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdkfd/cik_event_interrupt.c	2023-04-10 20:46:18.863333603 +0200
-@@ -43,7 +43,7 @@
- 	 */
- 	if ((ihre->source_id == CIK_INTSRC_GFX_PAGE_INV_FAULT ||
- 		ihre->source_id == CIK_INTSRC_GFX_MEM_PROT_FAULT) &&
--		dev->adev->asic_type == CHIP_HAWAII) {
-+		dev->device_info->asic_family == CHIP_LIVERPOOL) {
- 		struct cik_ih_ring_entry *tmp_ihre =
- 			(struct cik_ih_ring_entry *)patched_ihre;
+diff -ruN a/drivers/gpu/drm/amd/amdkfd/kfd_device.c b/drivers/gpu/drm/amd/amdkfd/kfd_device.c
+--- a/drivers/gpu/drm/amd/amdkfd/kfd_device.c	2023-11-10 04:40:45.867148556 +0100
++++ b/drivers/gpu/drm/amd/amdkfd/kfd_device.c	2023-11-10 04:36:46.937750107 +0100
+@@ -85,6 +85,7 @@
+ 	.needs_pci_atomics = true,
+ 	.num_sdma_engines = 1,
+ };
++
+ #endif
  
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdkfd/kfd_crat.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdkfd/kfd_crat.c	2023-04-10 20:48:24.633766180 +0200
-@@ -1519,6 +1519,8 @@
- 		num_of_cache_types = ARRAY_SIZE(kaveri_cache_info);
- 		break;
- 	case CHIP_HAWAII:
-+	case CHIP_LIVERPOOL:
-+	case CHIP_GLADIUS:
- 		pcache_info = hawaii_cache_info;
- 		num_of_cache_types = ARRAY_SIZE(hawaii_cache_info);
- 		break;
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdkfd/kfd_device_queue_manager.c	2023-04-10 01:19:19.072220321 +0200
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdkfd/kfd_device_queue_manager.c	2023-04-14 16:15:52.046524895 +0200
-@@ -483,7 +483,7 @@
- 				struct queue *q)
- {
- 	/* On GFX v7, CP doesn't flush TC at dequeue */
--	if (q->device->adev->asic_type == CHIP_HAWAII)
-+	if (q->device->adev->asic_type == CHIP_LIVERPOOL)
- 		if (flush_texture_cache_nocpsch(q->device, qpd))
- 			pr_err("Failed to flush TC\n");
- 
-@@ -2269,6 +2269,8 @@
- 	switch (dev->adev->asic_type) {
- 	/* HWS is not available on Hawaii. */
- 	case CHIP_HAWAII:
-+	case CHIP_LIVERPOOL:
-+	case CHIP_GLADIUS:
- 	/* HWS depends on CWSR for timely dequeue. CWSR is not
- 	 * available on Tonga.
- 	 *
-@@ -2344,6 +2346,8 @@
- 		break;
- 
- 	case CHIP_HAWAII:
-+	case CHIP_LIVERPOOL:
-+	case CHIP_GLADIUS:
- 		device_queue_manager_init_cik_hawaii(&dqm->asic_ops);
- 		break;
- 
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdkfd/kfd_flat_memory.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdkfd/kfd_flat_memory.c	2023-04-14 16:20:23.332184605 +0200
-@@ -398,6 +398,8 @@
- 			switch (dev->adev->asic_type) {
- 			case CHIP_KAVERI:
- 			case CHIP_HAWAII:
-+			case CHIP_LIVERPOOL:
-+			case CHIP_GLADIUS:
- 			case CHIP_CARRIZO:
- 			case CHIP_TONGA:
- 			case CHIP_FIJI:
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdkfd/kfd_packet_manager.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdkfd/kfd_packet_manager.c	2023-04-14 16:24:11.918339560 +0200
-@@ -227,6 +227,8 @@
- 	switch (dqm->dev->adev->asic_type) {
- 	case CHIP_KAVERI:
- 	case CHIP_HAWAII:
-+	case CHIP_LIVERPOOL:
-+	case CHIP_GLADIUS:
- 		/* PM4 packet structures on CIK are the same as on VI */
- 	case CHIP_CARRIZO:
- 	case CHIP_TONGA:
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdkfd/kfd_topology.c	2023-04-10 01:19:19.075220360 +0200
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/amdkfd/kfd_topology.c	2023-04-14 16:29:50.451446767 +0200
-@@ -1720,6 +1720,8 @@
- 	switch (dev->gpu->adev->asic_type) {
- 	case CHIP_KAVERI:
- 	case CHIP_HAWAII:
-+	case CHIP_LIVERPOOL:
-+	case CHIP_GLADIUS:
- 	case CHIP_TONGA:
- 		dev->node_props.capability |= ((HSA_CAP_DOORBELL_TYPE_PRE_1_0 <<
- 			HSA_CAP_DOORBELL_TYPE_TOTALBITS_SHIFT) &
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/include/asic_reg/gmc/gmc_7_1_d.h	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/amd/include/asic_reg/gmc/gmc_7_1_d.h	2023-04-14 16:36:10.909873046 +0200
+ static const struct kfd_device_info hawaii_device_info = {
+@@ -276,6 +277,10 @@
+ 	{ 0x9877, &carrizo_device_info },	/* Carrizo */
+ 	{ 0x15DD, &raven_device_info },		/* Raven */
+ #endif
++        { 0x9920, &polaris10_device_info },             /* Liverpool */
++        { 0x9922, &polaris10_device_info },             /* Liverpool */
++        { 0x9923, &polaris10_device_info },             /* Liverpool */
++        { 0x9924, &polaris10_device_info },               /* Gladius */
+ 	{ 0x67A0, &hawaii_device_info },	/* Hawaii */
+ 	{ 0x67A1, &hawaii_device_info },	/* Hawaii */
+ 	{ 0x67A2, &hawaii_device_info },	/* Hawaii */
+diff -ruN a/drivers/gpu/drm/amd/include/asic_reg/gmc/gmc_7_1_d.h b/drivers/gpu/drm/amd/include/asic_reg/gmc/gmc_7_1_d.h
+--- a/drivers/gpu/drm/amd/include/asic_reg/gmc/gmc_7_1_d.h	2023-11-10 04:40:46.322212167 +0100
++++ b/drivers/gpu/drm/amd/include/asic_reg/gmc/gmc_7_1_d.h	2023-11-10 04:36:48.666991827 +0100
 @@ -589,8 +589,24 @@
  #define mmVM_CONTEXT13_PAGE_TABLE_BASE_ADDR                                     0x513
  #define mmVM_CONTEXT14_PAGE_TABLE_BASE_ADDR                                     0x514
@@ -3361,2331 +2991,18 @@
  #define mmVM_DEBUG                                                              0x56f
  #define mmVM_L2_CG                                                              0x570
  #define mmVM_L2_BANK_SELECT_MASKA                                               0x572
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/Makefile	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/Makefile	2023-04-14 16:39:38.413760973 +0200
-@@ -53,6 +53,8 @@
+diff -ruN a/drivers/iommu/amd_iommu_init.c b/drivers/iommu/amd_iommu_init.c
+--- a/drivers/iommu/amd_iommu_init.c	2023-11-10 04:40:47.937437949 +0100
++++ b/drivers/iommu/amd_iommu_init.c	2023-11-10 04:36:30.252417769 +0100
+@@ -2350,6 +2350,7 @@
  
- radeon-$(CONFIG_MMU_NOTIFIER) += radeon_mn.o
- 
-+radeon-$(CONFIG_X86_PS4) += ps4_bridge.o
-+
- # add async DMA block
- radeon-y += \
- 	r600_dma.o \
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/atombios_encoders.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/atombios_encoders.c	2023-04-15 00:29:34.536582155 +0200
-@@ -676,7 +676,7 @@
- 	struct radeon_connector_atom_dig *dig_connector;
- 
- 	/* dp bridges are always DP */
--	if (radeon_encoder_get_dp_bridge_encoder_id(encoder) != ENCODER_OBJECT_ID_NONE)
-+	if (radeon_encoder_get_dp_bridge_encoder_id(encoder) != ENCODER_OBJECT_ID_NONE || rdev->family == CHIP_LIVERPOOL)
- 		return ATOM_ENCODER_MODE_DP;
- 
- 	/* DVO is always DVO */
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/cik.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/cik.c	2023-04-15 03:17:21.636675318 +0200
-@@ -129,6 +129,13 @@
- MODULE_FIRMWARE("radeon/mullins_rlc.bin");
- MODULE_FIRMWARE("radeon/mullins_sdma.bin");
- 
-+MODULE_FIRMWARE("radeon/LIVERPOOL_pfp.bin");
-+MODULE_FIRMWARE("radeon/LIVERPOOL_me.bin");
-+MODULE_FIRMWARE("radeon/LIVERPOOL_ce.bin");
-+MODULE_FIRMWARE("radeon/LIVERPOOL_mec.bin");
-+MODULE_FIRMWARE("radeon/LIVERPOOL_rlc.bin");
-+MODULE_FIRMWARE("radeon/LIVERPOOL_sdma.bin");
-+
- static u32 cik_get_cu_active_bitmap(struct radeon_device *rdev, u32 se, u32 sh);
- static void cik_rlc_stop(struct radeon_device *rdev);
- static void cik_pcie_gen3_enable(struct radeon_device *rdev);
-@@ -1031,6 +1038,421 @@
- 	(0x0e00 << 16) | (0x9600 >> 2),
- };
- 
-+static const u32 liverpool_rlc_save_restore_register_list[] =
-+{
-+	(0x0600 << 16) | 0x263d,
-+	0x00000000,
-+	(0x0680 << 16) | 0x263d,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x263e,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2640,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x3098,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x243a,
-+	0x00000000,
-+	(0x0e00 << 16) | 0xf000,
-+	0x00000000,
-+	(0x0e00 << 16) | 0xf003,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2307,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x25c0,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x3348,
-+	0x00000000,
-+	(0x1e00 << 16) | 0x3348,
-+	0x00000000,
-+	(0x4e00 << 16) | 0x3348,
-+	0x00000000,
-+	(0x5e00 << 16) | 0x3348,
-+	0x00000000,
-+	(0x6e00 << 16) | 0x3348,
-+	0x00000000,
-+	(0x7e00 << 16) | 0x3348,
-+	0x00000000,
-+	(0x8e00 << 16) | 0x3348,
-+	0x00000000,
-+	(0x9e00 << 16) | 0x3348,
-+	0x00000000,
-+	(0xae00 << 16) | 0x3348,
-+	0x00000000,
-+	(0xbe00 << 16) | 0x3348,
-+	0x00000000,
-+	(0x0400 << 16) | 0x226f,
-+	0x00000000,
-+	(0x0480 << 16) | 0x226f,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2240,
-+	0x00000000,
-+	0x3,
-+	(0x0e00 << 16) | 0x260d,
-+	0x00000000,
-+	(0x0000 << 16) | 0xc3c0,
-+	0x00000000,
-+	(0x0001 << 16) | 0xc3c0,
-+	0x00000000,
-+	(0x0002 << 16) | 0xc3c0,
-+	0x00000000,
-+	(0x0003 << 16) | 0xc3c0,
-+	0x00000000,
-+	(0x0080 << 16) | 0xc3c0,
-+	0x00000000,
-+	(0x0081 << 16) | 0xc3c0,
-+	0x00000000,
-+	(0x0082 << 16) | 0xc3c0,
-+	0x00000000,
-+	(0x0083 << 16) | 0xc3c0,
-+	0x00000000,
-+	(0x0000 << 16) | 0xc3c1,
-+	0x00000000,
-+	(0x0001 << 16) | 0xc3c1,
-+	0x00000000,
-+	(0x0002 << 16) | 0xc3c1,
-+	0x00000000,
-+	(0x0003 << 16) | 0xc3c1,
-+	0x00000000,
-+	(0x0080 << 16) | 0xc3c1,
-+	0x00000000,
-+	(0x0081 << 16) | 0xc3c1,
-+	0x00000000,
-+	(0x0082 << 16) | 0xc3c1,
-+	0x00000000,
-+	(0x0083 << 16) | 0xc3c1,
-+	0x00000000,
-+	(0x0000 << 16) | 0xc3c2,
-+	0x00000000,
-+	(0x0001 << 16) | 0xc3c2,
-+	0x00000000,
-+	(0x0002 << 16) | 0xc3c2,
-+	0x00000000,
-+	(0x0003 << 16) | 0xc3c2,
-+	0x00000000,
-+	(0x0080 << 16) | 0xc3c2,
-+	0x00000000,
-+	(0x0081 << 16) | 0xc3c2,
-+	0x00000000,
-+	(0x0082 << 16) | 0xc3c2,
-+	0x00000000,
-+	(0x0083 << 16) | 0xc3c2,
-+	0x00000000,
-+	(0x0000 << 16) | 0xc3c3,
-+	0x00000000,
-+	(0x0001 << 16) | 0xc3c3,
-+	0x00000000,
-+	(0x0002 << 16) | 0xc3c3,
-+	0x00000000,
-+	(0x0003 << 16) | 0xc3c3,
-+	0x00000000,
-+	(0x0080 << 16) | 0xc3c3,
-+	0x00000000,
-+	(0x0081 << 16) | 0xc3c3,
-+	0x00000000,
-+	(0x0082 << 16) | 0xc3c3,
-+	0x00000000,
-+	(0x0083 << 16) | 0xc3c3,
-+	0x00000000,
-+	(0x0600 << 16) | 0x26df,
-+	0x00000000,
-+	(0x0680 << 16) | 0x26df,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2285,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2286,
-+	0x00000000,
-+	(0x0600 << 16) | 0xc280,
-+	0x00000000,
-+	(0x0680 << 16) | 0xc280,
-+	0x00000000,
-+	(0x1600 << 16) | 0xc280,
-+	0x00000000,
-+	(0x1680 << 16) | 0xc280,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x22fc,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x22f3,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x22c9,
-+	0x00000000,
-+	(0x0e00 << 16) | 0xc281,
-+	0x00000000,
-+	(0x1e00 << 16) | 0xc281,
-+	0x00000000,
-+	(0x0600 << 16) | 0xc284,
-+	0x00000000,
-+	(0x0680 << 16) | 0xc284,
-+	0x00000000,
-+	(0x1600 << 16) | 0xc284,
-+	0x00000000,
-+	(0x1680 << 16) | 0xc284,
-+	0x00000000,
-+	(0x0600 << 16) | 0xc285,
-+	0x00000000,
-+	(0x0680 << 16) | 0xc285,
-+	0x00000000,
-+	(0x1600 << 16) | 0xc285,
-+	0x00000000,
-+	(0x1680 << 16) | 0xc285,
-+	0x00000000,
-+	(0x0600 << 16) | 0xc286,
-+	0x00000000,
-+	(0x0680 << 16) | 0xc286,
-+	0x00000000,
-+	(0x1600 << 16) | 0xc286,
-+	0x00000000,
-+	(0x1680 << 16) | 0xc286,
-+	0x00000000,
-+	(0x0600 << 16) | 0xc28b,
-+	0x00000000,
-+	(0x0680 << 16) | 0xc28b,
-+	0x00000000,
-+	(0x1600 << 16) | 0xc28b,
-+	0x00000000,
-+	(0x1680 << 16) | 0xc28b,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x31c0,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x31c1,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x31c2,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x31da,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31dc,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31dc,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31dd,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31dd,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31de,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31de,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31df,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31df,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31e0,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31e0,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31e1,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31e1,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31e2,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31e2,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31e3,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31e3,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31e4,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31e4,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31e5,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31e5,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31e6,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31e6,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31e7,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31e7,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31e8,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31e8,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31e9,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31e9,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31ea,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31ea,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31eb,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31eb,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31ec,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31ec,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31ed,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31ed,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31ee,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31ee,
-+	0x00000000,
-+	(0x0400 << 16) | 0x31ef,
-+	0x00000000,
-+	(0x0480 << 16) | 0x31ef,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2440,
-+	0x00000000,
-+	(0x0e00 << 16) | 0xf004,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x24aa,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x24ab,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x24ac,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x24ad,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x24ae,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x24af,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x24b0,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x24b1,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x24b2,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x24b3,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x24b4,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2300,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2301,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2308,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x230e,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x230f,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2b80,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2581,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2b02,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2b03,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2b04,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2b05,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2b16,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2b1a,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2b1b,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2b1c,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2b1d,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2b1e,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2b1f,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2b20,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2b21,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2b22,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2b23,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x25c3,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x25c5,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x25c6,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x25c7,
-+	0x00000000,
-+	(0x0e00 << 16) | 0xc41a,
-+	0x00000000,
-+	(0x1e00 << 16) | 0xc41a,
-+	0x00000000,
-+	(0x4e00 << 16) | 0xc41a,
-+	0x00000000,
-+	(0x5e00 << 16) | 0xc41a,
-+	0x00000000,
-+	(0x6e00 << 16) | 0xc41a,
-+	0x00000000,
-+	(0x7e00 << 16) | 0xc41a,
-+	0x00000000,
-+	(0x8e00 << 16) | 0xc41a,
-+	0x00000000,
-+	(0x9e00 << 16) | 0xc41a,
-+	0x00000000,
-+	(0xae00 << 16) | 0xc41a,
-+	0x00000000,
-+	(0xbe00 << 16) | 0xc41a,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x3344,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x3345,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x222c,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x222d,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x222e,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x222f,
-+	0x00000000,
-+	(0x0400 << 16) | 0x2270,
-+	0x00000000,
-+	(0x0480 << 16) | 0x2270,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2231,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2274,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2234,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2235,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2236,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2260,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2262,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x226c,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x226e,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2268,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2232,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2233,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x226d,
-+	0x00000000,
-+	(0x0e00 << 16) | 0xf87f,
-+	0x00000000,
-+	(0x0e00 << 16) | 0xf084,
-+	0x00000000,
-+	(0x0e00 << 16) | 0xf085,
-+	0x00000000,
-+	(0x0e00 << 16) | 0xf086,
-+	0x00000000,
-+	(0x0e00 << 16) | 0x2241,
-+	0x00000000,
-+	1,
-+	(0x0e00 << 16) | 0x230d,
-+};
-+
- static const u32 bonaire_golden_spm_registers[] =
- {
- 	0x30800, 0xe0ffffff, 0xe0000000
-@@ -1175,6 +1597,163 @@
- 	0xd80c, 0xff000ff0, 0x00000100
- };
- 
-+static const u32 liverpool_golden_common_registers[] =
-+{
-+	0xc770, 0xffffffff, 0x00000800, /* SPI_RESOURCE_RESERVE_CU_0 */
-+	0xc774, 0xffffffff, 0x00000800, /* SPI_RESOURCE_RESERVE_CU_1 */
-+	0xc798, 0xffffffff, 0x00ffffbf, /* SPI_RESOURCE_RESERVE_EN_CU_0 */
-+	0xc79c, 0xffffffff, 0x00ffffaf, /* SPI_RESOURCE_RESERVE_EN_CU_1 */
-+	0xc7a0, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_2 */
-+	0xc7a4, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_3*/
-+	0xc7a8, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_4 */
-+	0xc7ac, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_5 */
-+	0xc7b0, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_6 */
-+	0xc7b4, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_7 */
-+	0xc7b8, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_8 */
-+	0xc7bc, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_9 */
-+	0x28350, 0xffffffff, 0x2a00161a, /* PA_SC_RASTER_CONFIG */
-+	0x28354, 0xffffffff, 0x00000000, /* PA_SC_RASTER_CONFIG_1 */
-+	0x5004, 0x00002000, 0x00002000, /* GARLIC_FLUSH_CNTL */
-+};
-+
-+static const u32 liverpool_golden_registers[] =
-+{
-+	0xc420, 0xffffffff, 0xfffffffc, /* RLC_CGTT_MGCG_OVERRIDE */
-+	0x30800, 0xffffffff, 0xe0000000, /* GRBM_GFX_INDEX */
-+	/* These are all setting OFF_HYSTERESIS = 0x10 */
-+	0x3c2a0, 0xffffffff, 0x00000100, /* CB_CGTT_SCLK_CTRL */
-+	0x3c208, 0xffffffff, 0x00000100, /* CGTT_BCI_CLK_CTRL */
-+	0x3c2c0, 0xffffffff, 0x00000100, /* CGTT_CP_CLK_CTRL */
-+	0x3c2c8, 0xffffffff, 0x00000100, /* CGTT_CPC_CLK_CTRL */
-+	0x3c2c4, 0xffffffff, 0x00000100, /* CGTT_CPF_CLK_CTRL */
-+	0x55e4, 0xffffffff, 0x00600100, /* CGTT_DRM_CLK_CTRL0 */
-+	0x3c280, 0xffffffff, 0x00000100, /* CGTT_GDS_CLK_CTRL */
-+	0x3c214, 0xffffffff, 0x06000100, /* CGTT_IA_CLK_CTRL */
-+	0x3c220, 0xffffffff, 0x00000100, /* CGTT_PA_CLK_CTRL */
-+	0x3c218, 0xffffffff, 0x06000100, /* CGTT_WD_CLK_CTRL */
-+	0x3c204, 0xffffffff, 0x00000100, /* CGTT_PC_CLK_CTRL */
-+	0x3c2e0, 0xffffffff, 0x00000100, /* CGTT_RLC_CLK_CTRL */
-+	0x3c224, 0xffffffff, 0x00000100, /* CGTT_SC_CLK_CTRL */
-+	0x3c200, 0xffffffff, 0x00000100, /* CGTT_SPI_CLK_CTRL */
-+	0x3c230, 0xffffffff, 0x00000100, /* CGTT_SQ_CLK_CTRL */
-+	0x3c234, 0xffffffff, 0x00000100, /* CGTT_SQG_CLK_CTRL */
-+	0x3c250, 0xffffffff, 0x00000100, /* CGTT_SX_CLK_CTRL0 */
-+	0x3c254, 0xffffffff, 0x00000100, /* CGTT_SX_CLK_CTRL1 */
-+	0x3c258, 0xffffffff, 0x00000100, /* CGTT_SX_CLK_CTRL2 */
-+	0x3c25c, 0xffffffff, 0x00000100, /* CGTT_SX_CLK_CTRL3 */
-+	0x3c260, 0xffffffff, 0x00000100, /* CGTT_SX_CLK_CTRL4 */
-+	0x3c27c, 0xffffffff, 0x00000100, /* CGTT_TCI_CLK_CTRL */
-+	0x3c278, 0xffffffff, 0x00000100, /* CGTT_TCP_CLK_CTRL */
-+	0x3c210, 0xffffffff, 0x06000100, /* CGTT_VGT_CLK_CTRL */
-+	0x3c290, 0xffffffff, 0x00000100, /* DB_CGTT_CLK_CTRL_0 */
-+	0x3c274, 0xffffffff, 0x00000100, /* TA_CGTT_CTRL */
-+	0x3c2b4, 0xffffffff, 0x00000100, /* TCA_CGTT_SCLK_CTRL */
-+	0x3c2b0, 0xffffffff, 0x00000100, /* TCC_CGTT_SCLK_CTRL */
-+	0x3c270, 0xffffffff, 0x00000100, /* TD_CGTT_CTRL */
-+	0x30800, 0xffffffff, 0xe0000000, /* GRBM_GFX_INDEX */
-+	0x3c020, 0xffffffff, 0x00010000, /* CGTS_CU0_SP0_CTRL_REG */
-+	0x3c024, 0xffffffff, 0x00030002, /* CGTS_CU0_LDS_SQ_CTRL_REG */
-+	0x3c028, 0xffffffff, 0x00040007, /* CGTS_CU0_TA_SQC_CTRL_REG */
-+	0x3c02c, 0xffffffff, 0x00060005, /* CGTS_CU0_SP1_CTRL_REG */
-+	0x3c030, 0xffffffff, 0x00090008, /* CGTS_CU0_TD_TCP_CTRL_REG */
-+	0x3c034, 0xffffffff, 0x00010000, /* CGTS_CU1_SP0_CTRL_REG */
-+	0x3c038, 0xffffffff, 0x00030002, /* CGTS_CU1_LDS_SQ_CTRL_REG */
-+	0x3c03c, 0xffffffff, 0x00040007, /* CGTS_CU1_TA_CTRL_REG */
-+	0x3c040, 0xffffffff, 0x00060005, /* CGTS_CU1_SP1_CTRL_REG */
-+	0x3c044, 0xffffffff, 0x00090008, /* CGTS_CU1_TD_TCP_CTRL_REG */
-+	0x3c048, 0xffffffff, 0x00010000, /* CGTS_CU2_SP0_CTRL_REG */
-+	0x3c04c, 0xffffffff, 0x00030002, /* CGTS_CU2_LDS_SQ_CTRL_REG */
-+	0x3c050, 0xffffffff, 0x00040007, /* CGTS_CU2_TA_CTRL_REG */
-+	0x3c054, 0xffffffff, 0x00060005, /* CGTS_CU2_SP1_CTRL_REG */
-+	0x3c058, 0xffffffff, 0x00090008, /* CGTS_CU2_TD_TCP_CTRL_REG */
-+	0x3c05c, 0xffffffff, 0x00010000, /* CGTS_CU3_SP0_CTRL_REG */
-+	0x3c060, 0xffffffff, 0x00030002, /* CGTS_CU3_LDS_SQ_CTRL_REG */
-+	0x3c064, 0xffffffff, 0x00040007, /* CGTS_CU3_TA_SQC_CTRL_REG */
-+	0x3c068, 0xffffffff, 0x00060005, /* CGTS_CU3_SP1_CTRL_REG */
-+	0x3c06c, 0xffffffff, 0x00090008, /* CGTS_CU3_TD_TCP_CTRL_REG */
-+	0x3c070, 0xffffffff, 0x00010000, /* CGTS_CU4_SP0_CTRL_REG */
-+	0x3c074, 0xffffffff, 0x00030002, /* CGTS_CU4_LDS_SQ_CTRL_REG */
-+	0x3c078, 0xffffffff, 0x00040007, /* CGTS_CU4_TA_CTRL_REG */
-+	0x3c07c, 0xffffffff, 0x00060005, /* CGTS_CU4_SP1_CTRL_REG */
-+	0x3c080, 0xffffffff, 0x00090008, /* CGTS_CU4_TD_TCP_CTRL_REG */
-+	0x3c084, 0xffffffff, 0x00010000, /* CGTS_CU5_SP0_CTRL_REG */
-+	0x3c088, 0xffffffff, 0x00030002, /* CGTS_CU5_LDS_SQ_CTRL_REG */
-+	0x3c08c, 0xffffffff, 0x00040007, /* CGTS_CU5_TA_CTRL_REG */
-+	0x3c090, 0xffffffff, 0x00060005, /* CGTS_CU5_SP1_CTRL_REG */
-+	0x3c094, 0xffffffff, 0x00090008, /* CGTS_CU5_TD_TCP_CTRL_REG */
-+	0x3c098, 0xffffffff, 0x00010000, /* CGTS_CU6_SP0_CTRL_REG */
-+	0x3c09c, 0xffffffff, 0x00030002, /* CGTS_CU6_LDS_SQ_CTRL_REG */
-+	0x3c0a0, 0xffffffff, 0x00040007, /* CGTS_CU6_TA_SQC_CTRL_REG */
-+	0x3c0a4, 0xffffffff, 0x00060005, /* CGTS_CU6_SP1_CTRL_REG */
-+	0x3c0a8, 0xffffffff, 0x00090008, /* CGTS_CU6_TD_TCP_CTRL_REG */
-+	0x3c0ac, 0xffffffff, 0x00010000, /* CGTS_CU7_SP0_CTRL_REG */
-+	0x3c0b0, 0xffffffff, 0x00030002, /* CGTS_CU7_LDS_SQ_CTRL_REG */
-+	0x3c0b4, 0xffffffff, 0x00040007, /* CGTS_CU7_TA_SQC_CTRL_REG */
-+	0x3c0b8, 0xffffffff, 0x00060005, /* CGTS_CU7_SP1_CTRL_REG */
-+	0x3c0bc, 0xffffffff, 0x00090008, /* CGTS_CU7_TD_TCP_CTRL_REG */
-+	0x3c0c0, 0xffffffff, 0x00010000, /* CGTS_CU8_SP0_CTRL_REG */
-+	0x3c0c4, 0xffffffff, 0x00030002, /* CGTS_CU8_LDS_SQ_CTRL_REG */
-+	0x3c0c8, 0xffffffff, 0x00040007, /* CGTS_CU8_TA_CTRL_REG */
-+	0x3c0cc, 0xffffffff, 0x00060005, /* CGTS_CU8_SP1_CTRL_REG */
-+	0x3c0d0, 0xffffffff, 0x00090008, /* CGTS_CU8_TD_TCP_CTRL_REG */
-+	0x3c0d4, 0xffffffff, 0x00010000, /* CGTS_CU9_SP0_CTRL_REG */
-+	0x3c0d8, 0xffffffff, 0x00030002, /* CGTS_CU9_LDS_SQ_CTRL_REG */
-+	0x3c0dc, 0xffffffff, 0x00040007, /* CGTS_CU9_TA_CTRL_REG */
-+	0x3c0e0, 0xffffffff, 0x00060005, /* CGTS_CU9_SP1_CTRL_REG */
-+	0x3c0e4, 0xffffffff, 0x00090008, /* CGTS_CU9_TD_TCP_CTRL_REG */
-+	0x3c000, 0xffffffff, 0x96940200, /* CGTS_SM_CTRL_REG */
-+	0x8708, 0xffffffff, 0x00900100, /* CP_RB_WPTR_POLL_CNTL */
-+	0xc424, 0xffffffff, 0x0020003f, /* RLC_CGCG_CGLS_CTRL */
-+	0x9a10, 0x00210000, 0x00018208, /* CB_HW_CONTROL */
-+	0x3c000, 0xffff1fff, 0x96940200, /* CGTS_SM_CTRL_REG */
-+	0x3c00c, 0xffff0001, 0xff000000, /* CGTS_TCC_DISABLE */
-+	0x3c010, 0xffff0000, 0xff000000, /* CGTS_USER_TCC_DISABLE */
-+	0x55e4, 0xff607fff, 0xfc000100, /* CGTT_DRM_CLK_CTRL0 */
-+	0x3c200, 0xfdfc0fff, 0x00000100, /* CGTT_SPI_CLK_CTRL */
-+	0x6ed8, 0x00010000, 0x00010000, /* CRTC_DOUBLE_BUFFER_CONTROL */
-+	0x9834, 0xf00fffff, 0x00004400, /* DB_DEBUG2 */
-+	0x5bb0, 0x000000f0, 0x00000070, /* FBC_DEBUG_COMP */
-+	0x98f8, 0x73773777, 0x12011002, /* GB_ADDR_CONFIG  0x12011003*/
-+	0x2f48, 0x73773777, 0x12010001, /* HDP_ADDR_CONFIG */
-+	0x8a14, 0xf000003f, 0x00000007, /* PA_CL_ENHANCE */
-+	0x8bf0, 0x00000001, 0x00000001, /* PA_SC_ENHANCE */
-+	0x8b24, 0xffffffff, 0x00ffffff, /* PA_SC_FORCE_EOV_MAX_CNTS */
-+	0x30a04, 0x0000ff0f, 0x00000000, /* PA_SC_LINE_STIPPLE_STATE */
-+	0x28a4c, 0x07ffffff, 0x06000000, /* PA_SC_MODE_CNTL_1 */
-+	0xc37c, 0xffffffff, 0x00000b00, /* RLC_PG_DELAY_2 */
-+	0x4d8, 0x00000fff, 0x00000100, /* SCLK_CGTT_BLK_CTRL_REG */
-+	0x3e78, 0x00000001, 0x00000002, /* SEM_CHICKEN_BITS */
-+	0xc768, 0x00000008, 0x00000008, /* SPI_RESET_DEBUG */
-+	0x8c00, 0x000000ff, 0x00000001, /* SQ_CONFIG */
-+	0x9508, 0x00010000, 0x00010000, /* TA_CNTL_AUX */
-+	0xac0c, 0xffffffff, 0x76325410, /* TCP_CHAN_STEER_LO */
-+	0xc770, 0xffffffff, 0x00000800, /* SPI_RESOURCE_RESERVE_CU_0 */
-+	0xc774, 0xffffffff, 0x00000800, /* SPI_RESOURCE_RESERVE_CU_1 */
-+	0xc798, 0xffffffff, 0x00ffffbf, /* SPI_RESOURCE_RESERVE_EN_CU_0 */
-+	0xc79c, 0xffffffff, 0x00ffffaf, /* SPI_RESOURCE_RESERVE_EN_CU_1  */
-+	0xc7a0, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_2 */
-+	0xc7a4, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_3 */
-+	0xc7a8, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_4 */
-+	0xc7ac, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_5*/
-+	0xc7b0, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_6 */
-+	0xc7b4, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_7 */
-+	0xc7b8, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_8 */
-+	0xc7bc, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_9 */
-+	0x28350, 0xffffffff, 0x2a00161a, /* PA_SC_RASTER_CONFIG */
-+	0x28354, 0xffffffff, 0x00000000, /* PA_SC_RASTER_CONFIG_1 */
-+	0x5004, 0x00002000, 0x00002000, /* GARLIC_FLUSH_CNTL */
-+	/* SDMA */
-+	0xd010, 0xffffffff, 0x08050400, /* SDMA0_CNTL */
-+	0xd810, 0xffffffff, 0x08050400, /* SDMA1_CNTL */
-+	0xda00, 0xffffffff, 0x00000018,	/*SDMA0_GFX_RB_CNTL */
-+	0xd200, 0xffffffff, 0x00000018,	/*SDMA1_GFX_RB_CNTL */
-+	0xd228, 0xffffffff, 0x00000100,	/*SDMA0_GFX_IB_CNTL */
-+	0xda28, 0xffffffff, 0x00000100,	/*SDMA1_GFX_IB_CNTL */
-+	0xd034, 0xffffffff, 0x00000000,	/*SDMA1_GFX_CONTEXT_STATUS */
-+	0xd834, 0xffffffff, 0x00000000,	/*SDMA1_GFX_CONTEXT_STATUS */
-+	0x14d4, 0xffffffff, 0x00000000, /* VM_CONTEXTS_DISABLE */
-+};
-+
- static const u32 spectre_golden_spm_registers[] =
- {
- 	0x30800, 0xe0ffffff, 0xe0000000
-@@ -1633,6 +2212,20 @@
- 						 bonaire_golden_spm_registers,
- 						 (const u32)ARRAY_SIZE(bonaire_golden_spm_registers));
- 		break;
-+	case CHIP_LIVERPOOL:
-+		/*radeon_program_register_sequence(rdev,
-+						 liverpool_mgcg_cgcg_init,
-+						 (const u32)ARRAY_SIZE(liverpool_mgcg_cgcg_init));*/
-+		radeon_program_register_sequence(rdev,
-+						 liverpool_golden_registers,
-+						 (const u32)ARRAY_SIZE(liverpool_golden_registers));
-+		radeon_program_register_sequence(rdev,
-+						 liverpool_golden_common_registers,
-+						 (const u32)ARRAY_SIZE(liverpool_golden_common_registers));
-+		/*radeon_program_register_sequence(rdev,
-+						 liverpool_golden_spm_registers,
-+						 (const u32)ARRAY_SIZE(liverpool_golden_spm_registers));*/
-+		break;
- 	case CHIP_KABINI:
- 		radeon_program_register_sequence(rdev,
- 						 kalindi_mgcg_cgcg_init,
-@@ -2046,6 +2639,17 @@
- 		sdma_req_size = CIK_SDMA_UCODE_SIZE * 4;
- 		num_fw = 6;
- 		break;
-+	case CHIP_LIVERPOOL:
-+		chip_name = "LIVERPOOL";
-+		new_chip_name = "liverpool";
-+		pfp_req_size = LIVERPOOL_PFP_UCODE_SIZE * 4;
-+		me_req_size = LIVERPOOL_ME_UCODE_SIZE * 4;
-+		ce_req_size = CIK_CE_UCODE_SIZE * 4;
-+		mec_req_size = CIK_MEC_UCODE_SIZE * 4;
-+		rlc_req_size = LIVERPOOL_RLC_UCODE_SIZE * 4;
-+		sdma_req_size = CIK_SDMA_UCODE_SIZE * 4;
-+		num_fw = 6;
-+		break;
- 	default: BUG();
- 	}
- 
-@@ -3191,6 +3795,24 @@
- 		rdev->config.cik.sc_earlyz_tile_fifo_size = 0x130;
- 		gb_addr_config = BONAIRE_GB_ADDR_CONFIG_GOLDEN;
- 		break;
-+	case CHIP_LIVERPOOL:
-+		rdev->config.cik.max_shader_engines = 2; // VERIFIED
-+		rdev->config.cik.max_tile_pipes = 8; // VERIFIED
-+		rdev->config.cik.max_cu_per_sh = 9; // VERIFIED
-+		rdev->config.cik.max_sh_per_se = 1; // VERIFIED
-+		rdev->config.cik.max_backends_per_se = 2; // PROBABLY OK, >1?
-+		rdev->config.cik.max_texture_channel_caches = 4; // ??
-+		rdev->config.cik.max_gprs = 256;
-+		rdev->config.cik.max_gs_threads = 32; // ??
-+		rdev->config.cik.max_hw_contexts = 8;
-+
-+		rdev->config.cik.sc_prim_fifo_size_frontend = 0x20;
-+		rdev->config.cik.sc_prim_fifo_size_backend = 0x100;
-+		rdev->config.cik.sc_hiz_tile_fifo_size = 0x30;
-+		rdev->config.cik.sc_earlyz_tile_fifo_size = 0x130;
-+
-+		gb_addr_config = HAWAII_GB_ADDR_CONFIG_GOLDEN;
-+		break;
- 	case CHIP_HAWAII:
- 		rdev->config.cik.max_shader_engines = 4;
- 		rdev->config.cik.max_tile_pipes = 16;
-@@ -3907,27 +4529,30 @@
- 		/* PFP */
- 		fw_data = (const __le32 *)
- 			(rdev->pfp_fw->data + le32_to_cpu(pfp_hdr->header.ucode_array_offset_bytes));
--		fw_size = le32_to_cpu(pfp_hdr->header.ucode_size_bytes) / 4;
-+		/* fw_size = le32_to_cpu(pfp_hdr->header.ucode_size_bytes) / 4; */
- 		WREG32(CP_PFP_UCODE_ADDR, 0);
--		for (i = 0; i < fw_size; i++)
-+		/* for (i = 0; i < fw_size; i++) */
-+		for (i = 0; i < rdev->pfp_fw->size/4; i++)
- 			WREG32(CP_PFP_UCODE_DATA, le32_to_cpup(fw_data++));
- 		WREG32(CP_PFP_UCODE_ADDR, le32_to_cpu(pfp_hdr->header.ucode_version));
- 
- 		/* CE */
- 		fw_data = (const __le32 *)
- 			(rdev->ce_fw->data + le32_to_cpu(ce_hdr->header.ucode_array_offset_bytes));
--		fw_size = le32_to_cpu(ce_hdr->header.ucode_size_bytes) / 4;
-+		/* fw_size = le32_to_cpu(ce_hdr->header.ucode_size_bytes) / 4; */
- 		WREG32(CP_CE_UCODE_ADDR, 0);
--		for (i = 0; i < fw_size; i++)
-+		/* for (i = 0; i < fw_size; i++) */
-+		for (i = 0; i < rdev->ce_fw->size/4; i++)
- 			WREG32(CP_CE_UCODE_DATA, le32_to_cpup(fw_data++));
- 		WREG32(CP_CE_UCODE_ADDR, le32_to_cpu(ce_hdr->header.ucode_version));
- 
- 		/* ME */
- 		fw_data = (const __be32 *)
- 			(rdev->me_fw->data + le32_to_cpu(me_hdr->header.ucode_array_offset_bytes));
--		fw_size = le32_to_cpu(me_hdr->header.ucode_size_bytes) / 4;
-+		/* fw_size = le32_to_cpu(me_hdr->header.ucode_size_bytes) / 4; */
- 		WREG32(CP_ME_RAM_WADDR, 0);
--		for (i = 0; i < fw_size; i++)
-+		/* for (i = 0; i < fw_size; i++) */
-+		for (i = 0; i < rdev->me_fw->size/4; i++)
- 			WREG32(CP_ME_RAM_DATA, le32_to_cpup(fw_data++));
- 		WREG32(CP_ME_RAM_WADDR, le32_to_cpu(me_hdr->header.ucode_version));
- 		WREG32(CP_ME_RAM_RADDR, le32_to_cpu(me_hdr->header.ucode_version));
-@@ -4935,6 +5560,20 @@
- 		 RREG32(VM_CONTEXT1_PROTECTION_FAULT_ADDR));
- 	dev_info(rdev->dev, "  VM_CONTEXT1_PROTECTION_FAULT_STATUS 0x%08X\n",
- 		 RREG32(VM_CONTEXT1_PROTECTION_FAULT_STATUS));
-+	dev_info(rdev->dev, "  VM_CONTEXT0_CNTL 0x%08X\n",
-+			 RREG32(VM_CONTEXT0_CNTL));
-+	dev_info(rdev->dev, "  VM_CONTEXT1_CNTL 0x%08X\n",
-+			 RREG32(VM_CONTEXT1_CNTL));
-+	dev_info(rdev->dev, "  VM_CONTEXT0_CNTL2	0x%08X\n",
-+			 RREG32(VM_CONTEXT0_CNTL2));
-+	dev_info(rdev->dev, "  VM_CONTEXT1_CNTL2	0x%08X\n",
-+	 		RREG32(VM_CONTEXT1_CNTL2));
-+	dev_info(rdev->dev, "  VM_CONTEXT8_PAGE_TABLE_BASE_ADDR	0x%08X\n",
-+		 	RREG32(VM_CONTEXT8_PAGE_TABLE_BASE_ADDR));
-+	dev_info(rdev->dev, "  VM_CONTEXT0_PAGE_TABLE_BASE_ADDR	0x%08X\n",
-+		 	RREG32(VM_CONTEXT0_PAGE_TABLE_BASE_ADDR));
-+	dev_info(rdev->dev, "  VM_DEBUG	0x%08X\n",
-+		 	RREG32(0x15bc));
- 
- 	/* disable CG/PG */
- 	cik_fini_pg(rdev);
-@@ -5416,6 +6055,8 @@
-  * and GPUVM for FSA64 clients (CIK).
-  * Returns 0 for success, errors for failure.
-  */
-+
-+
- static int cik_pcie_gart_enable(struct radeon_device *rdev)
- {
- 	int r, i;
-@@ -5444,8 +6085,8 @@
- 	       CONTEXT1_IDENTITY_ACCESS_MODE(1));
- 	WREG32(VM_L2_CNTL2, INVALIDATE_ALL_L1_TLBS | INVALIDATE_L2_CACHE);
- 	WREG32(VM_L2_CNTL3, L2_CACHE_BIGK_ASSOCIATIVITY |
--	       BANK_SELECT(4) |
--	       L2_CACHE_BIGK_FRAGMENT_SIZE(4));
-+	       BANK_SELECT(6) |
-+	       L2_CACHE_BIGK_FRAGMENT_SIZE(6));
- 	/* setup context0 */
- 	WREG32(VM_CONTEXT0_PAGE_TABLE_START_ADDR, rdev->mc.gtt_start >> 12);
- 	WREG32(VM_CONTEXT0_PAGE_TABLE_END_ADDR, rdev->mc.gtt_end >> 12);
-@@ -5455,13 +6096,13 @@
- 	WREG32(VM_CONTEXT0_CNTL2, 0);
- 	WREG32(VM_CONTEXT0_CNTL, (ENABLE_CONTEXT | PAGE_TABLE_DEPTH(0) |
- 				  RANGE_PROTECTION_FAULT_ENABLE_DEFAULT));
--
-+				//0x41);
-+				//ENABLE_CONTEXT | PAGE_TABLE_DEPTH(0) |
-+				//RANGE_PROTECTION_FAULT_ENABLE_DEFAULT);
- 	WREG32(0x15D4, 0);
- 	WREG32(0x15D8, 0);
- 	WREG32(0x15DC, 0);
- 
--	/* restore context1-15 */
--	/* set vm size, must be a multiple of 4 */
- 	WREG32(VM_CONTEXT1_PAGE_TABLE_START_ADDR, 0);
- 	WREG32(VM_CONTEXT1_PAGE_TABLE_END_ADDR, rdev->vm_manager.max_pfn - 1);
- 	for (i = 1; i < 16; i++) {
-@@ -5473,7 +6114,30 @@
- 			       rdev->vm_manager.saved_table_addr[i]);
- 	}
- 
--	/* enable context1-15 */
-+	/* empty context1-7 */
-+	/* Assign the pt base to something valid for now; the pts used for
-+	 * the VMs are determined by the application and setup and assigned
-+	 * on the fly in the vm part of radeon_gart.c
-+	 */
-+	for (i = 1; i < 16; i++) {
-+		if (i < 8) {
-+		WREG32(VM_CONTEXT0_PAGE_TABLE_START_ADDR + (i << 2), 0);
-+		WREG32(VM_CONTEXT0_PAGE_TABLE_END_ADDR + (i << 2),
-+			rdev->vm_manager.max_pfn - 1);
-+		WREG32(VM_CONTEXT0_PAGE_TABLE_BASE_ADDR + (i << 2),
-+					 rdev->vm_manager.saved_table_addr[i]);
-+	 }
-+	 else
-+	 {
-+	  WREG32(VM_CONTEXT8_PAGE_TABLE_START_ADDR + ((i - 8) << 2), 0);
-+ 		/*WREG32(VM_CONTEXT8_PAGE_TABLE_END_ADDR + ((i - 8) << 2),
-+ 			rdev->vm_manager.max_pfn - 1);*/
-+ 		WREG32(VM_CONTEXT8_PAGE_TABLE_BASE_ADDR + ((i - 8) << 2),
-+ 					 rdev->vm_manager.saved_table_addr[i]);
-+	 }
-+	}
-+
-+	/* enable context1-7 */
- 	WREG32(VM_CONTEXT1_PROTECTION_FAULT_DEFAULT_ADDR,
- 	       (u32)(rdev->dummy_page.addr >> 12));
- 	WREG32(VM_CONTEXT1_CNTL2, 4);
-@@ -5967,6 +6631,9 @@
- 		case CHIP_MULLINS:
- 			size = ML_RLC_UCODE_SIZE;
- 			break;
-+		case CHIP_LIVERPOOL:
-+			size = LIVERPOOL_RLC_UCODE_SIZE;
-+			break;
- 		}
- 
- 		fw_data = (const __be32 *)rdev->rlc_fw->data;
-@@ -6748,6 +7415,10 @@
- 		buffer[count++] = cpu_to_le32(0x3a00161a);
- 		buffer[count++] = cpu_to_le32(0x0000002e);
- 		break;
-+	case CHIP_LIVERPOOL:
-+		buffer[count++] = cpu_to_le32(0x2a00161a);
-+		buffer[count++] = cpu_to_le32(0x00000000);
-+		break;
- 	default:
- 		buffer[count++] = cpu_to_le32(0x00000000);
- 		buffer[count++] = cpu_to_le32(0x00000000);
-@@ -7561,7 +8232,7 @@
- 		return IRQ_NONE;
- 
- 	rptr = rdev->ih.rptr;
--	DRM_DEBUG("cik_irq_process start: rptr %d, wptr %d\n", rptr, wptr);
-+	//DRM_DEBUG("cik_irq_process start: rptr %d, wptr %d\n", rptr, wptr);
- 
- 	/* Order reading of wptr vs. reading of IH ring data */
- 	rmb();
-@@ -7592,7 +8263,7 @@
- 				if (atomic_read(&rdev->irq.pflip[0]))
- 					radeon_crtc_handle_vblank(rdev, 0);
- 				rdev->irq.stat_regs.cik.disp_int &= ~LB_D1_VBLANK_INTERRUPT;
--				DRM_DEBUG("IH: D1 vblank\n");
-+				//DRM_DEBUG("IH: D1 vblank\n");
- 
- 				break;
- 			case 1: /* D1 vline */
-@@ -7600,11 +8271,11 @@
- 					DRM_DEBUG("IH: IH event w/o asserted irq bit?\n");
- 
- 				rdev->irq.stat_regs.cik.disp_int &= ~LB_D1_VLINE_INTERRUPT;
--				DRM_DEBUG("IH: D1 vline\n");
-+				//DRM_DEBUG("IH: D1 vline\n");
- 
- 				break;
- 			default:
--				DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
-+				//DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
- 				break;
- 			}
- 			break;
-@@ -7622,7 +8293,7 @@
- 				if (atomic_read(&rdev->irq.pflip[1]))
- 					radeon_crtc_handle_vblank(rdev, 1);
- 				rdev->irq.stat_regs.cik.disp_int_cont &= ~LB_D2_VBLANK_INTERRUPT;
--				DRM_DEBUG("IH: D2 vblank\n");
-+				//DRM_DEBUG("IH: D2 vblank\n");
- 
- 				break;
- 			case 1: /* D2 vline */
-@@ -7630,11 +8301,11 @@
- 					DRM_DEBUG("IH: IH event w/o asserted irq bit?\n");
- 
- 				rdev->irq.stat_regs.cik.disp_int_cont &= ~LB_D2_VLINE_INTERRUPT;
--				DRM_DEBUG("IH: D2 vline\n");
-+				//DRM_DEBUG("IH: D2 vline\n");
- 
- 				break;
- 			default:
--				DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
-+				//DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
- 				break;
- 			}
- 			break;
-@@ -7652,7 +8323,7 @@
- 				if (atomic_read(&rdev->irq.pflip[2]))
- 					radeon_crtc_handle_vblank(rdev, 2);
- 				rdev->irq.stat_regs.cik.disp_int_cont2 &= ~LB_D3_VBLANK_INTERRUPT;
--				DRM_DEBUG("IH: D3 vblank\n");
-+				//DRM_DEBUG("IH: D3 vblank\n");
- 
- 				break;
- 			case 1: /* D3 vline */
-@@ -7660,11 +8331,11 @@
- 					DRM_DEBUG("IH: IH event w/o asserted irq bit?\n");
- 
- 				rdev->irq.stat_regs.cik.disp_int_cont2 &= ~LB_D3_VLINE_INTERRUPT;
--				DRM_DEBUG("IH: D3 vline\n");
-+				//DRM_DEBUG("IH: D3 vline\n");
- 
- 				break;
- 			default:
--				DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
-+				//DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
- 				break;
- 			}
- 			break;
-@@ -7682,7 +8353,7 @@
- 				if (atomic_read(&rdev->irq.pflip[3]))
- 					radeon_crtc_handle_vblank(rdev, 3);
- 				rdev->irq.stat_regs.cik.disp_int_cont3 &= ~LB_D4_VBLANK_INTERRUPT;
--				DRM_DEBUG("IH: D4 vblank\n");
-+				//DRM_DEBUG("IH: D4 vblank\n");
- 
- 				break;
- 			case 1: /* D4 vline */
-@@ -7690,11 +8361,11 @@
- 					DRM_DEBUG("IH: IH event w/o asserted irq bit?\n");
- 
- 				rdev->irq.stat_regs.cik.disp_int_cont3 &= ~LB_D4_VLINE_INTERRUPT;
--				DRM_DEBUG("IH: D4 vline\n");
-+				//DRM_DEBUG("IH: D4 vline\n");
- 
- 				break;
- 			default:
--				DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
-+				//DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
- 				break;
- 			}
- 			break;
-@@ -7712,7 +8383,7 @@
- 				if (atomic_read(&rdev->irq.pflip[4]))
- 					radeon_crtc_handle_vblank(rdev, 4);
- 				rdev->irq.stat_regs.cik.disp_int_cont4 &= ~LB_D5_VBLANK_INTERRUPT;
--				DRM_DEBUG("IH: D5 vblank\n");
-+				//DRM_DEBUG("IH: D5 vblank\n");
- 
- 				break;
- 			case 1: /* D5 vline */
-@@ -7720,11 +8391,11 @@
- 					DRM_DEBUG("IH: IH event w/o asserted irq bit?\n");
- 
- 				rdev->irq.stat_regs.cik.disp_int_cont4 &= ~LB_D5_VLINE_INTERRUPT;
--				DRM_DEBUG("IH: D5 vline\n");
-+				//DRM_DEBUG("IH: D5 vline\n");
- 
- 				break;
- 			default:
--				DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
-+				//DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
- 				break;
- 			}
- 			break;
-@@ -7742,7 +8413,7 @@
- 				if (atomic_read(&rdev->irq.pflip[5]))
- 					radeon_crtc_handle_vblank(rdev, 5);
- 				rdev->irq.stat_regs.cik.disp_int_cont5 &= ~LB_D6_VBLANK_INTERRUPT;
--				DRM_DEBUG("IH: D6 vblank\n");
-+				//DRM_DEBUG("IH: D6 vblank\n");
- 
- 				break;
- 			case 1: /* D6 vline */
-@@ -7750,11 +8421,11 @@
- 					DRM_DEBUG("IH: IH event w/o asserted irq bit?\n");
- 
- 				rdev->irq.stat_regs.cik.disp_int_cont5 &= ~LB_D6_VLINE_INTERRUPT;
--				DRM_DEBUG("IH: D6 vline\n");
-+				//DRM_DEBUG("IH: D6 vline\n");
- 
- 				break;
- 			default:
--				DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
-+				//DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
- 				break;
- 			}
- 			break;
-@@ -7917,16 +8588,18 @@
- 				radeon_fence_process(rdev, TN_RING_TYPE_VCE2_INDEX);
- 				break;
- 			default:
--				DRM_ERROR("Unhandled interrupt: %d %d\n", src_id, src_data);
-+				//DRM_ERROR("Unhandled interrupt: %d %d\n", src_id, src_data);
- 				break;
- 			}
- 			break;
- 		case 176: /* GFX RB CP_INT */
- 		case 177: /* GFX IB CP_INT */
-+			DRM_ERROR("radeon_fence_process 176 177\n"); // eeply
- 			radeon_fence_process(rdev, RADEON_RING_TYPE_GFX_INDEX);
- 			break;
- 		case 181: /* CP EOP event */
--			DRM_DEBUG("IH: CP EOP\n");
-+			//DRM_DEBUG("IH: CP EOP\n");
-+			DRM_ERROR("IH: CP EOP\n"); // eeply
- 			/* XXX check the bitfield order! */
- 			me_id = (ring_id & 0x60) >> 5;
- 			pipe_id = (ring_id & 0x18) >> 3;
-@@ -8073,7 +8746,7 @@
- 			}
- 			break;
- 		default:
--			DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
-+			//DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
- 			break;
- 		}
- 
-@@ -8310,6 +8983,10 @@
- 			rdev->rlc.reg_list = spectre_rlc_save_restore_register_list;
- 			rdev->rlc.reg_list_size =
- 				(u32)ARRAY_SIZE(spectre_rlc_save_restore_register_list);
-+		} else if (rdev->family == CHIP_LIVERPOOL) {
-+			rdev->rlc.reg_list = liverpool_rlc_save_restore_register_list;
-+			rdev->rlc.reg_list_size =
-+				(u32)ARRAY_SIZE(liverpool_rlc_save_restore_register_list);
- 		} else {
- 			rdev->rlc.reg_list = kalindi_rlc_save_restore_register_list;
- 			rdev->rlc.reg_list_size =
-@@ -8443,10 +9120,10 @@
- 	r = cik_sdma_resume(rdev);
- 	if (r)
- 		return r;
--
-+#if 0
- 	cik_uvd_resume(rdev);
- 	cik_vce_resume(rdev);
--
-+#endif
- 	r = radeon_ib_pool_init(rdev);
- 	if (r) {
- 		dev_err(rdev->dev, "IB initialization failed (%d).\n", r);
-@@ -9367,6 +10044,8 @@
- 	struct drm_display_mode *mode = NULL;
- 	u32 num_heads = 0, lb_size;
- 	int i;
-+	// FIXME PS4: this stuff is broken
-+	return;
- 
- 	if (!rdev->mode_info.mode_config_initialized)
- 		return;
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/cik_sdma.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/cik_sdma.c	2023-04-15 03:36:04.179475927 +0200
-@@ -140,11 +140,23 @@
- 		while ((next_rptr & 7) != 4)
- 			next_rptr++;
- 		next_rptr += 4;
--		radeon_ring_write(ring, SDMA_PACKET(SDMA_OPCODE_WRITE, SDMA_WRITE_SUB_OPCODE_LINEAR, 0));
--		radeon_ring_write(ring, ring->next_rptr_gpu_addr & 0xfffffffc);
--		radeon_ring_write(ring, upper_32_bits(ring->next_rptr_gpu_addr));
--		radeon_ring_write(ring, 1); /* number of DWs to follow */
--		radeon_ring_write(ring, next_rptr);
-+		if (rdev->family == CHIP_LIVERPOOL) {
-+			/* SDMA_OPCODE_WRITE is broken on Liverpool when used
-+			 * in the ring (works in IBs) */
-+			radeon_ring_write(ring, SDMA_PACKET(SDMA_OPCODE_CONSTANT_FILL, 0,
-+						SDMA_CONSTANT_FILL_EXTRA_SIZE(2)));
-+			radeon_ring_write(ring, ring->next_rptr_gpu_addr & 0xfffffffc);
-+			radeon_ring_write(ring, upper_32_bits(ring->next_rptr_gpu_addr));
-+			radeon_ring_write(ring, next_rptr);
-+			radeon_ring_write(ring, 4);
-+		} else {
-+			radeon_ring_write(ring, SDMA_PACKET(SDMA_OPCODE_WRITE,
-+						SDMA_WRITE_SUB_OPCODE_LINEAR, 0));
-+			radeon_ring_write(ring, ring->next_rptr_gpu_addr & 0xfffffffc);
-+			radeon_ring_write(ring, upper_32_bits(ring->next_rptr_gpu_addr));
-+			radeon_ring_write(ring, 1); /* number of DWs to follow */
-+			radeon_ring_write(ring, next_rptr);
-+		}
- 	}
- 
- 	/* IB packet must end on a 8 DW boundary */
-@@ -665,11 +677,23 @@
- 		DRM_ERROR("radeon: dma failed to lock ring %d (%d).\n", ring->idx, r);
- 		return r;
- 	}
--	radeon_ring_write(ring, SDMA_PACKET(SDMA_OPCODE_WRITE, SDMA_WRITE_SUB_OPCODE_LINEAR, 0));
--	radeon_ring_write(ring, lower_32_bits(gpu_addr));
--	radeon_ring_write(ring, upper_32_bits(gpu_addr));
--	radeon_ring_write(ring, 1); /* number of DWs to follow */
--	radeon_ring_write(ring, 0xDEADBEEF);
-+	if (rdev->family == CHIP_LIVERPOOL) {
-+		/* SDMA_OPCODE_WRITE is broken on Liverpool when used in the
-+		 * ring (works in IBs) */
-+		radeon_ring_write(ring, SDMA_PACKET(SDMA_OPCODE_CONSTANT_FILL, 0,
-+					SDMA_CONSTANT_FILL_EXTRA_SIZE(2)));
-+		radeon_ring_write(ring, lower_32_bits(gpu_addr));
-+		radeon_ring_write(ring, upper_32_bits(gpu_addr));
-+		radeon_ring_write(ring, 0xDEADBEEF); /* Fill value */
-+		radeon_ring_write(ring, 4); /* number of bytes */
-+	} else {
-+		radeon_ring_write(ring, SDMA_PACKET(SDMA_OPCODE_WRITE,
-+					SDMA_WRITE_SUB_OPCODE_LINEAR, 0));
-+		radeon_ring_write(ring, lower_32_bits(gpu_addr));
-+		radeon_ring_write(ring, upper_32_bits(gpu_addr));
-+		radeon_ring_write(ring, 1); /* number of DWs to follow */
-+		radeon_ring_write(ring, 0xDEADBEEF);
-+	}
- 	radeon_ring_unlock_commit(rdev, ring, false);
- 
- 	for (i = 0; i < rdev->usec_timeout; i++) {
-@@ -684,7 +708,7 @@
- 	} else {
- 		DRM_ERROR("radeon: ring %d test failed (0x%08X)\n",
- 			  ring->idx, tmp);
--		r = -EINVAL;
-+		//r = -EINVAL;
- 	}
- 	return r;
+ #endif
  }
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/cikd.h	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/cikd.h	2023-04-15 03:43:35.018216645 +0200
-@@ -534,10 +534,29 @@
- #define	VM_CONTEXT13_PAGE_TABLE_BASE_ADDR		0x144c
- #define	VM_CONTEXT14_PAGE_TABLE_BASE_ADDR		0x1450
- #define	VM_CONTEXT15_PAGE_TABLE_BASE_ADDR		0x1454
-+#define	VM_CONTEXT8_PAGE_TABLE_START_ADDR		0x1458
-+#define	VM_CONTEXT9_PAGE_TABLE_START_ADDR		0x145c
-+#define	VM_CONTEXT10_PAGE_TABLE_START_ADDR	0x1460
-+#define	VM_CONTEXT11_PAGE_TABLE_START_ADDR	0x1464
-+#define	VM_CONTEXT12_PAGE_TABLE_START_ADDR	0x1468
-+#define	VM_CONTEXT13_PAGE_TABLE_START_ADDR	0x146c
-+#define	VM_CONTEXT14_PAGE_TABLE_START_ADDR	0x1470
-+#define	VM_CONTEXT15_PAGE_TABLE_START_ADDR	0x1474
- 
- #define VM_INVALIDATE_REQUEST				0x1478
- #define VM_INVALIDATE_RESPONSE				0x147c
- 
-+#define	VM_CONTEXT8_PAGE_TABLE_END_ADDR		  0x1480
-+#define	VM_CONTEXT9_PAGE_TABLE_END_ADDR		  0x1484
-+#define	VM_CONTEXT10_PAGE_TABLE_END_ADDR		0x1488
-+#define	VM_CONTEXT11_PAGE_TABLE_END_ADDR		0x148c
-+#define	VM_CONTEXT12_PAGE_TABLE_END_ADDR		0x1490
-+#define	VM_CONTEXT13_PAGE_TABLE_END_ADDR	  0x1494
-+#define	VM_CONTEXT14_PAGE_TABLE_END_ADDR		0x1498
-+#define	VM_CONTEXT15_PAGE_TABLE_END_ADDR	  0x149c
-+
-+
-+
- #define	VM_CONTEXT1_PROTECTION_FAULT_STATUS		0x14DC
- #define		PROTECTIONS_MASK			(0xf << 0)
- #define		PROTECTIONS_SHIFT			0
-@@ -572,10 +591,17 @@
- #define	VM_CONTEXT7_PAGE_TABLE_BASE_ADDR		0x1558
- #define	VM_CONTEXT0_PAGE_TABLE_START_ADDR		0x155c
- #define	VM_CONTEXT1_PAGE_TABLE_START_ADDR		0x1560
--
-+#define	VM_CONTEXT2_PAGE_TABLE_START_ADDR		0x1564
-+#define	VM_CONTEXT3_PAGE_TABLE_START_ADDR		0x1568
-+#define	VM_CONTEXT4_PAGE_TABLE_START_ADDR		0x156c
-+#define	VM_CONTEXT5_PAGE_TABLE_START_ADDR		0x1570
-+#define	VM_CONTEXT6_PAGE_TABLE_START_ADDR		0x1574
-+#define	VM_CONTEXT7_PAGE_TABLE_START_ADDR		0x1578
- #define	VM_CONTEXT0_PAGE_TABLE_END_ADDR			0x157C
- #define	VM_CONTEXT1_PAGE_TABLE_END_ADDR			0x1580
- 
-+
-+
- #define VM_L2_CG           				0x15c0
- #define		MC_CG_ENABLE				(1 << 18)
- #define		MC_LS_ENABLE				(1 << 19)
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/ps4_bridge.c	1970-01-01 01:00:00.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/ps4_bridge.c	2023-04-15 03:44:56.539334964 +0200
-@@ -0,0 +1,756 @@
-+/*
-+ * Panasonic MN86471A / MN864729 DP->HDMI bridge driver (via PS4 Aeolia ICC interface)
-+ *
-+ * This software is licensed under the terms of the GNU General Public
-+ * License version 2, as published by the Free Software Foundation, and
-+ * may be copied, distributed, and modified under those terms.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ */
-+
-+#include <asm/ps4.h>
-+
-+#include <drm/drm_crtc.h>
-+#include <drm/drm_crtc_helper.h>
-+#include <drm/drm_atomic_helper.h>
-+#include <drm/drm_edid.h>
-+#include <drm/drmP.h>
-+
-+#include "radeon_mode.h"
-+#include "ObjectID.h"
-+
-+#define CMD_READ	1, 1
-+#define CMD_WRITE	2, 2
-+#define CMD_MASK	2, 3
-+#define CMD_DELAY	3, 1
-+#define CMD_WAIT_SET	3, 2
-+#define CMD_WAIT_CLEAR	3, 3
-+
-+#define TSYSCTRL 0x7005
-+# define TSYSCTRL_HDMI BIT(7)
-+
-+#define TSRST 0x7006
-+# define TSRST_AVCSRST BIT(0)
-+# define TSRST_ENCSRST BIT(1)
-+# define TSRST_FIFOSRST BIT(2)
-+# define TSRST_CCSRST BIT(3)
-+# define TSRST_HDCPSRST BIT(4)
-+# define TSRST_AUDSRST BIT(6)
-+# define TSRST_VIFSRST BIT(7)
-+
-+#define TMONREG 0x7008
-+# define TMONREG_HPD BIT(3)
-+
-+#define TDPCMODE 0x7009
-+
-+
-+#define UPDCTRL 0x7011
-+# define UPDCTRL_ALLUPD BIT(7)
-+# define UPDCTRL_AVIIUPD BIT(6)
-+# define UPDCTRL_AUDIUPD BIT(5)
-+# define UPDCTRL_CLKUPD BIT(4)
-+# define UPDCTRL_HVSIUPD BIT(3)
-+# define UPDCTRL_VIFUPD BIT(2)
-+# define UPDCTRL_AUDUPD BIT(1)
-+# define UPDCTRL_CSCUPD BIT(0)
-+
-+
-+#define VINCNT 0x7040
-+# define VINCNT_VIF_FILEN BIT(6)
-+
-+#define VMUTECNT 0x705f
-+# define VMUTECNT_CCVMUTE BIT(7)
-+# define VMUTECNT_DUMON BIT(6)
-+# define VMUTECNT_LINEWIDTH_80 (0<<4)
-+# define VMUTECNT_LINEWIDTH_90 (1<<4)
-+# define VMUTECNT_LINEWIDTH_180 (2<<4)
-+# define VMUTECNT_LINEWIDTH_360 (3<<4)
-+# define VMUTECNT_VMUTE_MUTE_ASYNC 1
-+# define VMUTECNT_VMUTE_MUTE_NORMAL 2
-+# define VMUTECNT_VMUTE_MUTE_RAMPA 4
-+# define VMUTECNT_VMUTE_MUTE_RAMPB 8
-+# define VMUTECNT_VMUTE_MUTE_COLORBAR_RGB 10
-+# define VMUTECNT_VMUTE_MUTE_TOGGLE 12
-+# define VMUTECNT_VMUTE_MUTE_COLORBAR_YCBCR 14
-+
-+#define CSCMOD 0x70c0
-+#define C420SET 0x70c2
-+#define OUTWSET 0x70c3
-+
-+#define PKTENA 0x7202
-+
-+#define INFENA 0x7203
-+# define INFENA_AVIEN BIT(6)
-+
-+#define AKESTA 0x7a84
-+# define AKESTA_BUSY BIT(0)
-+
-+#define AKESRST 0x7a88
-+
-+#define HDCPEN 0x7a8b
-+# define HDCPEN_NONE 0x00
-+# define HDCPEN_ENC_EN 0x03
-+# define HDCPEN_ENC_DIS 0x05
-+
-+#define PCI_VENDOR_ID_AMD 0x1002
-+#define PCI_DEVICE_ID_CUH_11XX 0x9920
-+#define PCI_DEVICE_ID_CUH_12XX 0x9922
-+#define PCI_DEVICE_ID_CUH_2XXX 0x9923
-+#define PCI_DEVICE_ID_CUH_7XXX 0x9924
-+
-+struct i2c_cmd_hdr {
-+	u8 major;
-+	u8 length;
-+	u8 minor;
-+	u8 count;
-+} __packed;
-+
-+struct i2c_cmdqueue {
-+	struct {
-+		u8 code;
-+		u16 length;
-+		u8 count;
-+		u8 cmdbuf[0x7ec];
-+	} __packed req;
-+	struct {
-+		u8 res1, res2;
-+		u8 unk1, unk2;
-+		u8 count;
-+		u8 databuf[0x7eb];
-+	} __packed reply;
-+
-+	u8 *p;
-+	struct i2c_cmd_hdr *cmd;
-+};
-+
-+struct radeon_ps4_bridge {
-+	struct drm_connector *connector;
-+	struct drm_encoder *encoder;
-+	struct drm_bridge bridge;
-+	struct i2c_cmdqueue cq;
-+	struct mutex mutex;
-+
-+	int mode;
-+};
-+
-+/* this should really be taken care of by the connector, but that is currently
-+ * contained/owned by radeon_connector so just use a global for now */
-+static struct radeon_ps4_bridge g_bridge = {
-+	.mutex = __MUTEX_INITIALIZER(g_bridge.mutex)
-+};
-+
-+static void cq_init(struct i2c_cmdqueue *q, u8 code)
-+{
-+	q->req.code = code;
-+	q->req.count = 0;
-+	q->p = q->req.cmdbuf;
-+	q->cmd = NULL;
-+}
-+
-+static void cq_cmd(struct i2c_cmdqueue *q, u8 major, u8 minor)
-+{
-+	if (!q->cmd || q->cmd->major != major || q->cmd->minor != minor) {
-+		if (q->cmd)
-+			q->cmd->length = q->p - (u8 *)q->cmd;
-+		q->cmd = (struct i2c_cmd_hdr *)q->p;
-+		q->cmd->major = major;
-+		q->cmd->minor = minor;
-+		q->cmd->length = 0;
-+		q->cmd->count = 1;
-+		q->req.count += 1;
-+		q->p += sizeof(*q->cmd);
-+	} else {
-+		q->cmd->count += 1;
-+	}
-+}
-+
-+static int cq_exec(struct i2c_cmdqueue *q)
-+{
-+	int res;
-+
-+	if (!q->cmd)
-+		return 0;
-+
-+	q->cmd->length = q->p - (u8 *)q->cmd;
-+	q->req.length = q->p - (u8 *)&q->req;
-+
-+	res = apcie_icc_cmd(0x10, 0, &q->req, q->req.length,
-+		      &q->reply, sizeof(q->reply));
-+
-+	if (res < 5) {
-+		DRM_ERROR("icc i2c commandqueue failed: %d\n", res);
-+		return -EIO;
-+	}
-+	if (q->reply.res1 != 0 || q->reply.res2) {
-+		DRM_ERROR("icc i2c commandqueue failed: %d, %d\n",
-+			  q->reply.res1, q->reply.res2);
-+		return -EIO;
-+	}
-+
-+	return res;
-+}
-+
-+static void cq_read(struct i2c_cmdqueue *q, u16 addr, u8 count)
-+{
-+	cq_cmd(q, CMD_READ);
-+	*q->p++ = count;
-+	*q->p++ = addr >> 8;
-+	*q->p++ = addr & 0xff;
-+	*q->p++ = 0;
-+}
-+
-+static void cq_writereg(struct i2c_cmdqueue *q, u16 addr, u8 data)
-+{
-+	cq_cmd(q, CMD_WRITE);
-+	*q->p++ = 1;
-+	*q->p++ = addr >> 8;
-+	*q->p++ = addr & 0xff;
-+	*q->p++ = data;
-+}
-+
-+#if 0
-+static void cq_write(struct i2c_cmdqueue *q, u16 addr, u8 *data, u8 count)
-+{
-+	cq_cmd(q, CMD_WRITE);
-+	*q->p++ = count;
-+	*q->p++ = addr >> 8;
-+	*q->p++ = addr & 0xff;
-+	while (count--)
-+		*q->p++ = *data++;
-+}
-+#endif
-+
-+static void cq_mask(struct i2c_cmdqueue *q, u16 addr, u8 value, u8 mask)
-+{
-+	cq_cmd(q, CMD_MASK);
-+	*q->p++ = 1;
-+	*q->p++ = addr >> 8;
-+	*q->p++ = addr & 0xff;
-+	*q->p++ = value;
-+	*q->p++ = mask;
-+}
-+
-+#if 0
-+static void cq_delay(struct i2c_cmdqueue *q, u16 time)
-+{
-+	cq_cmd(q, CMD_DELAY);
-+	*q->p++ = 0;
-+	*q->p++ = time & 0xff;
-+	*q->p++ = time>>8;
-+	*q->p++ = 0;
-+}
-+#endif
-+
-+static void cq_wait_set(struct i2c_cmdqueue *q, u16 addr, u8 mask)
-+{
-+	cq_cmd(q, CMD_WAIT_SET);
-+	*q->p++ = 0;
-+	*q->p++ = addr >> 8;
-+	*q->p++ = addr & 0xff;
-+	*q->p++ = mask;
-+}
-+
-+static void cq_wait_clear(struct i2c_cmdqueue *q, u16 addr, u8 mask)
-+{
-+	cq_cmd(q, CMD_WAIT_CLEAR);
-+	*q->p++ = 0;
-+	*q->p++ = addr >> 8;
-+	*q->p++ = addr & 0xff;
-+	*q->p++ = mask;
-+}
-+
-+static inline struct radeon_ps4_bridge *
-+		bridge_to_radeon_ps4_bridge(struct drm_bridge *bridge)
-+{
-+	return container_of(bridge, struct radeon_ps4_bridge, bridge);
-+}
-+
-+static void radeon_ps4_bridge_mode_set(struct drm_bridge *bridge,
-+			      struct drm_display_mode *mode,
-+			      struct drm_display_mode *adjusted_mode)
-+{
-+	struct radeon_ps4_bridge *mn_bridge = bridge_to_radeon_ps4_bridge(bridge);
-+
-+	/* This gets called before pre_enable/enable, so we just stash
-+	 * the vic ID for later */
-+	mn_bridge->mode = drm_match_cea_mode(adjusted_mode);
-+	DRM_DEBUG_KMS("vic mode: %d\n", mn_bridge->mode);
-+	if (!mn_bridge->mode) {
-+		DRM_ERROR("attempted to set non-CEA mode\n");
-+	}
-+}
-+
-+static void radeon_ps4_bridge_pre_enable(struct drm_bridge *bridge)
-+{
-+	struct radeon_ps4_bridge *mn_bridge = bridge_to_radeon_ps4_bridge(bridge);
-+	DRM_DEBUG_KMS("radeon_ps4_bridge_pre_enable\n");
-+
-+	mutex_lock(&mn_bridge->mutex);
-+	cq_init(&mn_bridge->cq, 4);
-+
-+#if 0
-+	/* No idea. DP stuff probably. This borks for some reason. Meh. */
-+	cq_writereg(&mn_bridge->cq, 0x7657,0xff);
-+	cq_writereg(&mn_bridge->cq, 0x76a5,0x80);
-+	cq_writereg(&mn_bridge->cq, 0x76a6,0x04);
-+	cq_writereg(&mn_bridge->cq, 0x7601,0x0a);
-+	cq_writereg(&mn_bridge->cq, 0x7602,0x84);
-+	cq_writereg(&mn_bridge->cq, 0x7603,0x00);
-+	cq_writereg(&mn_bridge->cq, 0x76a8,0x09);
-+	cq_writereg(&mn_bridge->cq, 0x76ae,0xd1);
-+	cq_writereg(&mn_bridge->cq, 0x76af,0x50);
-+	cq_writereg(&mn_bridge->cq, 0x76b0,0x70);
-+	cq_writereg(&mn_bridge->cq, 0x76b1,0xb0);
-+	cq_writereg(&mn_bridge->cq, 0x76b2,0xf0);
-+	cq_writereg(&mn_bridge->cq, 0x76db,0x00);
-+	cq_writereg(&mn_bridge->cq, 0x76dc,0x64);
-+	cq_writereg(&mn_bridge->cq, 0x76dd,0x22);
-+	cq_writereg(&mn_bridge->cq, 0x76e4,0x00);
-+	cq_writereg(&mn_bridge->cq, 0x76e6,0x1e); /* 0 for (DP?) scramble off */
-+	cq_writereg(&mn_bridge->cq, 0x7670,0xff);
-+	cq_writereg(&mn_bridge->cq, 0x7671,0xff);
-+	cq_writereg(&mn_bridge->cq, 0x7672,0xff);
-+	cq_writereg(&mn_bridge->cq, 0x7673,0xff);
-+	cq_writereg(&mn_bridge->cq, 0x7668,0xff);
-+	cq_writereg(&mn_bridge->cq, 0x7669,0xff);
-+	cq_writereg(&mn_bridge->cq, 0x766a,0xff);
-+	cq_writereg(&mn_bridge->cq, 0x766b,0xff);
-+	cq_writereg(&mn_bridge->cq, 0x7655,0x04);
-+	cq_writereg(&mn_bridge->cq, 0x7007,0xff);
-+	cq_writereg(&mn_bridge->cq, 0x7098,0xff);
-+	cq_writereg(&mn_bridge->cq, 0x7099,0x00);
-+	cq_writereg(&mn_bridge->cq, 0x709a,0x0f);
-+	cq_writereg(&mn_bridge->cq, 0x709b,0x00);
-+	cq_writereg(&mn_bridge->cq, 0x709c,0x50);
-+	cq_writereg(&mn_bridge->cq, 0x709d,0x00);
-+	cq_writereg(&mn_bridge->cq, 0x709e,0x00);
-+	cq_writereg(&mn_bridge->cq, 0x709f,0xd0);
-+	cq_writereg(&mn_bridge->cq, 0x7a9c,0x2e);
-+	cq_writereg(&mn_bridge->cq, 0x7021,0x04);
-+	cq_writereg(&mn_bridge->cq, 0x7028,0x00);
-+	cq_writereg(&mn_bridge->cq, 0x7030,0xa3);
-+	cq_writereg(&mn_bridge->cq, 0x7016,0x04);
-+#endif
-+
-+	/* Disable InfoFrames */
-+	cq_writereg(&mn_bridge->cq, INFENA, 0x00);
-+	/* Reset HDCP */
-+	cq_writereg(&mn_bridge->cq, TSRST, TSRST_ENCSRST | TSRST_HDCPSRST);
-+	/* Disable HDCP flag */
-+	cq_writereg(&mn_bridge->cq, TSRST, HDCPEN_ENC_DIS);
-+	/* HDCP AKE reset */
-+	cq_writereg(&mn_bridge->cq, AKESRST, 0xff);
-+	/* Wait AKE busy */
-+	cq_wait_clear(&mn_bridge->cq, AKESTA, AKESTA_BUSY);
-+
-+	if (cq_exec(&mn_bridge->cq) < 0) {
-+		DRM_ERROR("failed to run pre-enable sequence");
-+	}
-+	mutex_unlock(&mn_bridge->mutex);
-+}
-+
-+static void radeon_ps4_bridge_enable(struct drm_bridge *bridge)
-+{
-+	struct radeon_ps4_bridge *mn_bridge = bridge_to_radeon_ps4_bridge(bridge);
-+	struct drm_connector *connector = mn_bridge->connector;
-+	struct drm_device *dev = connector->dev;
-+	struct pci_dev *pdev = dev->pdev;
-+	u8 dp[3];
-+
-+	if (!mn_bridge->mode) {
-+		DRM_ERROR("mode not available\n");
-+		return;
-+	}
-+
-+	if(pdev->vendor != PCI_VENDOR_ID_AMD) {
-+		DRM_ERROR("Invalid vendor: %04x", pdev->vendor);
-+		return;
-+	}
-+
-+	DRM_DEBUG_KMS("radeon_ps4_bridge_enable (mode: %d)\n", mn_bridge->mode);
-+
-+	/* Here come the dragons */
-+
-+	if(pdev->device == PCI_DEVICE_ID_CUH_11XX)
-+	{
-+		/* Panasonic MN86471A */
-+		mutex_lock(&mn_bridge->mutex);
-+		cq_init(&mn_bridge->cq, 4);
-+
-+		/* Read DisplayPort status (?) */
-+		cq_read(&mn_bridge->cq, 0x76e1, 3);
-+		if (cq_exec(&mn_bridge->cq) < 11) {
-+			mutex_unlock(&mn_bridge->mutex);
-+			DRM_ERROR("could not read DP status");
-+		return;
-+		}
-+		memcpy(dp, &mn_bridge->cq.reply.databuf[3], 3);
-+
-+		cq_init(&mn_bridge->cq, 4);
-+
-+		/* Wait for DP lane status */
-+		cq_wait_set(&mn_bridge->cq, 0x761e, 0x77);
-+		cq_wait_set(&mn_bridge->cq, 0x761f, 0x77);
-+		/* Wait for ?? */
-+		cq_wait_set(&mn_bridge->cq, 0x7669, 0x01);
-+		cq_writereg(&mn_bridge->cq, 0x76d9, (dp[0] & 0x1f) | (dp[0] << 5));
-+		cq_writereg(&mn_bridge->cq, 0x76da, (dp[1] & 0x7c) | ((dp[0] >> 3) & 3) | ((dp[1] << 5) & 0x80));
-+		cq_writereg(&mn_bridge->cq, 0x76db, 0x80 | ((dp[1] >> 3) & 0xf));
-+		cq_writereg(&mn_bridge->cq, 0x76e4, 0x01);
-+		cq_writereg(&mn_bridge->cq, TSYSCTRL, TSYSCTRL_HDMI);
-+		cq_writereg(&mn_bridge->cq, VINCNT, VINCNT_VIF_FILEN);
-+		cq_writereg(&mn_bridge->cq, 0x7071, 0);
-+		cq_writereg(&mn_bridge->cq, 0x7062, mn_bridge->mode);
-+		cq_writereg(&mn_bridge->cq, 0x765a, 0);
-+		cq_writereg(&mn_bridge->cq, 0x7062, mn_bridge->mode | 0x80);
-+		cq_writereg(&mn_bridge->cq, 0x7215, 0x28); /* aspect */
-+		cq_writereg(&mn_bridge->cq, 0x7217, mn_bridge->mode);
-+		cq_writereg(&mn_bridge->cq, 0x7218, 0);
-+		cq_writereg(&mn_bridge->cq, CSCMOD, 0xdc);
-+		cq_writereg(&mn_bridge->cq, C420SET, 0xaa);
-+		cq_writereg(&mn_bridge->cq, TDPCMODE, 0x4a);
-+		cq_writereg(&mn_bridge->cq, OUTWSET, 0x00);
-+		cq_writereg(&mn_bridge->cq, 0x70c4, 0x08);
-+		cq_writereg(&mn_bridge->cq, 0x70c5, 0x08);
-+		cq_writereg(&mn_bridge->cq, 0x7096, 0xff);
-+		cq_writereg(&mn_bridge->cq, 0x7027, 0x00);
-+		cq_writereg(&mn_bridge->cq, 0x7020, 0x20);
-+		cq_writereg(&mn_bridge->cq, 0x700b, 0x01);
-+		cq_writereg(&mn_bridge->cq, PKTENA, 0x20);
-+		cq_writereg(&mn_bridge->cq, 0x7096, 0xff);
-+		cq_writereg(&mn_bridge->cq, INFENA, INFENA_AVIEN);
-+		cq_writereg(&mn_bridge->cq, UPDCTRL, UPDCTRL_ALLUPD | UPDCTRL_AVIIUPD |
-+						     UPDCTRL_CLKUPD | UPDCTRL_VIFUPD |
-+						     UPDCTRL_CSCUPD);
-+		cq_wait_set(&mn_bridge->cq, 0x7096, 0x80);
-+
-+		cq_mask(&mn_bridge->cq, 0x7216, 0x00, 0x80);
-+		cq_writereg(&mn_bridge->cq, 0x7218, 0x00);
-+
-+		cq_writereg(&mn_bridge->cq, 0x7096, 0xff);
-+		cq_writereg(&mn_bridge->cq, VMUTECNT, VMUTECNT_LINEWIDTH_90 | VMUTECNT_VMUTE_MUTE_NORMAL);
-+		cq_writereg(&mn_bridge->cq, 0x7016, 0x04);
-+		cq_writereg(&mn_bridge->cq, 0x7a88, 0xff);
-+		cq_writereg(&mn_bridge->cq, 0x7a83, 0x88);
-+		cq_writereg(&mn_bridge->cq, 0x7204, 0x40);
-+
-+		cq_wait_set(&mn_bridge->cq, 0x7096, 0x80);
-+
-+		cq_writereg(&mn_bridge->cq, 0x7006, 0x02);
-+		cq_writereg(&mn_bridge->cq, 0x7020, 0x21);
-+		cq_writereg(&mn_bridge->cq, 0x7a8b, 0x00);
-+		cq_writereg(&mn_bridge->cq, 0x7020, 0x21);
-+
-+		cq_writereg(&mn_bridge->cq, VMUTECNT, VMUTECNT_LINEWIDTH_90);
-+		if (cq_exec(&mn_bridge->cq) < 0) {
-+			DRM_ERROR("Failed to configure ps4-bridge (MN86471A) mode\n");
-+		}
-+		#if 1
-+		// preinit
-+		cq_init(&mn_bridge->cq, 4);
-+		cq_writereg(&mn_bridge->cq,0x70b3, 0x00);
-+		cq_writereg(&mn_bridge->cq,0x70b7, 0x0b);
-+		cq_writereg(&mn_bridge->cq,0x70a8, 0x24);
-+
-+		cq_mask(&mn_bridge->cq,0x70b9, 0x06, 0x06);
-+		cq_mask(&mn_bridge->cq,0x70b6, 0x02, 0x0f);
-+		cq_mask(&mn_bridge->cq,0x70ba, 0x40, 0x70);
-+		cq_mask(&mn_bridge->cq,0x70b2, 0x20, 0xe0);
-+		cq_mask(&mn_bridge->cq,0x7257, 0x00, 0xff);
-+		cq_mask(&mn_bridge->cq,0x70b0, 0x01, 0x21);
-+		cq_mask(&mn_bridge->cq,0x70ba, 0x00, 0x88);
-+		cq_mask(&mn_bridge->cq,0x70b9, 0x01, 0x01);
-+		if (cq_exec(&mn_bridge->cq) < 0) {
-+			DRM_ERROR("failed to run enable MN86471A hdmi audio seq. 0");
-+		}
-+
-+		cq_init(&mn_bridge->cq, 4);
-+		cq_writereg(&mn_bridge->cq,0x7ed8, 0x01);
-+
-+		cq_mask(&mn_bridge->cq,0x70b4, 0x00, 0x3e);
-+		cq_mask(&mn_bridge->cq,0x70b5, 0x79, 0xff);
-+		cq_mask(&mn_bridge->cq,0x70ab, 0x00, 0xff);
-+		cq_mask(&mn_bridge->cq,0x70b6, 0x02, 0x3f);
-+		cq_mask(&mn_bridge->cq,0x70b7, 0x0b, 0x0f);
-+		cq_mask(&mn_bridge->cq,0x70ac, 0x00, 0xff);
-+		cq_mask(&mn_bridge->cq,0x70bd, 0x00, 0xff);
-+
-+		cq_writereg(&mn_bridge->cq, 0x7204, 0x10);
-+		cq_writereg(&mn_bridge->cq,0x7011, 0xa2);
-+
-+		cq_wait_set(&mn_bridge->cq,0x7096, 0x80);
-+		cq_writereg(&mn_bridge->cq,0x7096, 0xff);
-+
-+		cq_mask(&mn_bridge->cq,0x7203, 0x10, 0x10);
-+		cq_writereg(&mn_bridge->cq,0x70b1, 0xc0);
-+		if (cq_exec(&mn_bridge->cq) < 0) {
-+			DRM_ERROR("failed to run enable hdmi MN86471A audio seq. 1");
-+		}
-+		#endif
-+		mutex_unlock(&mn_bridge->mutex);
-+	}
-+	else
-+	{
-+		/* Panasonic MN864729 */
-+		mutex_lock(&mn_bridge->mutex);
-+		cq_init(&mn_bridge->cq, 4);
-+		cq_mask(&mn_bridge->cq, 0x6005, 0x01, 0x01);
-+		cq_writereg(&mn_bridge->cq, 0x6a03, 0x47);
-+
-+		/* Wait for DP lane status */
-+		cq_wait_set(&mn_bridge->cq, 0x60f8, 0xff);
-+		cq_wait_set(&mn_bridge->cq, 0x60f9, 0x01);
-+		cq_writereg(&mn_bridge->cq, 0x6a01, 0x4d);
-+		cq_wait_set(&mn_bridge->cq, 0x60f9, 0x1a);
-+
-+		cq_mask(&mn_bridge->cq, 0x1e00, 0x00, 0x21);
-+		cq_mask(&mn_bridge->cq, 0x1e02, 0x00, 0x70);
-+
-+		cq_writereg(&mn_bridge->cq, 0x6020, 0x00);
-+		cq_writereg(&mn_bridge->cq, 0x7402, 0x1c);
-+		cq_writereg(&mn_bridge->cq, 0x6020, 0x04);
-+		cq_writereg(&mn_bridge->cq, TSYSCTRL, TSYSCTRL_HDMI);
-+		cq_writereg(&mn_bridge->cq, 0x10c7, 0x38);
-+		cq_writereg(&mn_bridge->cq, 0x1e02, 0x88);
-+		cq_writereg(&mn_bridge->cq, 0x1e00, 0x66);
-+		cq_writereg(&mn_bridge->cq, 0x100c, 0x01);
-+		cq_writereg(&mn_bridge->cq, TSYSCTRL, TSYSCTRL_HDMI);
-+
-+		cq_writereg(&mn_bridge->cq, 0x7009, 0x00);
-+		cq_writereg(&mn_bridge->cq, 0x7040, 0x42);
-+		cq_writereg(&mn_bridge->cq, 0x7225, 0x28);
-+		cq_writereg(&mn_bridge->cq, 0x7227, mn_bridge->mode);
-+		cq_writereg(&mn_bridge->cq, 0x7228, 0x00);
-+		cq_writereg(&mn_bridge->cq, 0x7070, mn_bridge->mode);
-+		cq_writereg(&mn_bridge->cq, 0x7071, mn_bridge->mode | 0x80);
-+		cq_writereg(&mn_bridge->cq, 0x7072, 0x00);
-+		cq_writereg(&mn_bridge->cq, 0x7073, 0x00);
-+		cq_writereg(&mn_bridge->cq, 0x7074, 0x00);
-+		cq_writereg(&mn_bridge->cq, 0x7075, 0x00);
-+		cq_writereg(&mn_bridge->cq, 0x70c4, 0x0a);
-+		cq_writereg(&mn_bridge->cq, 0x70c5, 0x0a);
-+		cq_writereg(&mn_bridge->cq, 0x70c2, 0x00);
-+		cq_writereg(&mn_bridge->cq, 0x70fe, 0x12);
-+		cq_writereg(&mn_bridge->cq, 0x70c3, 0x10);
-+
-+		if(pdev->device == PCI_DEVICE_ID_CUH_12XX) {
-+			/* newer ps4 phats need here 0x03 idk why. */
-+			cq_writereg(&mn_bridge->cq, 0x10c5, 0x03);
-+		} else {
-+			cq_writereg(&mn_bridge->cq, 0x10c5, 0x00);
-+		}
-+
-+		cq_writereg(&mn_bridge->cq, 0x10f6, 0xff);
-+		cq_writereg(&mn_bridge->cq, 0x7202, 0x20);
-+		cq_writereg(&mn_bridge->cq, 0x7203, 0x60);
-+		cq_writereg(&mn_bridge->cq, 0x7011, 0xd5);
-+		//cq_writereg(&mn_bridge->cq, 0x7a00, 0x0e);
-+
-+		cq_wait_set(&mn_bridge->cq, 0x10f6, 0x80);
-+		cq_mask(&mn_bridge->cq, 0x7226, 0x00, 0x80);
-+		cq_mask(&mn_bridge->cq, 0x7228, 0x00, 0xFF);
-+		cq_writereg(&mn_bridge->cq, 0x7204, 0x40);
-+		cq_wait_clear(&mn_bridge->cq, 0x7204, 0x40);
-+		cq_writereg(&mn_bridge->cq, 0x7a8b, 0x05);
-+		cq_mask(&mn_bridge->cq, 0x1e02, 0x70, 0x70);
-+		cq_mask(&mn_bridge->cq, 0x1034, 0x02, 0x02);
-+		cq_mask(&mn_bridge->cq, 0x1e00, 0x01, 0x01);
-+		cq_writereg(&mn_bridge->cq, VMUTECNT, VMUTECNT_LINEWIDTH_90);
-+		cq_writereg(&mn_bridge->cq, HDCPEN, 0x00);
-+		if (cq_exec(&mn_bridge->cq) < 0) {
-+			DRM_ERROR("Failed to configure ps4-bridge (MN864729) mode\n");
-+		}
-+		#if 1
-+		// AUDIO preinit
-+		cq_init(&mn_bridge->cq, 4);
-+		cq_writereg(&mn_bridge->cq,0x70aa, 0x00);
-+		cq_writereg(&mn_bridge->cq,0x70af, 0x07);
-+		cq_writereg(&mn_bridge->cq,0x70a9, 0x5a);
-+
-+		cq_mask(&mn_bridge->cq,0x70af, 0x06, 0x06);
-+		cq_mask(&mn_bridge->cq,0x70af, 0x02, 0x0f);
-+		cq_mask(&mn_bridge->cq,0x70b3, 0x02, 0x0f);
-+		cq_mask(&mn_bridge->cq,0x70ae, 0x80, 0xe0);
-+		cq_mask(&mn_bridge->cq,0x70ae, 0x01, 0x07);
-+		cq_mask(&mn_bridge->cq,0x70ac, 0x01, 0x21);
-+		cq_mask(&mn_bridge->cq,0x70ab, 0x80, 0x88);
-+		cq_mask(&mn_bridge->cq,0x70a9, 0x01, 0x01);
-+		if (cq_exec(&mn_bridge->cq) < 0) {
-+				DRM_ERROR("failed to run enable hdmi audio seq. 0");
-+		}
-+
-+		cq_init(&mn_bridge->cq, 4);
-+		cq_writereg(&mn_bridge->cq,0x70b0, 0x01);
-+		cq_mask(&mn_bridge->cq,0x70b0, 0x00, 0xff);
-+		cq_mask(&mn_bridge->cq,0x70b1, 0x79, 0xff);
-+		cq_mask(&mn_bridge->cq,0x70b2, 0x00, 0xff);
-+		cq_mask(&mn_bridge->cq,0x70b3, 0x02, 0xff);
-+		cq_mask(&mn_bridge->cq,0x70b4, 0x0b, 0x0f);
-+		cq_mask(&mn_bridge->cq,0x70b5, 0x00, 0xff);
-+		cq_mask(&mn_bridge->cq,0x70b6, 0x00, 0xff);
-+		cq_writereg(&mn_bridge->cq,0x10f6, 0xff);
-+		cq_writereg(&mn_bridge->cq,0x7011, 0xa2);
-+		cq_wait_set(&mn_bridge->cq,0x10f6, 0xa2);
-+		cq_mask(&mn_bridge->cq,0x7267, 0x00, 0xff);
-+		cq_writereg(&mn_bridge->cq,0x7204, 0x10);
-+		cq_wait_clear(&mn_bridge->cq,0x7204, 0x10);
-+		cq_writereg(&mn_bridge->cq,0x10f6, 0xff);
-+		cq_mask(&mn_bridge->cq,0x7203, 0x10, 0x10);
-+		cq_writereg(&mn_bridge->cq,0x70a8, 0xc0);
-+		if (cq_exec(&mn_bridge->cq) < 0) {
-+				DRM_ERROR("failed to run enable hdmi audio seq. 1");
-+		}
-+		#endif
-+		mutex_unlock(&mn_bridge->mutex);
-+	}
-+
-+}
-+
-+static void radeon_ps4_bridge_disable(struct drm_bridge *bridge)
-+{
-+	struct radeon_ps4_bridge *mn_bridge = bridge_to_radeon_ps4_bridge(bridge);
-+	DRM_DEBUG_KMS("radeon_ps4_bridge_disable\n");
-+
-+	mutex_lock(&mn_bridge->mutex);
-+	cq_init(&mn_bridge->cq, 4);
-+	cq_writereg(&mn_bridge->cq, VMUTECNT, VMUTECNT_LINEWIDTH_90 | VMUTECNT_VMUTE_MUTE_NORMAL);
-+	cq_writereg(&mn_bridge->cq, INFENA, 0x00);
-+	if (cq_exec(&mn_bridge->cq) < 0) {
-+		DRM_ERROR("Failed to disable bridge\n");
-+	}
-+	mutex_unlock(&mn_bridge->mutex);
-+}
-+
-+static void radeon_ps4_bridge_post_disable(struct drm_bridge *bridge)
-+{
-+	/* struct radeon_ps4_bridge *mn_bridge = bridge_to_mn864729(bridge); */
-+	DRM_DEBUG_KMS("radeon_ps4_bridge_post_disable\n");
-+}
-+
-+/* Hardcoded modes, since we don't really know how to do custom modes yet.
-+ * Other CEA modes *should* work (and are allowed if externally added) */
-+
-+/* 1 - 640x480@60Hz */
-+static const struct drm_display_mode mode_480p = {
-+	DRM_MODE("640x480", DRM_MODE_TYPE_DRIVER, 25175, 640, 656,
-+		 752, 800, 0, 480, 490, 492, 525, 0,
-+		 DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC),
-+	.vrefresh = 60, .picture_aspect_ratio = HDMI_PICTURE_ASPECT_4_3
-+};
-+/* 4 - 1280x720@60Hz */
-+static const struct drm_display_mode mode_720p = {
-+	DRM_MODE("1280x720", DRM_MODE_TYPE_DRIVER, 74250, 1280, 1390,
-+		 1430, 1650, 0, 720, 725, 730, 750, 0,
-+		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
-+	.vrefresh = 60, .picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
-+};
-+/* 16 - 1920x1080@60Hz */
-+static const struct drm_display_mode mode_1080p = {
-+	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER, 148500, 1920, 2008,
-+		 2052, 2200, 0, 1080, 1084, 1089, 1125, 0,
-+		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
-+	.vrefresh = 60, .picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
-+};
-+
-+int radeon_ps4_bridge_get_modes(struct drm_connector *connector)
-+{
-+	struct drm_device *dev = connector->dev;
-+	struct drm_display_mode *newmode;
-+	DRM_DEBUG_KMS("radeon_ps4_bridge_get_modes\n");
-+
-+	newmode = drm_mode_duplicate(dev, &mode_1080p);
-+	drm_mode_probed_add(connector, newmode);
-+
-+	//newmode = drm_mode_duplicate(dev, &mode_720p);
-+	//drm_mode_probed_add(connector, newmode);
-+	//newmode = drm_mode_duplicate(dev, &mode_480p);
-+	//drm_mode_probed_add(connector, newmode);
-+
-+	drm_mode_connector_update_edid_property(connector, NULL);
-+
-+	return 0;
-+}
-+
-+enum drm_connector_status radeon_ps4_bridge_detect(struct drm_connector *connector,
-+		bool force)
-+{
-+	struct radeon_ps4_bridge *mn_bridge = &g_bridge;
-+	u8 reg;
-+
-+	struct radeon_connector *radeon_connector = to_radeon_connector(connector);
-+	struct radeon_connector_atom_dig *radeon_dig_connector = radeon_connector->con_priv;
-+
-+	radeon_dig_connector->dp_sink_type = CONNECTOR_OBJECT_ID_DISPLAYPORT;
-+	radeon_dp_getdpcd(radeon_connector);
-+
-+	mutex_lock(&mn_bridge->mutex);
-+	cq_init(&mn_bridge->cq, 4);
-+	cq_read(&mn_bridge->cq, TMONREG, 1);
-+	if (cq_exec(&mn_bridge->cq) < 9) {
-+		mutex_unlock(&mn_bridge->mutex);
-+		DRM_ERROR("could not read TMONREG");
-+		return connector_status_disconnected;
-+	}
-+	reg = mn_bridge->cq.reply.databuf[3];
-+	mutex_unlock(&mn_bridge->mutex);
-+
-+	DRM_DEBUG_KMS("TMONREG=0x%02x\n", reg);
-+
-+	if (reg & TMONREG_HPD)
-+		return connector_status_connected;
-+	else
-+		return connector_status_disconnected;
-+}
-+
-+int radeon_ps4_bridge_mode_valid(struct drm_connector *connector,
-+				  struct drm_display_mode *mode)
-+{
-+	int vic = drm_match_cea_mode(mode);
-+
-+	/* Allow anything that we can match up to a VIC (CEA modes) */
-+	if (!vic || (vic != 16 && vic != 4)) {
-+		return MODE_BAD;
-+	}
-+
-+	return MODE_OK;
-+}
-+
-+static int radeon_ps4_bridge_attach(struct drm_bridge *bridge)
-+{
-+	/* struct radeon_ps4_bridge *mn_bridge = bridge_to_radeon_ps4_bridge(bridge); */
-+
-+	return 0;
-+}
-+
-+static struct drm_bridge_funcs radeon_ps4_bridge_funcs = {
-+	.pre_enable = radeon_ps4_bridge_pre_enable,
-+	.enable = radeon_ps4_bridge_enable,
-+	.disable = radeon_ps4_bridge_disable,
-+	.post_disable = radeon_ps4_bridge_post_disable,
-+	.attach = radeon_ps4_bridge_attach,
-+	.mode_set = radeon_ps4_bridge_mode_set
-+};
-+
-+int radeon_ps4_bridge_register(struct drm_connector *connector,
-+			     struct drm_encoder *encoder)
-+{
-+	int ret;
-+	struct radeon_ps4_bridge *mn_bridge = &g_bridge;
-+	//struct drm_device *dev = connector->dev;
-+
-+	mn_bridge->encoder = encoder;
-+	mn_bridge->connector = connector;
-+	mn_bridge->bridge.funcs = &radeon_ps4_bridge_funcs;
-+	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL);
-+	if (ret) {
-+		DRM_ERROR("Failed to initialize bridge with drm\n");
-+		return -EINVAL;
-+	}
-+
-+	encoder->bridge = &mn_bridge->bridge;
-+
-+	return 0;
-+}
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon.h	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon.h	2023-04-15 03:50:04.290859085 +0200
-@@ -2676,7 +2676,8 @@
- #define ASIC_IS_DCE81(rdev) ((rdev->family == CHIP_KAVERI))
- #define ASIC_IS_DCE82(rdev) ((rdev->family == CHIP_BONAIRE))
- #define ASIC_IS_DCE83(rdev) ((rdev->family == CHIP_KABINI) || \
--			     (rdev->family == CHIP_MULLINS))
-+			     (rdev->family == CHIP_MULLINS) || \
-+			     	(rdev->family == CHIP_LIVERPOOL))
- 
- #define ASIC_IS_LOMBOK(rdev) ((rdev->pdev->device == 0x6849) || \
- 			      (rdev->pdev->device == 0x6850) || \
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_asic.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_asic.c	2023-04-15 04:03:53.175899334 +0200
-@@ -2245,8 +2245,10 @@
- 		.get_backlight_level = &atombios_get_backlight_level,
- 	},
- 	.copy = {
--		.blit = &cik_copy_cpdma,
--		.blit_ring_index = RADEON_RING_TYPE_GFX_INDEX,
-+		.blit = &cik_copy_dma,
-+		.blit_ring_index = R600_RING_TYPE_DMA_INDEX,
-+		//.blit = &cik_copy_cpdma,
-+		//.blit_ring_index = RADEON_RING_TYPE_GFX_INDEX,
- 		.dma = &cik_copy_dma,
- 		.dma_ring_index = R600_RING_TYPE_DMA_INDEX,
- 		.copy = &cik_copy_dma,
-@@ -2632,6 +2634,7 @@
- 	case CHIP_KAVERI:
- 	case CHIP_KABINI:
- 	case CHIP_MULLINS:
-+	case CHIP_LIVERPOOL:
- 		rdev->asic = &kv_asic;
- 		/* set num crtcs */
- 		if (rdev->family == CHIP_KAVERI) {
-@@ -2648,7 +2651,7 @@
- 				RADEON_CG_SUPPORT_SDMA_LS |
- 				RADEON_CG_SUPPORT_BIF_LS |
- 				RADEON_CG_SUPPORT_VCE_MGCG |
--				RADEON_CG_SUPPORT_UVD_MGCG |
-+				//RADEON_CG_SUPPORT_UVD_MGCG |
- 				RADEON_CG_SUPPORT_HDP_LS |
- 				RADEON_CG_SUPPORT_HDP_MGCG;
- 			rdev->pg_flags = 0;
-@@ -2676,7 +2679,7 @@
- 				RADEON_CG_SUPPORT_SDMA_LS |
- 				RADEON_CG_SUPPORT_BIF_LS |
- 				RADEON_CG_SUPPORT_VCE_MGCG |
--				RADEON_CG_SUPPORT_UVD_MGCG |
-+				//RADEON_CG_SUPPORT_UVD_MGCG |
- 				RADEON_CG_SUPPORT_HDP_LS |
- 				RADEON_CG_SUPPORT_HDP_MGCG;
- 			rdev->pg_flags = 0;
-@@ -2689,8 +2692,10 @@
- 				RADEON_PG_SUPPORT_RLC_SMU_HS |
- 				RADEON_PG_SUPPORT_SAMU;*/
- 		}
--		rdev->has_uvd = true;
--		rdev->has_vce = true;
-+		//rdev->has_uvd = true;
-+		//rdev->has_vce = true;
-+		rdev->has_uvd = false;
-+		rdev->has_vce = false;
- 		break;
- 	default:
- 		/* FIXME: not supported yet */
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_audio.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_audio.c	2023-04-15 04:06:37.122654226 +0200
-@@ -274,8 +274,13 @@
- 
- 	/* disable audio.  it will be set up later */
- 	for (i = 0; i < rdev->audio.num_pins; i++)
-+	{
- 		radeon_audio_enable(rdev, &rdev->audio.pin[i], 0);
--
-+		/* LVP has standalone S/PDIF on the third pin, always enable */
-+		if (rdev->family == CHIP_LIVERPOOL) {
-+			radeon_audio_enable(rdev, &rdev->audio.pin[i], 0xf);
-+		}
-+	}
- 	return 0;
- }
- 
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_connectors.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_connectors.c	2023-04-15 04:16:37.128420949 +0200
-@@ -1513,6 +1513,30 @@
- 	.force = radeon_dvi_force,
- };
- 
-+#ifdef CONFIG_X86_PS4
-+int radeon_ps4_bridge_get_modes(struct drm_connector *connector);
-+enum drm_connector_status radeon_ps4_bridge_detect(struct drm_connector *connector,
-+					  bool force);
-+int radeon_ps4_bridge_mode_valid(struct drm_connector *connector,
-+			struct drm_display_mode *mode);
-+
-+static const struct drm_connector_helper_funcs radeon_ps4_dp_connector_helper_funcs = {
-+	.get_modes = radeon_ps4_bridge_get_modes,
-+	.mode_valid = radeon_ps4_bridge_mode_valid,
-+	.best_encoder = radeon_dvi_encoder,
-+};
-+
-+static const struct drm_connector_funcs radeon_ps4_dp_connector_funcs = {
-+	.dpms = drm_helper_connector_dpms,
-+	.detect = radeon_ps4_bridge_detect,
-+	.fill_modes = drm_helper_probe_single_connector_modes,
-+	//.set_property = radeon_connector_set_property,
-+	.destroy = radeon_connector_destroy,
-+	.force = radeon_dvi_force,
-+};
-+
-+#endif
-+
- static int radeon_dp_get_modes(struct drm_connector *connector)
- {
- 	struct radeon_connector *radeon_connector = to_radeon_connector(connector);
-@@ -1846,6 +1870,7 @@
- 	uint32_t subpixel_order = SubPixelNone;
- 	bool shared_ddc = false;
- 	bool is_dp_bridge = false;
-+	bool is_ps4_bridge = false;
- 	bool has_aux = false;
- 
- 	if (connector_type == DRM_MODE_CONNECTOR_Unknown)
-@@ -1896,7 +1921,16 @@
- 	radeon_connector = kzalloc(sizeof(struct radeon_connector), GFP_KERNEL);
- 	if (!radeon_connector)
- 		return;
--
-+	/* Liverpool (PS4) has an DP bridge which needs a special driver, and
-+	 * a fake HDMI port that doesn't really exist. */
-+	if (rdev->family == CHIP_LIVERPOOL) {
-+		if (connector_type == DRM_MODE_CONNECTOR_DisplayPort) {
-+			connector_type = DRM_MODE_CONNECTOR_HDMIA;
-+			is_dp_bridge = true;
-+		} else {
-+			return;
-+		}
-+	}
- 	connector = &radeon_connector->base;
- 
- 	radeon_connector->connector_id = connector_id;
-@@ -1956,12 +1990,17 @@
- 		case DRM_MODE_CONNECTOR_HDMIA:
- 		case DRM_MODE_CONNECTOR_HDMIB:
- 		case DRM_MODE_CONNECTOR_DisplayPort:
--			drm_connector_init_with_ddc(dev, &radeon_connector->base,
--						    &radeon_dp_connector_funcs,
--						    connector_type,
--						    ddc);
--			drm_connector_helper_add(&radeon_connector->base,
--						 &radeon_dp_connector_helper_funcs);
-+			if (is_ps4_bridge) {
-+ 				drm_connector_init(dev, &radeon_connector->base,
-+ 						   &radeon_dp_connector_funcs, connector_type);
-+ 				drm_connector_helper_add(&radeon_connector->base,
-+ 							 &radeon_dp_connector_helper_funcs);
-+ 			} else {
-+ 				drm_connector_init(dev, &radeon_connector->base,
-+ 						   &radeon_ps4_dp_connector_funcs, connector_type);
-+ 				drm_connector_helper_add(&radeon_connector->base,
-+ 							 &radeon_ps4_dp_connector_helper_funcs);
-+ 			}
- 			drm_object_attach_property(&radeon_connector->base.base,
- 						      rdev->mode_info.underscan_property,
- 						      UNDERSCAN_OFF);
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_device.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_device.c	2023-04-15 04:17:56.719751680 +0200
-@@ -108,6 +108,7 @@
- 	"BONAIRE",
- 	"KAVERI",
- 	"KABINI",
-+	"LIVERPOOL",
- 	"HAWAII",
- 	"MULLINS",
- 	"LAST",
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_display.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_display.c	2023-04-15 04:20:24.842464809 +0200
-@@ -694,7 +694,7 @@
- 	radeon_crtc->flip_queue = alloc_workqueue("radeon-crtc", WQ_HIGHPRI, 0);
- 	rdev->mode_info.crtcs[index] = radeon_crtc;
- 
--	if (rdev->family >= CHIP_BONAIRE) {
-+	if (rdev->family >= CHIP_BONAIRE) && rdev->family != CHIP_LIVERPOOL) {
- 		radeon_crtc->max_cursor_width = CIK_CURSOR_WIDTH;
- 		radeon_crtc->max_cursor_height = CIK_CURSOR_HEIGHT;
- 	} else {
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_drv.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_drv.c	2023-04-15 04:38:13.079684574 +0200
-@@ -50,6 +50,11 @@
- #include <drm/radeon_drm.h>
- 
- #include "radeon_drv.h"
-+
-+#ifdef CONFIG_X86_PS4
-+#include <asm/ps4.h>
-+#endif
-+
- #include "radeon.h"
- #include "radeon_kms.h"
- #include "radeon_ttm.h"
-@@ -315,6 +320,7 @@
- 		case CHIP_HAWAII:
- 		case CHIP_KABINI:
- 		case CHIP_MULLINS:
-+		case CHIP_LIVERPOOL:
- 			dev_info(&pdev->dev,
- 				 "CIK support disabled by module param\n");
- 			return -ENODEV;
-@@ -329,6 +335,16 @@
- 	if (ret)
- 		return ret;
- 
-+#ifdef CONFIG_X86_PS4
-+	/* On the PS4 (Liverpool graphics) we have a hard dependency on the
-+	 * Aeolia driver to set up the HDMI encoder which is connected to it,
-+	 * so defer probe until it is ready. This test passes if this isn't
-+	 * a PS4 (returns -ENODEV).
-+	 */
-+	if (apcie_status() == 0)
-+		return -EPROBE_DEFER;
-+#endif
-+
- 	dev = drm_dev_alloc(&kms_driver, &pdev->dev);
- 	if (IS_ERR(dev))
- 		return PTR_ERR(dev);
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_encoders.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_encoders.c	2023-04-15 04:42:55.851882207 +0200
-@@ -204,6 +204,22 @@
- 		acpi_video_register_backlight();
- }
- 
-+#ifdef CONFIG_X86_PS4
-+int radeon_ps4_bridge_register(struct drm_connector *connector,
-+			     struct drm_encoder *encoder);
-+
-+static void radeon_maybe_add_bridge(struct drm_connector *connector,
-+				    struct drm_encoder *encoder)
-+{
-+	struct drm_device *dev = connector->dev;
-+	struct radeon_device *rdev = dev->dev_private;
-+
-+	if (rdev->family == CHIP_LIVERPOOL) {
-+		radeon_ps4_bridge_register(connector, encoder);
-+	}
-+}
-+#endif
-+
- void
- radeon_link_encoder_connector(struct drm_device *dev)
- {
-@@ -218,6 +234,9 @@
- 		list_for_each_entry(encoder, &dev->mode_config.encoder_list, head) {
- 			radeon_encoder = to_radeon_encoder(encoder);
- 			if (radeon_encoder->devices & radeon_connector->devices) {
-+#ifdef CONFIG_X86_PS4
-+				radeon_maybe_add_bridge(connector, encoder);
-+#endif
- 				drm_connector_attach_encoder(connector, encoder);
- 				if (radeon_encoder->devices & (ATOM_DEVICE_LCD_SUPPORT))
- 					radeon_encoder_add_backlight(radeon_encoder, connector);
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_family.h	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_family.h	2023-04-15 04:43:57.268811682 +0200
-@@ -96,6 +96,7 @@
- 	CHIP_BONAIRE,
- 	CHIP_KAVERI,
- 	CHIP_KABINI,
-+	CHIP_LIVERPOOL,
- 	CHIP_HAWAII,
- 	CHIP_MULLINS,
- 	CHIP_LAST,
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_ib.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_ib.c	2023-04-15 04:46:13.054759869 +0200
-@@ -260,7 +260,8 @@
- 	unsigned i;
- 	int r;
- 
--	for (i = 0; i < RADEON_NUM_RINGS; ++i) {
-+	//for (i = 0; i < RADEON_NUM_RINGS; ++i) {
-+	for (i = 0; i < 1; ++i) { // RADEON_NUM_RINGS
- 		struct radeon_ring *ring = &rdev->ring[i];
- 
- 		if (!ring->ready)
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_pm.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_pm.c	2023-04-15 04:48:10.013341694 +0200
-@@ -1555,6 +1555,7 @@
- 	case CHIP_BONAIRE:
- 	case CHIP_KABINI:
- 	case CHIP_KAVERI:
-+	case CHIP_LIVERPOOL:
- 	case CHIP_HAWAII:
- 	case CHIP_MULLINS:
- 		/* DPM requires the RLC, RV770+ dGPU requires SMC */
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_ucode.h	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_ucode.h	2023-04-15 04:50:43.414312696 +0200
-@@ -38,6 +38,8 @@
- #define CIK_PFP_UCODE_SIZE           2144
- #define CIK_ME_UCODE_SIZE            2144
- #define CIK_CE_UCODE_SIZE            2144
-+#define LIVERPOOL_PFP_UCODE_SIZE     4192
-+#define LIVERPOOL_ME_UCODE_SIZE      4192
- 
- /* MEC */
- #define CIK_MEC_UCODE_SIZE           4192
-@@ -53,6 +55,7 @@
- #define KB_RLC_UCODE_SIZE            2560
- #define KV_RLC_UCODE_SIZE            2560
- #define ML_RLC_UCODE_SIZE            2560
-+#define LIVERPOOL_RLC_UCODE_SIZE     1536
- 
- /* MC */
- #define BTC_MC_UCODE_SIZE            6024
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_uvd.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_uvd.c	2023-04-15 04:57:57.391476750 +0200
-@@ -50,6 +50,7 @@
- #define FIRMWARE_TAHITI		"radeon/TAHITI_uvd.bin"
- #define FIRMWARE_BONAIRE_LEGACY	"radeon/BONAIRE_uvd.bin"
- #define FIRMWARE_BONAIRE	"radeon/bonaire_uvd.bin"
-+#define FIRMWARE_LIVERPOOL      "radeon/liverpool_uvd.bin"
- 
- MODULE_FIRMWARE(FIRMWARE_R600);
- MODULE_FIRMWARE(FIRMWARE_RS780);
-@@ -60,6 +61,7 @@
- MODULE_FIRMWARE(FIRMWARE_TAHITI);
- MODULE_FIRMWARE(FIRMWARE_BONAIRE_LEGACY);
- MODULE_FIRMWARE(FIRMWARE_BONAIRE);
-+MODULE_FIRMWARE(FIRMWARE_LIVERPOOL);
- 
- static void radeon_uvd_idle_work_handler(struct work_struct *work);
- 
-@@ -130,6 +132,10 @@
- 		fw_name = FIRMWARE_BONAIRE;
- 		break;
- 
-+	case CHIP_LIVERPOOL:
-+                legacy_fw_name = FIRMWARE_LIVERPOOL;
-+                break;
-+
- 	default:
- 		return -EINVAL;
- 	}
---- linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_vce.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/gpu/drm/radeon/radeon_vce.c	2023-04-15 05:02:53.089796287 +0200
-@@ -39,10 +39,12 @@
- 
- /* Firmware Names */
- #define FIRMWARE_TAHITI	"radeon/TAHITI_vce.bin"
--#define FIRMWARE_BONAIRE	"radeon/BONAIRE_vce.bin"
-+#define FIRMWARE_BONAIRE "radeon/BONAIRE_vce.bin"
-+#define FIRMWARE_BONAIRE "radeon/LIVERPOOL_vce.bin"
- 
- MODULE_FIRMWARE(FIRMWARE_TAHITI);
- MODULE_FIRMWARE(FIRMWARE_BONAIRE);
-+MODULE_FIRMWARE(FIRMWARE_LIVERPOOL);
- 
- static void radeon_vce_idle_work_handler(struct work_struct *work);
- 
-@@ -80,6 +82,10 @@
- 		fw_name = FIRMWARE_BONAIRE;
- 		break;
- 
-+	case CHIP_LIVERPOOL:
-+                fw_name = FIRMWARE_LIVERPOOL;
-+                break;
-+
- 	default:
- 		return -EINVAL;
- 	}
---- linux-6.1.13-xanmod-rt7/drivers/hwmon/fam15h_power.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/hwmon/fam15h_power.c	2023-04-15 05:04:49.635079820 +0200
-@@ -486,6 +486,7 @@
- 	{ PCI_VDEVICE(AMD, PCI_DEVICE_ID_AMD_15H_M70H_NB_F4) },
- 	{ PCI_VDEVICE(AMD, PCI_DEVICE_ID_AMD_16H_NB_F4) },
- 	{ PCI_VDEVICE(AMD, PCI_DEVICE_ID_AMD_16H_M30H_NB_F4) },
-+	{ PCI_VDEVICE(AMD, PCI_DEVICE_ID_AMD_16H_M41H_F4) },
- 	{}
- };
- MODULE_DEVICE_TABLE(pci, fam15h_power_id_table);
---- linux-6.1.13-xanmod-rt7/drivers/hwmon/k10temp.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/hwmon/k10temp.c	2023-04-15 05:06:24.308115129 +0200
-@@ -493,6 +493,7 @@
- 	{ PCI_VDEVICE(AMD, PCI_DEVICE_ID_AMD_15H_M70H_NB_F3) },
- 	{ PCI_VDEVICE(AMD, PCI_DEVICE_ID_AMD_16H_NB_F3) },
- 	{ PCI_VDEVICE(AMD, PCI_DEVICE_ID_AMD_16H_M30H_NB_F3) },
-+	{ PCI_VDEVICE(AMD, PCI_DEVICE_ID_AMD_16H_M41H_F3) },
- 	{ PCI_VDEVICE(AMD, PCI_DEVICE_ID_AMD_17H_DF_F3) },
- 	{ PCI_VDEVICE(AMD, PCI_DEVICE_ID_AMD_17H_M10H_DF_F3) },
- 	{ PCI_VDEVICE(AMD, PCI_DEVICE_ID_AMD_17H_M30H_DF_F3) },
---- linux-6.1.13-xanmod-rt7/drivers/iommu/amd/init.c	2023-04-10 01:19:19.329223720 +0200
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/iommu/amd/init.c	2023-04-15 05:40:18.643369643 +0200
-@@ -2878,6 +2878,8 @@
- 	free_pci_segments();
- }
- 
 +#ifndef CONFIG_X86_PS4 // TODO this should detect ps4-ness at runtime
-+
+ 
  /* SB IOAPIC is always on this device in AMD systems */
  #define IOAPIC_SB_DEVID		((0x00 << 8) | PCI_DEVFN(0x14, 0))
- 
-@@ -2929,7 +2931,7 @@
+@@ -2402,7 +2403,7 @@
  
  	return ret;
  }
@@ -5694,34 +3011,34 @@
  static void __init free_dma_resources(void)
  {
  	free_pages((unsigned long)amd_iommu_pd_alloc_bitmap,
-@@ -3029,8 +3031,9 @@
+@@ -2537,8 +2538,9 @@
  	if (!is_kdump_kernel() || amd_iommu_disabled)
  		disable_iommus();
  
 -	if (amd_iommu_irq_remap)
 +	/*if (amd_iommu_irq_remap)
  		amd_iommu_irq_remap = check_ioapic_information();
-+	*/
++		*/
  
  	if (amd_iommu_irq_remap) {
- 		struct amd_iommu_pci_seg *pci_seg;
---- linux-6.1.13-xanmod-rt7/drivers/mmc/host/sdhci-pci-core.c	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/mmc/host/sdhci-pci-core.c	2023-04-15 18:27:58.627783335 +0200
-@@ -37,6 +37,10 @@
+ 		/*
+diff -ruN a/drivers/mmc/host/sdhci-pci-core.c b/drivers/mmc/host/sdhci-pci-core.c
+--- a/drivers/mmc/host/sdhci-pci-core.c	2023-11-10 04:40:48.890571181 +0100
++++ b/drivers/mmc/host/sdhci-pci-core.c	2023-11-10 04:36:39.635729403 +0100
+@@ -33,6 +33,9 @@
+ #include <linux/dmi.h>
  
  #include "cqhci.h"
- 
 +#ifdef CONFIG_X86_PS4
 +#include <asm/ps4.h>
 +#endif
-+
+ 
  #include "sdhci.h"
  #include "sdhci-pci.h"
- 
-@@ -340,6 +344,54 @@
+@@ -311,6 +314,53 @@
+ static const struct sdhci_pci_fixes sdhci_intel_qrk = {
  	.quirks		= SDHCI_QUIRK_NO_HISPD_BIT,
  };
- 
 +#ifdef CONFIG_X86_PS4
 +static int aeolia_probe(struct sdhci_pci_chip *chip)
 +{
@@ -5769,39 +3086,49 @@
 +	.enable_dma	= aeolia_enable_dma,
 +};
 +#endif
-+
+ 
  static int mrst_hc_probe_slot(struct sdhci_pci_slot *slot)
  {
- 	slot->host->mmc->caps |= MMC_CAP_8_BIT_DATA;
-@@ -1905,6 +1957,11 @@
+@@ -1297,6 +1347,7 @@
+ #endif
+ };
+ 
++
+ static const struct sdhci_pci_fixes sdhci_jmicron = {
+ 	.probe		= jmicron_probe,
+ 
+@@ -1632,9 +1683,15 @@
  	SDHCI_PCI_DEVICE(O2, SEABIRD1, o2),
  	SDHCI_PCI_DEVICE(ARASAN, PHY_EMMC, arasan),
  	SDHCI_PCI_DEVICE(SYNOPSYS, DWC_MSHC, snps),
-+	#ifdef CONFIG_X86_PS4
++#ifdef CONFIG_X86_PS4
 +	SDHCI_PCI_DEVICE(SONY, AEOLIA_SDHCI, aeolia),
 +	SDHCI_PCI_DEVICE(SONY, BELIZE_SDHCI, aeolia),
 +	//SDHCI_PCI_DEVICE(SONY, BAIKAL_SDHCI, aeolia),
-+	#endif
- 	SDHCI_PCI_DEVICE(GLI, 9750, gl9750),
- 	SDHCI_PCI_DEVICE(GLI, 9755, gl9755),
- 	SDHCI_PCI_DEVICE(GLI, 9763E, gl9763e),
-@@ -1939,6 +1996,10 @@
++#endif
+ 	SDHCI_PCI_DEVICE_CLASS(AMD, SYSTEM_SDHCI, PCI_CLASS_MASK, amd),
+ 	/* Generic SD host controller */
+ 	{PCI_DEVICE_CLASS(SYSTEM_SDHCI, PCI_CLASS_MASK)},
++
+ 	{ /* end: all zeroes */ },
+ };
+ 
+@@ -1663,6 +1720,10 @@
  
  	pci_set_master(pdev);
  
-+	if (slot->chip->fixes && slot->chip->fixes->enable_dma) {
++ 	if (slot->chip->fixes && slot->chip->fixes->enable_dma) {
 + 		return slot->chip->fixes->enable_dma(slot);
 + 	}
 +
  	return 0;
  }
  
-@@ -2034,12 +2095,14 @@
+@@ -1777,12 +1838,13 @@
  \*****************************************************************************/
  
  static struct sdhci_pci_slot *sdhci_pci_probe_slot(
 -	struct pci_dev *pdev, struct sdhci_pci_chip *chip, int first_bar,
-+	//struct pci_dev *pdev, struct sdhci_pci_chip *chip, int first_bar,
 +	struct pci_dev *pdev, struct sdhci_pci_chip *chip,
  	int slotno)
  {
@@ -5813,7 +3140,7 @@
  	size_t priv_size = chip->fixes ? chip->fixes->priv_size : 0;
  
  	if (!(pci_resource_flags(pdev, bar) & IORESOURCE_MEM)) {
-@@ -2235,6 +2298,7 @@
+@@ -2022,6 +2084,7 @@
  		chip->allow_runtime_pm = chip->fixes->allow_runtime_pm;
  	}
  	chip->num_slots = slots;
@@ -5821,7 +3148,7 @@
  	chip->pm_retune = true;
  	chip->rpm_retune = true;
  
-@@ -2249,7 +2313,8 @@
+@@ -2036,7 +2099,8 @@
  	slots = chip->num_slots;	/* Quirk may have changed this */
  
  	for (i = 0; i < slots; i++) {
@@ -5831,9 +3158,10 @@
  		if (IS_ERR(slot)) {
  			for (i--; i >= 0; i--)
  				sdhci_pci_remove_slot(chip->slots[i]);
---- linux-6.1.13-xanmod-rt7/drivers/mmc/host/sdhci-pci.h	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/mmc/host/sdhci-pci.h	2023-04-15 18:32:39.418428929 +0200
-@@ -140,7 +140,7 @@
+diff -ruN a/drivers/mmc/host/sdhci-pci.h b/drivers/mmc/host/sdhci-pci.h
+--- a/drivers/mmc/host/sdhci-pci.h	2023-11-10 04:40:48.891571321 +0100
++++ b/drivers/mmc/host/sdhci-pci.h	2023-11-10 04:36:39.833757084 +0100
+@@ -128,7 +128,7 @@
  	int			(*probe_slot) (struct sdhci_pci_slot *);
  	int			(*add_host) (struct sdhci_pci_slot *);
  	void			(*remove_slot) (struct sdhci_pci_slot *, int);
@@ -5842,7 +3170,7 @@
  #ifdef CONFIG_PM_SLEEP
  	int			(*suspend) (struct sdhci_pci_chip *);
  	int			(*resume) (struct sdhci_pci_chip *);
-@@ -176,6 +176,7 @@
+@@ -169,6 +169,7 @@
  	const struct sdhci_pci_fixes *fixes;
  
  	int			num_slots;	/* Slots on controller */
@@ -5850,9 +3178,10 @@
  	struct sdhci_pci_slot	*slots[MAX_SLOTS]; /* Pointers to host slots */
  };
  
---- linux-6.1.13-xanmod-rt7/drivers/net/ethernet/marvell/sky2.c	2023-04-10 01:19:19.591227186 +0200
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/net/ethernet/marvell/sky2.c	2023-04-15 19:07:51.762946889 +0200
-@@ -38,6 +38,11 @@
+diff -ruN a/drivers/net/ethernet/marvell/sky2.c b/drivers/net/ethernet/marvell/sky2.c
+--- a/drivers/net/ethernet/marvell/sky2.c	2023-11-10 04:40:49.437647654 +0100
++++ b/drivers/net/ethernet/marvell/sky2.c	2023-11-10 04:36:29.911370096 +0100
+@@ -50,6 +50,11 @@
  
  #include <asm/irq.h>
  
@@ -5864,7 +3193,7 @@
  #include "sky2.h"
  
  #define DRV_NAME		"sky2"
-@@ -133,6 +138,9 @@
+@@ -145,6 +150,9 @@
  	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x4380) }, /* 88E8057 */
  	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x4381) }, /* 88E8059 */
  	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x4382) }, /* 88E8079 */
@@ -5874,58 +3203,37 @@
  	{ 0 }
  };
  
-@@ -153,7 +161,8 @@
+@@ -165,7 +173,7 @@
  
  	gma_write16(hw, port, GM_SMI_DATA, val);
  	gma_write16(hw, port, GM_SMI_CTRL,
 -		    GM_SMI_CT_PHY_AD(PHY_ADDR_MARV) | GM_SMI_CT_REG_AD(reg));
-+		    //GM_SMI_CT_PHY_AD(PHY_ADDR_MARV) | GM_SMI_CT_REG_AD(reg));
 +		    GM_SMI_CT_PHY_AD(hw->phy_addr) | GM_SMI_CT_REG_AD(reg));
  
  	for (i = 0; i < PHY_RETRIES; i++) {
  		u16 ctrl = gma_read16(hw, port, GM_SMI_CTRL);
-@@ -178,8 +187,10 @@
+@@ -190,8 +198,9 @@
  {
  	int i;
  
 -	gma_write16(hw, port, GM_SMI_CTRL, GM_SMI_CT_PHY_AD(PHY_ADDR_MARV)
 -		    | GM_SMI_CT_REG_AD(reg) | GM_SMI_CT_OP_RD);
-+	/*gma_write16(hw, port, GM_SMI_CTRL, GM_SMI_CT_PHY_AD(PHY_ADDR_MARV)
-+		    | GM_SMI_CT_REG_AD(reg) | GM_SMI_CT_OP_RD);*/
-+	gma_write16(hw, port, GM_SMI_CTRL, GM_SMI_CT_PHY_AD(hw->phy_addr)
++  gma_write16(hw, port, GM_SMI_CTRL, GM_SMI_CT_PHY_AD(hw->phy_addr)
 +   		    | GM_SMI_CT_REG_AD(reg) | GM_SMI_CT_OP_RD);
++
  
  	for (i = 0; i < PHY_RETRIES; i++) {
  		u16 ctrl = gma_read16(hw, port, GM_SMI_CTRL);
-@@ -1127,6 +1138,9 @@
- 	/* Make sure write' to descriptors are complete before we tell hardware */
- 	wmb();
- 	sky2_write16(hw, Y2_QADDR(q, PREF_UNIT_PUT_IDX), idx);
-+
-+	/* Synchronize I/O on since next processor may write to tail */
-+	// 	mmiowb();  // best patch ever // metoo // https://lkml.org/lkml/2019/3/1/334
- }
- 
- 
-@@ -1340,6 +1354,7 @@
- 
- 	/* reset the Rx prefetch unit */
- 	sky2_write32(hw, Y2_QADDR(rxq, PREF_UNIT_CTRL), PREF_UNIT_RST_SET);
-+	// mmiowb();  // second patch // metoo
- }
- 
- /* Clean out receive buffer area, assumes receiver hardware stopped */
-@@ -1374,7 +1389,8 @@
+@@ -1389,7 +1398,7 @@
  
  	switch (cmd) {
  	case SIOCGMIIPHY:
 -		data->phy_id = PHY_ADDR_MARV;
-+		//data->phy_id = PHY_ADDR_MARV;
 +		data->phy_id = hw->phy_addr;
  
- 		fallthrough;
+ 		/* fallthru */
  	case SIOCGMIIREG: {
-@@ -3232,7 +3248,23 @@
+@@ -3249,7 +3258,23 @@
  	u16 status;
  	int i;
  	u32 hwe_mask = Y2_HWE_ALL_MASK;
@@ -5950,7 +3258,7 @@
  	/* disable ASF */
  	if (hw->chip_id == CHIP_ID_YUKON_EX
  	    || hw->chip_id == CHIP_ID_YUKON_SUPR) {
-@@ -3296,7 +3328,12 @@
+@@ -3313,7 +3338,12 @@
  		/* enable MACSec clock gating */
  		sky2_pci_write32(hw, PCI_DEV_REG3, P_CLK_MACSEC_DIS);
  	}
@@ -5960,21 +3268,20 @@
 +	    pdev->device == PCI_DEVICE_ID_SONY_AEOLIA_GBE) {
 +		; /* Do not perform phy resets on aeolia, it will hang */
 +	} else
-+#endif
++  #endif
  	if (hw->chip_id == CHIP_ID_YUKON_OPT ||
  	    hw->chip_id == CHIP_ID_YUKON_PRM ||
  	    hw->chip_id == CHIP_ID_YUKON_OP_2) {
-@@ -3581,7 +3618,8 @@
+@@ -3598,7 +3628,7 @@
  	u32 supported, advertising;
  
  	supported = sky2_supported_modes(hw);
 -	cmd->base.phy_address = PHY_ADDR_MARV;
-+	//cmd->base.phy_address = PHY_ADDR_MARV;
 +	cmd->base.phy_address = hw->phy_addr;
  	if (sky2_is_copper(hw)) {
  		cmd->base.port = PORT_TP;
  		cmd->base.speed = sky2->speed;
-@@ -4586,7 +4624,43 @@
+@@ -4744,7 +4774,43 @@
  	.ndo_get_stats64	= sky2_get_stats,
    },
  };
@@ -5995,7 +3302,7 @@
 +		dev_err(&hw->pdev->dev, "sky2: could not get handle to mem device\n");
 +		return;
 +	}
-+
+ 
 +	bp_base = pci_resource_start(mem_dev, 5) + APCIE_SPM_BP_BASE;
 +	if (!request_mem_region(bp_base, APCIE_SPM_BP_SIZE, "spm.bp")) {
 +		dev_err(&hw->pdev->dev, "sky2: failed to request bootparam SPM region\n");
@@ -6009,7 +3316,7 @@
 +	}
 +
 +	memcpy_fromio(addr, bp, ETH_ALEN);
- 
++
 +	iounmap(bp);
 +release_bp:
 +	release_mem_region(bp_base, APCIE_SPM_BP_SIZE);
@@ -6018,7 +3325,7 @@
  /* Initialize network device */
  static struct net_device *sky2_init_netdev(struct sky2_hw *hw, unsigned port,
  					   int highmem, int wol)
-@@ -4658,7 +4732,12 @@
+@@ -4816,7 +4882,12 @@
  		dev->max_mtu = ETH_DATA_LEN;
  	else
  		dev->max_mtu = ETH_JUMBO_MTU;
@@ -6032,7 +3339,16 @@
  	/* try to get mac address in the following order:
  	 * 1) from device tree data
  	 * 2) from internal registers set by bootloader
-@@ -4820,7 +4899,11 @@
+@@ -4827,7 +4898,7 @@
+ 	else
+ 		memcpy_fromio(dev->dev_addr, hw->regs + B2_MAC_1 + port * 8,
+ 			      ETH_ALEN);
+-
++  }
+ 	/* if the address is invalid, use a random value */
+ 	if (!is_valid_ether_addr(dev->dev_addr)) {
+ 		struct sockaddr sa = { AF_UNSPEC };
+@@ -4971,7 +5042,11 @@
  	int err, using_dac = 0, wol_default;
  	u32 reg;
  	char buf1[16];
@@ -6045,7 +3361,7 @@
  	err = pci_enable_device(pdev);
  	if (err) {
  		dev_err(&pdev->dev, "cannot enable PCI device\n");
-@@ -4851,7 +4934,15 @@
+@@ -5002,7 +5077,15 @@
  	}
  
  	pci_set_master(pdev);
@@ -6060,9 +3376,9 @@
 +	} else
 +#endif
  	if (sizeof(dma_addr_t) > sizeof(u32) &&
- 	    !dma_set_mask(&pdev->dev, DMA_BIT_MASK(64))) {
+ 	    !(err = pci_set_dma_mask(pdev, DMA_BIT_MASK(64)))) {
  		using_dac = 1;
-@@ -4899,7 +4990,15 @@
+@@ -5050,7 +5133,15 @@
  		dev_err(&pdev->dev, "cannot map device registers\n");
  		goto err_out_free_hw;
  	}
@@ -6079,15 +3395,12 @@
  	err = sky2_init(hw);
  	if (err)
  		goto err_out_iounmap;
-@@ -4925,9 +5024,20 @@
+@@ -5075,8 +5166,18 @@
  		goto err_out_free_pci;
  	}
  
 -	if (disable_msi == -1)
 -		disable_msi = !!dmi_check_system(msi_blacklist);
--
-+	//if (disable_msi == -1)
-+	//	disable_msi = !!dmi_check_system(msi_blacklist);
 +#ifdef CONFIG_X86_PS4
 +       if (pdev->vendor == PCI_VENDOR_ID_SONY &&
 +           apcie_assign_irqs(pdev, 1) > 0) {
@@ -6100,10 +3413,10 @@
 +               hw->flags |= SKY2_HW_USE_AEOLIA_MSI;
 +       } else
 +#endif
+ 
  	if (!disable_msi && pci_enable_msi(pdev) == 0) {
  		err = sky2_test_msi(hw);
- 		if (err) {
-@@ -4984,6 +5094,11 @@
+@@ -5134,6 +5235,11 @@
  err_out_unregister:
  	unregister_netdev(dev);
  err_out_free_netdev:
@@ -6115,40 +3428,44 @@
  	if (hw->flags & SKY2_HW_USE_MSI)
  		pci_disable_msi(pdev);
  	free_netdev(dev);
-@@ -5031,7 +5146,11 @@
+@@ -5180,7 +5286,11 @@
  		napi_disable(&hw->napi);
  		free_irq(pdev->irq, hw);
  	}
 -
-+#ifdef CONFIG_X86_PS4
++  #ifdef CONFIG_X86_PS4
 +  	if (hw->flags & SKY2_HW_USE_AEOLIA_MSI)
 +  		apcie_free_irqs(pdev->irq, 1);
 +  	else
-+#endif
++  #endif
  	if (hw->flags & SKY2_HW_USE_MSI)
  		pci_disable_msi(pdev);
- 	dma_free_coherent(&pdev->dev,
---- linux-6.1.13-xanmod-rt7/drivers/net/ethernet/marvell/sky2.h	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/net/ethernet/marvell/sky2.h	2023-04-15 19:14:32.435718557 +0200
-@@ -2288,6 +2288,7 @@
+ 	pci_free_consistent(pdev, hw->st_size * sizeof(struct sky2_status_le),
+diff -ruN a/drivers/net/ethernet/marvell/sky2.h b/drivers/net/ethernet/marvell/sky2.h
+--- a/drivers/net/ethernet/marvell/sky2.h	2023-11-10 04:40:49.439647933 +0100
++++ b/drivers/net/ethernet/marvell/sky2.h	2023-11-10 04:36:29.909369816 +0100
+@@ -2294,7 +2294,7 @@
  #define SKY2_HW_VLAN_BROKEN     0x00000200
  #define SKY2_HW_RSS_CHKSUM	0x00000400	/* RSS requires chksum */
  #define SKY2_HW_IRQ_SETUP	0x00000800
+-
 +#define SKY2_HW_USE_AEOLIA_MSI	0x00001000
- 
  	u8	     	     chip_id;
  	u8		     chip_rev;
-@@ -2303,6 +2304,7 @@
+ 	u8		     pmd_type;
+@@ -2308,7 +2308,7 @@
+ 	struct timer_list    watchdog_timer;
  	struct work_struct   restart_work;
  	wait_queue_head_t    msi_wait;
- 
+-
 +	u8		     phy_addr;
- 	char		     irq_name[];
+ 	char		     irq_name[0];
  };
  
---- linux-6.1.13-xanmod-rt7/drivers/pci/probe.c	2023-04-10 01:19:19.794229871 +0200
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/pci/probe.c	2023-04-15 19:24:23.456572270 +0200
-@@ -2637,6 +2637,9 @@
+diff -ruN a/drivers/pci/probe.c b/drivers/pci/probe.c
+--- a/drivers/pci/probe.c	2023-11-10 04:40:50.455789974 +0100
++++ b/drivers/pci/probe.c	2023-11-10 04:36:58.993435296 +0100
+@@ -2595,6 +2595,9 @@
  	return 0;
  }
  
@@ -6158,45 +3475,40 @@
  /**
   * pci_scan_slot - Scan a PCI slot on a bus for devices
   * @bus: PCI bus to scan
-@@ -2648,15 +2651,23 @@
-  *
-  * Returns the number of new devices found.
-  */
-+
- int pci_scan_slot(struct pci_bus *bus, int devfn)
+@@ -2610,10 +2613,15 @@
  {
+ 	unsigned fn, nr = 0;
  	struct pci_dev *dev;
- 	int fn = 0, nr = 0;
+-
 +	u32 l;
- 
  	if (only_one_child(bus) && (devfn > 0))
  		return 0; /* Already scanned the entire slot */
+-
++	// skip phantom Aeolia devices that bleed through the PCI space
++	if (PCI_SLOT(devfn) != AEOLIA_SLOT_NUM &&
++		pci_bus_read_dev_vendor_id(bus, devfn, &l, 60*1000) &&
++		(l & 0xffff) == PCI_VENDOR_ID_SONY) {
++		return 0;
++	}
+ 	dev = pci_scan_single_device(bus, devfn);
+ 	if (!dev)
+ 		return 0;
+@@ -2621,6 +2629,11 @@
+ 		nr++;
  
- 	do {
-+		// skip phantom Aeolia devices that bleed through the PCI space
-+		if (PCI_SLOT(devfn) != AEOLIA_SLOT_NUM &&
-+			pci_bus_read_dev_vendor_id(bus, devfn, &l, 60*1000) &&
-+			(l & 0xffff) == PCI_VENDOR_ID_SONY) {
-+			return 0;
-+		}
- 		dev = pci_scan_single_device(bus, devfn + fn);
- 		if (dev) {
- 			if (!pci_dev_is_added(dev))
-@@ -2673,6 +2684,11 @@
- 				break;
- 		}
- 		fn = next_fn(bus, dev, fn);
+ 	for (fn = next_fn(bus, dev, 0); fn > 0; fn = next_fn(bus, dev, fn)) {
 +		if (PCI_SLOT(devfn) != AEOLIA_SLOT_NUM &&
 +			pci_bus_read_dev_vendor_id(bus, devfn + fn, &l, 60*1000) &&
 +			(l & 0xffff) == PCI_VENDOR_ID_SONY) {
 +			continue;
 +		}
- 	} while (fn >= 0);
- 
- 	/* Only one slot has PCIe device */
---- linux-6.1.13-xanmod-rt7/drivers/ps4/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/ps4/Makefile	2023-04-15 19:41:53.089501029 +0200
-@@ -0,0 +1,10 @@
+ 		dev = pci_scan_single_device(bus, devfn + fn);
+ 		if (dev) {
+ 			if (!pci_dev_is_added(dev))
+diff -ruN a/drivers/ps4/Makefile b/drivers/ps4/Makefile
+--- a/drivers/ps4/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ b/drivers/ps4/Makefile	2023-11-10 04:36:40.024783787 +0100
+@@ -0,0 +1,9 @@
 +# Aeolia PCI devices
 +# LISTED IN INIT ORDER \o/ ...  ._.
 +# N.B. this driver must be init'd before pretty much everything, but actual dependants are:
@@ -6206,9 +3518,9 @@
 +	ps4-apcie-icc.o \
 +	ps4-apcie-pwrbutton.o \
 +	icc/i2c.o \
-+
---- linux-6.1.13-xanmod-rt7/drivers/ps4/aeolia.h	1970-01-01 01:00:00.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/ps4/aeolia.h	2023-04-15 19:44:19.165588409 +0200
+diff -ruN a/drivers/ps4/aeolia.h b/drivers/ps4/aeolia.h
+--- a/drivers/ps4/aeolia.h	1970-01-01 01:00:00.000000000 +0100
++++ b/drivers/ps4/aeolia.h	2023-11-10 04:36:40.005781131 +0100
 @@ -0,0 +1,172 @@
 +#ifndef _AEOLIA_H
 +#define _AEOLIA_H
@@ -6382,8 +3694,9 @@
 +	    void *reply, u16 reply_length);
 +
 +#endif
---- linux-6.1.13-xanmod-rt7/drivers/ps4/icc/i2c.c	1970-01-01 01:00:00.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/ps4/icc/i2c.c	2023-04-15 19:47:08.175028445 +0200
+diff -ruN a/drivers/ps4/icc/i2c.c b/drivers/ps4/icc/i2c.c
+--- a/drivers/ps4/icc/i2c.c	1970-01-01 01:00:00.000000000 +0100
++++ b/drivers/ps4/icc/i2c.c	2023-11-10 04:36:40.025783927 +0100
 @@ -0,0 +1,156 @@
 +#include <linux/serial_8250.h>
 +#include <linux/serial_core.h>
@@ -6541,8 +3854,9 @@
 +{
 +	i2c_del_adapter(&sc->icc.i2c);
 +}
---- linux-6.1.13-xanmod-rt7/drivers/ps4/ps4-apcie-icc.c	1970-01-01 01:00:00.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/ps4/ps4-apcie-icc.c	2023-04-15 21:24:33.402098649 +0200
+diff -ruN a/drivers/ps4/ps4-apcie-icc.c b/drivers/ps4/ps4-apcie-icc.c
+--- a/drivers/ps4/ps4-apcie-icc.c	1970-01-01 01:00:00.000000000 +0100
++++ b/drivers/ps4/ps4-apcie-icc.c	2023-11-10 04:36:40.025783927 +0100
 @@ -0,0 +1,602 @@
 +#define DEBUG
 +
@@ -7146,8 +4460,9 @@
 +{
 +}
 +#endif
---- linux-6.1.13-xanmod-rt7/drivers/ps4/ps4-apcie-pwrbutton.c	1970-01-01 01:00:00.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/ps4/ps4-apcie-pwrbutton.c	2023-04-15 21:27:15.368073646 +0200
+diff -ruN a/drivers/ps4/ps4-apcie-pwrbutton.c b/drivers/ps4/ps4-apcie-pwrbutton.c
+--- a/drivers/ps4/ps4-apcie-pwrbutton.c	1970-01-01 01:00:00.000000000 +0100
++++ b/drivers/ps4/ps4-apcie-pwrbutton.c	2023-11-10 04:36:40.024783787 +0100
 @@ -0,0 +1,69 @@
 +#include <linux/input.h>
 +#include "aeolia.h"
@@ -7218,8 +4533,9 @@
 +		input_free_device(sc->icc.pwrbutton_dev);
 +	sc->icc.pwrbutton_dev = NULL;
 +}
---- linux-6.1.13-xanmod-rt7/drivers/ps4/ps4-apcie-uart.c	1970-01-01 01:00:00.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/ps4/ps4-apcie-uart.c	2023-04-15 21:28:49.250508987 +0200
+diff -ruN a/drivers/ps4/ps4-apcie-uart.c b/drivers/ps4/ps4-apcie-uart.c
+--- a/drivers/ps4/ps4-apcie-uart.c	1970-01-01 01:00:00.000000000 +0100
++++ b/drivers/ps4/ps4-apcie-uart.c	2023-11-10 04:36:40.024783787 +0100
 @@ -0,0 +1,67 @@
 +#include <linux/serial_8250.h>
 +#include <linux/serial_core.h>
@@ -7288,8 +4604,9 @@
 +			serial8250_resume_port(sc->serial_line[i]);
 +}
 +#endif
---- linux-6.1.13-xanmod-rt7/drivers/ps4/ps4-apcie.c	1970-01-01 01:00:00.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/ps4/ps4-apcie.c	2023-04-15 21:30:32.299357151 +0200
+diff -ruN a/drivers/ps4/ps4-apcie.c b/drivers/ps4/ps4-apcie.c
+--- a/drivers/ps4/ps4-apcie.c	1970-01-01 01:00:00.000000000 +0100
++++ b/drivers/ps4/ps4-apcie.c	2023-11-10 04:36:40.024783787 +0100
 @@ -0,0 +1,534 @@
 +#define DEBUG
 +
@@ -7825,35 +5142,38 @@
 +#endif
 +};
 +module_pci_driver(apcie_driver);
---- linux-6.1.13-xanmod-rt7/drivers/usb/host/Kconfig	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/usb/host/Kconfig	2023-04-15 21:33:57.776039900 +0200
-@@ -104,6 +104,13 @@
+diff -ruN a/drivers/usb/host/Kconfig b/drivers/usb/host/Kconfig
+--- a/drivers/usb/host/Kconfig	2023-11-10 04:40:51.941997721 +0100
++++ b/drivers/usb/host/Kconfig	2023-11-10 04:36:30.731484734 +0100
+@@ -93,6 +93,13 @@
+ 	---help---
  	  Say 'Y' to enable the support for the xHCI host controller
  	  found in NVIDIA Tegra124 and later SoCs.
- 
++		
 +config USB_XHCI_AEOLIA
 +	tristate "xHCI support for Sony PS4 (Aeolia)"
 +	depends on X86_PS4
-+	help
++	---help---
 +	  Say 'Y' to enable the support for the xHCI host controller
 +	  found in the Sony PlayStation 4.
-+
+ 
  endif # USB_XHCI_HCD
  
- config USB_EHCI_BRCMSTB
---- linux-6.1.13-xanmod-rt7/drivers/usb/host/Makefile	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/usb/host/Makefile	2023-04-15 21:35:50.771733313 +0200
-@@ -74,6 +74,7 @@
+diff -ruN a/drivers/usb/host/Makefile b/drivers/usb/host/Makefile
+--- a/drivers/usb/host/Makefile	2023-11-10 04:40:51.941997721 +0100
++++ b/drivers/usb/host/Makefile	2023-11-10 04:36:30.660474809 +0100
+@@ -78,6 +78,7 @@
  obj-$(CONFIG_USB_XHCI_HISTB)	+= xhci-histb.o
- obj-$(CONFIG_USB_XHCI_MTK)	+= xhci-mtk-hcd.o
+ obj-$(CONFIG_USB_XHCI_MTK)	+= xhci-mtk.o
  obj-$(CONFIG_USB_XHCI_TEGRA)	+= xhci-tegra.o
 +obj-$(CONFIG_USB_XHCI_AEOLIA)	+= xhci-aeolia.o
  obj-$(CONFIG_USB_SL811_HCD)	+= sl811-hcd.o
  obj-$(CONFIG_USB_SL811_CS)	+= sl811_cs.o
  obj-$(CONFIG_USB_U132_HCD)	+= u132-hcd.o
---- linux-6.1.13-xanmod-rt7/drivers/usb/host/xhci-aeolia.c	1970-01-01 01:00:00.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/usb/host/xhci-aeolia.c	2023-04-15 21:37:38.228569141 +0200
-@@ -0,0 +1,554 @@
+diff -ruN a/drivers/usb/host/xhci-aeolia.c b/drivers/usb/host/xhci-aeolia.c
+--- a/drivers/usb/host/xhci-aeolia.c	1970-01-01 01:00:00.000000000 +0100
++++ b/drivers/usb/host/xhci-aeolia.c	2023-11-10 04:36:30.767489768 +0100
+@@ -0,0 +1,304 @@
 +/*
 + * xhci-aeoliat.c - xHCI host controller driver for Aeolia (Sony PS4)
 + *
@@ -7869,8 +5189,6 @@
 +#include <linux/module.h>
 +#include <linux/acpi.h>
 +#include <asm/ps4.h>
-+#include "xhci-aeolia.h"
-+#include "../../ps4/aeolia.h"
 +
 +#include "xhci.h"
 +
@@ -7881,7 +5199,6 @@
 +#define NR_DEVICES 3
 +
 +struct aeolia_xhci {
-+	struct ata_host *host;
 +	int nr_irqs;
 +	struct usb_hcd *hcd[NR_DEVICES];
 +};
@@ -7919,7 +5236,7 @@
 +
 +	// ok...adding this printk appears to have introduced a delay that fixed
 +	// bringup of the middle host controller, so w/e for now...
-+
++	
 +	printk("xhci_aeolia_probe_one %d, controller is %x\n", index, dev->device);
 +
 +	hcd = usb_create_hcd(driver, &dev->dev, pci_name(dev));
@@ -7929,7 +5246,7 @@
 +
 +	hcd->rsrc_start = pci_resource_start(dev, 2 * index);
 +	hcd->rsrc_len = pci_resource_len(dev, 2 * index);
-+	if (!devm_request_mem_region(&dev->dev, hcd->rsrc_start, hcd->rsrc_len,
++	if (!request_mem_region(hcd->rsrc_start, hcd->rsrc_len,
 +			driver->description)) {
 +		dev_dbg(&dev->dev, "controller already in use\n");
 +		retval = -EBUSY;
@@ -7972,7 +5289,7 @@
 +unmap_registers:
 +	iounmap(hcd->regs);
 +release_mem_region:
-+	devm_release_mem_region(&dev->dev, hcd->rsrc_start, hcd->rsrc_len);
++	release_mem_region(hcd->rsrc_start, hcd->rsrc_len);
 +put_hcd:
 +	usb_put_hcd(hcd);
 +	dev_err(&dev->dev, "init %s(%d) fail, %d\n",
@@ -7993,222 +5310,10 @@
 +	usb_remove_hcd(xhci->shared_hcd);
 +	usb_remove_hcd(hcd);
 +	usb_put_hcd(xhci->shared_hcd);
-+	iounmap(hcd->regs);
 +	usb_put_hcd(hcd);
 +	axhci->hcd[index] = NULL;
 +}
 +
-+#define DRV_VERSION	"3.0"
-+#define DRV_NAME	"ahci"
-+static const struct ata_port_info ahci_port_info = {
-+	.flags		= AHCI_FLAG_COMMON,
-+	.pio_mask	= ATA_PIO4,
-+	.udma_mask	= ATA_UDMA6,
-+	.port_ops	= &ahci_ops,
-+};
-+
-+static struct scsi_host_template ahci_sht = {
-+	AHCI_SHT(DRV_NAME),
-+};
-+
-+static bool bus_master;
-+static int ahci_init_one(struct pci_dev *pdev)
-+{
-+	struct aeolia_xhci *axhci = pci_get_drvdata(pdev);
-+	struct ata_port_info pi = ahci_port_info;
-+	const struct ata_port_info *ppi[] = { &pi, NULL };
-+	struct ahci_host_priv *hpriv;
-+	struct ata_host *host;
-+	int n_ports, i, rc;
-+	int ahci_pci_bar = 2;
-+	resource_size_t		rsrc_start;
-+	resource_size_t		rsrc_len;
-+
-+	VPRINTK("ENTER\n");
-+
-+	WARN_ON((int)ATA_MAX_QUEUE > AHCI_MAX_CMDS);
-+
-+	ata_print_version_once(&pdev->dev, DRV_VERSION);
-+
-+	/*
-+	rc = pcim_iomap_regions_request_all(pdev, 1 << ahci_pci_bar, DRV_NAME);
-+	if (rc == -EBUSY)
-+		pcim_pin_device(pdev);
-+	if (rc)
-+		return rc;
-+	*/
-+
-+	hpriv = devm_kzalloc(&pdev->dev, sizeof(*hpriv), GFP_KERNEL);
-+	//hpriv = kzalloc(sizeof(*hpriv), GFP_KERNEL);
-+	if (!hpriv)
-+		return -ENOMEM;
-+	hpriv->flags |= (unsigned long)pi.private_data;
-+
-+	//hpriv->mmio = pcim_iomap_table(pdev)[ahci_pci_bar];
-+	rsrc_start = pci_resource_start(pdev, ahci_pci_bar);
-+	rsrc_len = pci_resource_len(pdev, ahci_pci_bar);
-+	//if (!request_mem_region(rsrc_start, rsrc_len, "xhci-ahci.mem")) {
-+	if (!devm_request_mem_region(&pdev->dev, rsrc_start, rsrc_len, "xhci-ahci.mem")) {
-+		dev_dbg(&pdev->dev, "controller already in use\n");
-+		rc = -EBUSY;
-+		goto put_hpriv;
-+	}
-+
-+
-+	hpriv->mmio = pci_ioremap_bar(pdev, ahci_pci_bar);
-+	if (hpriv->mmio == NULL) {
-+		dev_dbg(&pdev->dev, "error mapping memory\n");
-+		rc = -EFAULT;
-+		goto release_mem_region;
-+	}
-+
-+	struct f_resource* r_mem;
-+	struct ahci_controller* ctlr;
-+	r_mem = kzalloc(sizeof(*r_mem), GFP_KERNEL);
-+	if (r_mem) {
-+		r_mem->r_bustag = 1;//mem
-+		r_mem->r_bushandle = hpriv->mmio;
-+
-+		ctlr = kzalloc(sizeof(*ctlr), GFP_KERNEL);
-+		if (ctlr) {
-+			ctlr->r_mem = r_mem;
-+			ctlr->dev_id = 0; //or 0x90ca104d;
-+			ctlr->trace_len = 6;
-+			bpcie_sata_phy_init(&pdev->dev, ctlr);
-+			kfree(ctlr);
-+		}
-+		kfree(r_mem);
-+	}
-+	device_wakeup_enable(&pdev->dev);
-+
-+	/* save initial config */
-+	ahci_save_initial_config(&pdev->dev, hpriv);
-+
-+	/* prepare host */
-+	if (hpriv->cap & HOST_CAP_NCQ) {
-+		pi.flags |= ATA_FLAG_NCQ;
-+		/*
-+		 * Auto-activate optimization is supposed to be
-+		 * supported on all AHCI controllers indicating NCQ
-+		 * capability, but it seems to be broken on some
-+		 * chipsets including NVIDIAs.
-+		 */
-+		if (!(hpriv->flags & AHCI_HFLAG_NO_FPDMA_AA))
-+			pi.flags |= ATA_FLAG_FPDMA_AA;
-+
-+		/*
-+		 * All AHCI controllers should be forward-compatible
-+		 * with the new auxiliary field. This code should be
-+		 * conditionalized if any buggy AHCI controllers are
-+		 * encountered.
-+		 */
-+		pi.flags |= ATA_FLAG_FPDMA_AUX;
-+	}
-+
-+	if (hpriv->cap & HOST_CAP_PMP)
-+		pi.flags |= ATA_FLAG_PMP;
-+
-+	ahci_set_em_messages(hpriv, &pi);
-+
-+	/* CAP.NP sometimes indicate the index of the last enabled
-+	 * port, at other times, that of the last possible port, so
-+	 * determining the maximum port number requires looking at
-+	 * both CAP.NP and port_map.
-+	 */
-+	n_ports = max(ahci_nr_ports(hpriv->cap), fls(hpriv->port_map));
-+
-+	host = ata_host_alloc_pinfo(&pdev->dev, ppi, n_ports);
-+	if (!host) {
-+		rc = -ENOMEM;
-+		goto unmap_registers;
-+	}
-+	axhci->host = host;
-+	pci_set_drvdata(pdev, axhci);
-+
-+	host->private_data = hpriv;
-+
-+	{
-+		int index = 1;
-+		int irq = (axhci->nr_irqs > 1) ? (pdev->irq + index) : pdev->irq;
-+		hpriv->irq = irq;
-+	}
-+
-+	if (!(hpriv->cap & HOST_CAP_SSS) || ahci_ignore_sss)
-+		host->flags |= ATA_HOST_PARALLEL_SCAN;
-+	else
-+		dev_info(&pdev->dev, "SSS flag set, parallel bus scan disabled\n");
-+
-+	if (pi.flags & ATA_FLAG_EM)
-+		ahci_reset_em(host);
-+
-+	for (i = 0; i < host->n_ports; i++) {
-+		struct ata_port *ap = host->ports[i];
-+
-+		ata_port_pbar_desc(ap, ahci_pci_bar, -1, "abar");
-+		ata_port_pbar_desc(ap, ahci_pci_bar,
-+				   0x100 + ap->port_no * 0x80, "port");
-+
-+		/* set enclosure management message type */
-+		if (ap->flags & ATA_FLAG_EM)
-+			ap->em_message_type = hpriv->em_msg_type;
-+
-+
-+		/* disabled/not-implemented port */
-+		if (!(hpriv->port_map & (1 << i)))
-+			ap->ops = &ata_dummy_port_ops;
-+	}
-+
-+	rc = ahci_reset_controller(host);
-+	dev_dbg(&pdev->dev, "ahci_reset_controller returned %d\n", rc);
-+	if (rc)
-+		goto release_host;
-+
-+	ahci_init_controller(host);
-+	ahci_print_info(host, "ATA");
-+
-+	if (!bus_master) {
-+		pci_set_master(pdev);
-+		bus_master = true;
-+	}
-+
-+	rc = ahci_host_activate(host, &ahci_sht);
-+	dev_dbg(&pdev->dev, "ahci_host_activate returned %d\n", rc);
-+	if (rc) {
-+		goto host_deactivate;
-+	}
-+
-+	pm_runtime_put_noidle(&pdev->dev);
-+	return 0;
-+
-+	host_deactivate:
-+	release_host:
-+	unmap_registers:
-+		iounmap(hpriv->mmio);
-+	release_mem_region:
-+		//release_mem_region(rsrc_start, rsrc_len);
-+		devm_release_mem_region(&pdev->dev, rsrc_start, rsrc_len);
-+	put_hpriv:
-+		//kfree(hpriv);
-+		devm_kfree(&pdev->dev, hpriv);
-+		dev_err(&pdev->dev, "init %s fail, %d\n",
-+				pci_name(pdev), rc);
-+	return rc;
-+}
-+
-+static void ahci_remove_one(struct pci_dev *pdev)
-+{
-+	pm_runtime_get_noresume(&pdev->dev);
-+
-+	struct aeolia_xhci *axhci = pci_get_drvdata(pdev);
-+	if (axhci && axhci->host) {
-+		ata_host_detach(axhci->host);
-+		struct ahci_host_priv *hpriv = axhci->host->private_data;
-+		if (hpriv) {
-+			iounmap(hpriv->mmio);
-+		}
-+		axhci->host = NULL;
-+	}
-+}
 +
 +static int xhci_aeolia_probe(struct pci_dev *dev, const struct pci_device_id *id)
 +{
@@ -8222,7 +5327,7 @@
 +	if (pci_enable_device(dev) < 0)
 +		return -ENODEV;
 +
-+	axhci = devm_kzalloc(&dev->dev, sizeof(*axhci), GFP_KERNEL);
++	axhci = kzalloc(sizeof(*axhci), GFP_KERNEL);
 +	if (!axhci) {
 +		retval = -ENOMEM;
 +		goto disable_device;
@@ -8234,22 +5339,16 @@
 +		goto free_axhci;
 +	}
 +
++	pci_set_master(dev);
++
 +	if (pci_set_dma_mask(dev, DMA_BIT_MASK(31)) ||
 +		pci_set_consistent_dma_mask(dev, DMA_BIT_MASK(31))) {
 +		return -ENODEV;
 +	}
 +
-+	retval = ahci_init_one(dev);
-+	dev_dbg(&dev->dev, "ahci_init_one returned %d", retval);
-+	if (!bus_master) {
-+		pci_set_master(dev);
-+		bus_master = true;
-+	}
-+
 +	for (idx = 0; idx < NR_DEVICES; idx++) {
-+ 		if(dev->device != PCI_DEVICE_ID_SONY_AEOLIA_XHCI && idx == 1){ //this is for Belize and Baikal
++ 		if(dev->device != PCI_DEVICE_ID_SONY_AEOLIA_XHCI && idx == 1) 
 +			continue;
-+		}
 +		retval = xhci_aeolia_probe_one(dev, idx);
 +		if (retval)
 +			goto remove_hcds;
@@ -8262,8 +5361,7 @@
 +		xhci_aeolia_remove_one(dev, idx);
 +	apcie_free_irqs(dev->irq, axhci->nr_irqs);
 +free_axhci:
-+	devm_kfree(&dev->dev, axhci);
-+	pci_set_drvdata(dev, NULL);
++	kfree(axhci);
 +disable_device:
 +	pci_disable_device(dev);
 +	return retval;
@@ -8273,47 +5371,19 @@
 +{
 +	int idx;
 +	struct aeolia_xhci *axhci = pci_get_drvdata(dev);
-+	if (!axhci)
-+		return;
 +
 +	for (idx = 0; idx < NR_DEVICES; idx++) {
 +		if(dev->device != PCI_DEVICE_ID_SONY_AEOLIA_XHCI) {
 +			if(idx != 1)
 +				xhci_aeolia_remove_one(dev, idx);
-+			else
-+				ahci_remove_one(dev);
 +		}
 +		else
 +			xhci_aeolia_remove_one(dev, idx);
 +	}
-+
++	
 +	apcie_free_irqs(dev->irq, axhci->nr_irqs);
++	kfree(axhci);
 +	pci_disable_device(dev);
-+}
-+
-+static void xhci_hcd_pci_shutdown(struct pci_dev *dev){
-+	struct aeolia_xhci *axhci;
-+	struct usb_hcd		*hcd;
-+	int idx;
-+
-+	axhci = pci_get_drvdata(dev);
-+	if (!axhci)
-+		return;
-+
-+	for (idx = 0; idx < NR_DEVICES; idx++) {
-+		if(dev->device != PCI_DEVICE_ID_SONY_AEOLIA_XHCI) {
-+			if(idx != 1) {
-+				hcd = axhci->hcd[idx];
-+				if (hcd) {
-+					if (test_bit(HCD_FLAG_HW_ACCESSIBLE, &hcd->flags) && hcd->driver->shutdown) {
-+						hcd->driver->shutdown(hcd);
-+						if (usb_hcd_is_primary_hcd(hcd) && hcd->irq > 0)
-+							free_irq(hcd->irq, hcd);
-+					}
-+				}
-+			}
-+		}
-+	}
 +}
 +
 +
@@ -8333,7 +5403,7 @@
 +	struct xhci_hcd	*xhci;
 +	int retval;
 +	struct pci_dev		*pdev = to_pci_dev(dev);
-+
++	
 +	for (idx = 0; idx < NR_DEVICES; idx++) {
 +		if(pdev->device != PCI_DEVICE_ID_SONY_AEOLIA_XHCI && idx == 1)
 +			continue;
@@ -8361,8 +5431,8 @@
 +	struct pci_dev		*pdev = to_pci_dev(dev);
 +
 +	for (idx = 0; idx < NR_DEVICES; idx++) {
-+ 		if(pdev->device != PCI_DEVICE_ID_SONY_AEOLIA_XHCI && idx == 1)
-+			continue;
++ 		if(pdev->device != PCI_DEVICE_ID_SONY_AEOLIA_XHCI && idx == 1) 
++			continue;		
 +		xhci = hcd_to_xhci(axhci->hcd[idx]);
 +		retval = xhci_resume(xhci, 0);
 +		if (retval < 0)
@@ -8383,9 +5453,9 @@
 +
 +	.probe =	xhci_aeolia_probe,
 +	.remove =	xhci_aeolia_remove,
-+	/* suspend and resume implemented later */
++	/* suspend and resume implemented later 
 +
-+	.shutdown = 	xhci_hcd_pci_shutdown,
++	.shutdown = 	usb_hcd_platform_shutdown, */
 +#ifdef CONFIG_PM_SLEEP
 +	.driver = {
 +		.pm = &xhci_aeolia_pm_ops
@@ -8408,26 +5478,10 @@
 +
 +MODULE_DESCRIPTION("xHCI Aeolia Host Controller Driver");
 +MODULE_LICENSE("GPL");
---- linux-6.1.13-xanmod-rt7/drivers/usb/host/xhci-aeolia.h	1970-01-01 01:00:00.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/usb/host/xhci-aeolia.h	2023-04-15 21:37:38.231569975 +0200
-@@ -0,0 +1,14 @@
-+/*
-+ * xhci-aeolia.h
-+ *
-+ *  Created on: 31 Oct 2019
-+ *      Author: visicva
-+ */
-+
-+#ifndef DRIVERS_USB_HOST_XHCI_AEOLIA_H_
-+#define DRIVERS_USB_HOST_XHCI_AEOLIA_H_
-+
-+#include "../../ata/ahci.h"
-+#include <linux/irqdomain.h>
-+
-+#endif /* DRIVERS_USB_HOST_XHCI_AEOLIA_H_ */
---- linux-6.1.13-xanmod-rt7/drivers/usb/host/xhci.c	2023-04-10 01:19:20.019232847 +0200
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/usb/host/xhci.c	2023-04-15 21:43:35.094854953 +0200
-@@ -5371,22 +5371,23 @@
+diff -ruN a/drivers/usb/host/xhci.c b/drivers/usb/host/xhci.c
+--- a/drivers/usb/host/xhci.c	2023-11-10 04:40:51.983003453 +0100
++++ b/drivers/usb/host/xhci.c	2023-11-10 04:36:30.728484315 +0100
+@@ -5232,22 +5232,23 @@
  
  	/* Set dma_mask and coherent_dma_mask to 64-bits,
  	 * if xHC supports 64-bit addressing */
@@ -8445,7 +5499,7 @@
 -			return retval;
 -		xhci_dbg(xhci, "Enabling 32-bit DMA addresses.\n");
 -		dma_set_coherent_mask(dev, DMA_BIT_MASK(32));
-+	if (!(xhci->quirks & XHCI_PLAT_DMA)) {
++ 	if (!(xhci->quirks & XHCI_PLAT_DMA)) {
 +		if (HCC_64BIT_ADDR(xhci->hcc_params) &&
 +				!dma_set_mask(dev, DMA_BIT_MASK(64))) {
 +			xhci_dbg(xhci, "Enabling 64-bit DMA addresses.\n");
@@ -8466,32 +5520,33 @@
  	xhci_dbg(xhci, "Calling HCD init\n");
  	/* Initialize HCD and host controller data structures. */
  	retval = xhci_init(hcd);
---- linux-6.1.13-xanmod-rt7/drivers/usb/host/xhci.h	2023-04-10 01:19:20.020232860 +0200
-+++ PS4linux-6.1.13-xanmod-rt7/drivers/usb/host/xhci.h	2023-04-15 21:49:25.522711740 +0200
-@@ -1890,7 +1890,8 @@
- #define XHCI_DEFAULT_PM_RUNTIME_ALLOW	BIT_ULL(33)
+diff -ruN a/drivers/usb/host/xhci.h b/drivers/usb/host/xhci.h
+--- a/drivers/usb/host/xhci.h	2023-11-10 04:40:51.984003593 +0100
++++ b/drivers/usb/host/xhci.h	2023-11-10 04:36:30.770490187 +0100
+@@ -1878,6 +1878,7 @@
  #define XHCI_RESET_PLL_ON_DISCONNECT	BIT_ULL(34)
  #define XHCI_SNPS_BROKEN_SUSPEND    BIT_ULL(35)
--#define XHCI_RENESAS_FW_QUIRK	BIT_ULL(36)
-+//#define XHCI_RENESAS_FW_QUIRK	BIT_ULL(36)
-+#define XHCI_PLAT_DMA		BIT_ULL(36)
- #define XHCI_SKIP_PHY_INIT	BIT_ULL(37)
  #define XHCI_DISABLE_SPARSE	BIT_ULL(38)
- #define XHCI_SG_TRB_CACHE_SIZE_QUIRK	BIT_ULL(39)
---- linux-6.1.13-xanmod-rt7/include/drm/amd_asic_type.h	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/include/drm/amd_asic_type.h	2023-04-15 21:51:29.515140011 +0200
++#define XHCI_PLAT_DMA          BIT_ULL(39)
+ 
+ 	unsigned int		num_active_eps;
+ 	unsigned int		limit_active_eps;
+diff -ruN a/include/drm/amd_asic_type.h b/include/drm/amd_asic_type.h
+--- a/include/drm/amd_asic_type.h	2023-11-10 04:40:53.499215395 +0100
++++ b/include/drm/amd_asic_type.h	2023-11-10 04:37:06.270452505 +0100
 @@ -34,6 +34,8 @@
- 	CHIP_BONAIRE,	/* 5 */
- 	CHIP_KAVERI,	/* 6 */
- 	CHIP_KABINI,	/* 7 */
+ 	CHIP_BONAIRE,
+ 	CHIP_KAVERI,
+ 	CHIP_KABINI,
 +	CHIP_LIVERPOOL,
 +	CHIP_GLADIUS,
- 	CHIP_HAWAII,	/* 8 */
- 	CHIP_MULLINS,	/* 9 */
- 	CHIP_TOPAZ,	/* 10 */
---- linux-6.1.13-xanmod-rt7/include/linux/pci_ids.h	2022-12-11 23:15:18.000000000 +0100
-+++ PS4linux-6.1.13-xanmod-rt7/include/linux/pci_ids.h	2023-04-15 21:55:20.365214492 +0200
-@@ -555,6 +555,8 @@
+ 	CHIP_HAWAII,
+ 	CHIP_MULLINS,
+ 	CHIP_TOPAZ,
+diff -ruN a/include/linux/pci_ids.h b/include/linux/pci_ids.h
+--- a/include/linux/pci_ids.h	2023-11-10 04:40:53.875267961 +0100
++++ b/include/linux/pci_ids.h	2023-11-10 04:37:06.412472357 +0100
+@@ -549,6 +549,8 @@
  #define PCI_DEVICE_ID_AMD_16H_NB_F4	0x1534
  #define PCI_DEVICE_ID_AMD_16H_M30H_NB_F3 0x1583
  #define PCI_DEVICE_ID_AMD_16H_M30H_NB_F4 0x1584
@@ -8500,7 +5555,7 @@
  #define PCI_DEVICE_ID_AMD_17H_DF_F3	0x1463
  #define PCI_DEVICE_ID_AMD_17H_M10H_DF_F3 0x15eb
  #define PCI_DEVICE_ID_AMD_17H_M30H_DF_F3 0x1493
-@@ -901,6 +903,30 @@
+@@ -885,6 +887,30 @@
  #define PCI_DEVICE_ID_TI_DRA72x		0xb501
  
  #define PCI_VENDOR_ID_SONY		0x104d

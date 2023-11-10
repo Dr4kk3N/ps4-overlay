@@ -1,10 +1,10 @@
-# Copyright 1999-2022 Gentoo Authors
+# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="8"
 ETYPE="sources"
 K_WANT_GENPATCHES="base extras experimental"
-K_GENPATCHES_VER="90"
+K_GENPATCHES_VER="295"
 
 inherit kernel-2
 detect_version
@@ -16,6 +16,14 @@ IUSE="experimental"
 
 DESCRIPTION="Full sources including the Gentoo patchset for the ${KV_MAJOR}.${KV_MINOR} kernel tree"
 SRC_URI="${KERNEL_URI} ${GENPATCHES_URI} ${ARCH_URI}"
+
+src_prepare() {
+	kernel-2_src_prepare
+#       eapply -p1 "${FILESDIR}/ps4config.patch"
+	eapply -p1 "${FILESDIR}/ps4kernel.patch"
+#	eapply -p1 "${FILESDIR}/ps4extra.patch"
+        eapply_user
+}
 
 pkg_postinst() {
 	kernel-2_pkg_postinst
