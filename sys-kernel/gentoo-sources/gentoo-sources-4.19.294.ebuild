@@ -21,7 +21,7 @@ src_prepare() {
 	kernel-2_src_prepare
 #       eapply -p1 "${FILESDIR}/ps4config.patch"
 	eapply -p1 "${FILESDIR}/ps4kernel.patch"
-#	eapply -p1 "${FILESDIR}/ps4extra.patch"
+	eapply -p1 "${FILESDIR}/ps4extra.patch"
         eapply_user
 }
 
