@@ -1,205 +1,172 @@
-# Copyright 2021-2022 Gentoo Authors
+# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-PLOCALES="be bg bn ca cs da de el en_GB es et eu fa fi fr gl he hr hu id it ja kk km lg lt nl pl pt pt_BR ro ru si_LK sk sl sr sr@latin sv te tr ug uk vi zh_CN zh_TW"
+if [[ -z ${PV%%*9999} ]]; then
+	inherit git-r3
+	EGIT_REPO_URI="https://github.com/DeaDBeeF-Player/${PN}.git"
+	EGIT_SUBMODULES=( external/mp4p )
+	SRC_URI=""
+else
+	MY_PV="d2fc9ef"
+	MY_MP="mp4p-97ab728"
+	MY_LR="ddb_dsp_libretro-b092190"
+	MY_PW="ddb_output_pw-14a3fc6"
+	[[ -n ${PV%%*_p*} ]] && MY_PV="${PV}"
+	SRC_URI="
+		mirror://githubcl/DeaDBeeF-Player/${PN}/tar.gz/${MY_PV}
+		-> ${P}.tar.gz
+		mirror://githubcl/DeaDBeeF-Player/${MY_MP%-*}/tar.gz/${MY_MP##*-}
+		-> ${MY_MP}.tar.gz
+		mirror://githubcl/DeaDBeeF-Player/${MY_LR%-*}/tar.gz/${MY_LR##*-}
+		-> ${MY_LR}.tar.gz
+		mirror://githubcl/DeaDBeeF-Player/${MY_PW%-*}/tar.gz/${MY_PW##*-}
+		-> ${MY_PW}.tar.gz
+	"
+	RESTRICT="primaryuri"
+	KEYWORDS="~amd64 ~x86"
+	S="${WORKDIR}/${PN}-${MY_PV}"
+fi
+inherit autotools flag-o-matic toolchain-funcs xdg
 
-inherit autotools plocale toolchain-funcs xdg flag-o-matic git-r3
+DESCRIPTION="A music player for *nix-like systems and OSX"
+HOMEPAGE="https://deadbeef.sourceforge.io"
+LICENSE="GPL-2 LGPL-2.1"
 
-DESCRIPTION="DeaDBeeF is a modular audio player similar to foobar2000"
-HOMEPAGE="https://deadbeef.sourceforge.io/"
-EGIT_REPO_URI="https://github.com/DeadBeeF-Player/${PN}.git"
-EGIT_BRANCH="master"
-
-LICENSE="
-	GPL-2
-	LGPL-2.1
-	wavpack? ( BSD )
-"
 SLOT="0"
-KEYWORDS="~amd64 ~riscv ~x86"
-IUSE="aac alsa cdda converter cover dts ffmpeg flac +hotkeys lastfm libsamplerate mp3 musepack nls notify +nullout opus oss pulseaudio pipewire sc68 shellexec +supereq threads vorbis wavpack mac zip"
-
+IUSE="
+X aac adplug alac alsa artwork cdda curl dts dumb ffmpeg flac gme gtk gtk3
+lastfm libnotify libretro libsamplerate mac mad midi mms musepack nls opus
+oss pipewire psf pulseaudio sc68 shorten sid sndfile threads tta vorbis
+wavpack wma zip
+"
 REQUIRED_USE="
-	|| ( alsa oss pulseaudio pipewire nullout )
+	lastfm? ( curl )
 "
 
-DEPEND="
-	x11-libs/gtk+:3
-	net-misc/curl:=
-	dev-libs/jansson:=
-	aac? ( media-libs/faad2 )
-	alsa? ( media-libs/alsa-lib )
-	cdda? (
-		dev-libs/libcdio:=
-		media-libs/libcddb
-		dev-libs/libcdio-paranoia:=
-	)
-	cover? (
-		media-libs/imlib2[jpeg,png]
-	)
+RDEPEND="
 	dts? ( media-libs/libdca )
-	ffmpeg? ( media-video/ffmpeg )
-	flac? (
-		media-libs/flac:=
-		media-libs/libogg
-	)
-	libsamplerate? ( media-libs/libsamplerate )
-	mp3? ( media-sound/mpg123 )
-	musepack? ( media-sound/musepack-tools )
-	nls? ( virtual/libintl )
-	notify? (
-		sys-apps/dbus
-	)
-	opus? ( media-libs/opusfile )
-	pulseaudio? ( media-sound/pulseaudio )
+	mac? ( media-sound/mac )
+	gme? ( media-libs/game-music-emu )
+	mms? ( media-libs/libmms )
+	tta? ( media-sound/ttaenc )
+	midi? ( media-sound/wildmidi )
+	dumb? ( media-libs/dumb )
+	shorten? ( media-sound/shorten )
+	alac? ( media-sound/alac_decoder )
+	alsa? ( media-libs/alsa-lib )
+	ffmpeg? ( media-video/ffmpeg:= )
+	mad? ( media-libs/libmad:= )
 	vorbis? ( media-libs/libvorbis )
-	mac? ( dev-lang/yasm )
+	flac? ( media-libs/flac )
 	wavpack? ( media-sound/wavpack )
-	zip? ( dev-libs/libzip )
-	dev-libs/libdispatch:=
+	sndfile? ( media-libs/libsndfile )
+	curl? ( net-misc/curl )
+	cdda? ( dev-libs/libcdio media-libs/libcddb )
+	gtk? ( x11-libs/gtk+:2 dev-libs/jansson:= )
+	gtk3? ( x11-libs/gtk+:3 dev-libs/jansson:= )
+	X? ( x11-libs/libX11 )
+	pulseaudio? ( media-libs/libpulse )
+	libsamplerate? ( media-libs/libsamplerate )
+	musepack? ( media-sound/musepack-tools )
+	aac? ( media-libs/faad2 )
+	libnotify? ( x11-libs/libnotify sys-apps/dbus )
+	zip? ( sys-libs/zlib dev-libs/libzip )
+	gme? ( sys-libs/zlib )
+	psf? ( sys-libs/zlib )
+	midi? ( media-sound/timidity-freepats )
+	opus? ( media-libs/opusfile )
+	dev-libs/libdispatch
+	pipewire? ( media-video/pipewire:= )
 "
-
-RDEPEND="${DEPEND}"
+DEPEND="
+	${RDEPEND}
+"
 BDEPEND="
-	dev-util/intltool
 	sys-devel/gettext
+	dev-util/intltool
+	oss? ( virtual/libc )
+	mac? ( dev-lang/yasm )
 	sys-devel/clang
-	sys-devel/llvm
-	virtual/pkgconfig
 "
+PATCHES=( "${FILESDIR}"/adplug.diff )
 
-#PATCHES=(
-#	"${FILESDIR}/deadbeef-9999-drop-Werror.patch"
-#)
-
-src_prepare() {
-	default
-	
-	if [[ -n ${PV%%*9999} ]]; then
-		mv "${WORKDIR}"/${MY_MP}/* "${S}"/external/mp4p
-	fi
-	local _t=/usr/share/timidity/freepats/timidity.cfg
-	sed \
-		-e "s,#define DEFAULT_TIMIDITY_CONFIG \",&${_t}:," \
-		-i plugins/wildmidi/wildmidiplug.c
-
-	drop_from_linguas() {
-		sed "/${1}/d" -i "${S}/po/LINGUAS" || die
-	}
-
-	drop_and_stub() {
-		rm -rf "${1}"
-		mkdir "${1}"
-		cat > "${1}/Makefile.in" <<-EOF
-			all: nothing
-			install: nothing
-			nothing:
-		EOF
-	}
-
-	plocale_for_each_disabled_locale drop_from_linguas || die
-
-	eautopoint --force
-	eautoreconf
-
-	# Get rid of bundled gettext.
-	use elibc_musl || drop_and_stub "${S}/intl"
-
-	# Plugins that are undesired for whatever reason, candidates for unbundling and such.
-	for i in adplug alac dumb ffap mms gme lfs mono2stereo psf sc60 shn sid soundtouch wma; do
-		drop_and_stub "${S}/plugins/${i}"
-	done
-
-	rm -rf "${S}/plugins/rg_scanner/ebur128"
-}
-
-src_configure () {
+pkg_setup() {
 	if ! tc-is-clang; then
 		AR=llvm-ar
 		CC=${CHOST}-clang
 		CXX=${CHOST}-clang++
 		NM=llvm-nm
 		RANLIB=llvm-ranlib
-
 		strip-unsupported-flags
 	fi
+}
 
-	export HOST_CC="$(tc-getBUILD_CC)"
-	export HOST_CXX="$(tc-getBUILD_CXX)"
-	tc-export CC CXX LD AR NM OBJDUMP RANLIB PKG_CONFIG
+src_prepare() {
+	default
+	if [[ -n ${PV%%*9999} ]]; then
+		mv "${WORKDIR}"/${MY_MP}/* "${S}"/external/${MY_MP%-*}
+		mv "${WORKDIR}"/${MY_LR}/* "${S}"/external/${MY_LR%-*}
+		mv "${WORKDIR}"/${MY_PW}/* "${S}"/external/${MY_PW%-*}
+	fi
+	local _t=/usr/share/timidity/freepats/timidity.cfg
+	sed \
+		-e "s,#define DEFAULT_TIMIDITY_CONFIG \",&${_t}:," \
+		-i plugins/wildmidi/wildmidiplug.c
+	eautopoint --force
+	eautoreconf
+}
 
+src_configure() {
 	local myconf=(
-		"--disable-static"
-		"--disable-staticlink"
-		"--disable-portable"
-		"--disable-rpath"
-
-		"--disable-libmad"
-		"--disable-gtk2"
-		"--disable-adplug"
-		"--disable-coreaudio"
-		"--disable-dumb"
-		"--disable-alac"
-		"--disable-gme"
-		"--disable-mms"
-		"--disable-mono2stereo"
-		"--disable-psf"
-		"--disable-rgscanner"
-		"--disable-shn"
-		"--disable-sid"
-		"--disable-sndfile"
-		"--disable-soundtouch"
-		"--disable-tta"
-		"--disable-vfs-zip"
-		"--disable-vtx"
-		"--disable-wildmidi"
-		"--disable-wma"
-
-		"$(use_enable alsa)"
-		"$(use_enable oss)"
-		"$(use_enable pulseaudio pulse)"
-		"$(use_enable mp3)"
-		"$(use_enable mp3 libmpg123)"
-		"$(use_enable nls)"
-		"$(use_enable vorbis)"
-		"$(use_enable threads)"
-		"$(use_enable flac)"
-		"$(use_enable supereq)"
-		"$(use_enable cdda)"
-		"$(use_enable cdda cdda-paranoia)"
-		"$(use_enable aac)"
-		"$(use_enable cover artwork)"
-		"$(use_enable cover artwork-network)"
-		"$(use_enable dts dca)"
-		"$(use_enable ffmpeg)"
-		"$(use_enable converter)"
-		"$(use_enable mac ffap)"
-		"$(use_enable musepack)"
-		"$(use_enable notify)"
-		"$(use_enable nullout)"
-		"$(use_enable opus)"
-		"$(use_enable pipewire)"
-		"$(use_enable sc68)"
-		"$(use_enable shellexec)"
-		"$(use_enable shellexec shellexecui)"
-		"$(use_enable lastfm lfm)"
-		"$(use_enable libsamplerate src)"
-		"$(use_enable wavpack)"
-
-		"--enable-gtk3"
-		"--enable-vfs-curl"
-		"--enable-shared"
-		"--enable-m3u"
-		"--enable-pltbrowser"
+		$(use_enable nls)
+		$(use_enable threads)
+		$(use_enable alsa)
+		$(use_enable oss)
+		$(use_enable pulseaudio pulse)
+		$(use_enable gtk gtk2)
+		$(use_enable gtk3)
+		$(use_enable curl vfs-curl)
+		$(use_enable lastfm lfm)
+		$(use_enable sid)
+		$(use_enable mad libmad)
+		$(use_enable mac ffap)
+		$(use_enable X hotkeys)
+		$(use_enable vorbis)
+		$(use_enable ffmpeg)
+		$(use_enable flac)
+		$(use_enable sndfile)
+		$(use_enable wavpack)
+		$(use_enable cdda )
+		$(use_enable gme)
+		$(use_enable libnotify notify)
+		$(use_enable musepack)
+		$(use_enable midi wildmidi)
+		$(use_enable tta)
+		$(use_enable dts dca)
+		$(use_enable aac)
+		$(use_enable mms)
+		$(use_enable libsamplerate src)
+		$(use_enable zip vfs-zip)
+		$(use_enable dumb)
+		$(use_enable shorten shn)
+		$(use_enable alac)
+		$(use_enable wma)
+		$(use_enable opus)
+		$(use_enable libretro)
+		$(use_enable pipewire)
+		$(use_enable adplug)
+		$(use_enable artwork)
+		--enable-artwork-network=$(usex artwork $(usex curl))
+		$(use_enable psf)
+		$(use_enable sc68)
 	)
-
 	econf "${myconf[@]}"
 }
 
 src_install() {
 	default
-
-	find "${ED}" -name '*.la' -delete || die
+	find "${ED}" -name '*.la' -delete
+	docompress -x /usr/share/doc/${PF}
 }
