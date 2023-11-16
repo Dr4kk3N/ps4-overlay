@@ -104,7 +104,7 @@ COMMON_DEPEND="
 		virtual/libcrypt:=
 	)
 	screencast? (
-		>=dev-qt/qtbase-${QTMIN}:6=[gui,egl]
+		>=dev-qt/qtbase-${QTMIN}:6=[gui]
 		>=kde-plasma/kpipewire-${PVCUT}:6
 		media-libs/libglvnd
 		>=media-video/pipewire-0.3:=
