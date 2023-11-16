@@ -49,9 +49,9 @@ BDEPEND="
 	dev-util/meson
 "
 
-#PATCHES=(
-#	"${FILESDIR}/typescript-error-suppression.patch"
-#)
+PATCHES=(
+	"${FILESDIR}/ts_config.patch"
+)
 
 src_unpack() {
 	if [[ ${PV} == 9999 ]]; then
