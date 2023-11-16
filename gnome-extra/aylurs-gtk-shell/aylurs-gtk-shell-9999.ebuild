@@ -50,7 +50,7 @@ BDEPEND="
 "
 
 PATCHES=(
-	"${FILESDIR}/ts_config.patch"
+	"${FILESDIR}/typescript-error-suppression.patch"
 )
 
 src_unpack() {

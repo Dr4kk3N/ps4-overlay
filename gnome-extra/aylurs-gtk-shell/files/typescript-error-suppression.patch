@@ -1,26 +1,47 @@
+diff --git a/src/app.ts b/src/app.ts
+index 239a38f..1a81eb2 100644
+--- a/src/app.ts
++++ b/src/app.ts
+@@ -31,6 +31,7 @@ export class App extends Gtk.Application {
+         }, this);
+     }
+ 
++    // @ts-ignore
+     private _dbus!: Gio.DBusExportedObject;
+     private _closeDelay!: { [key: string]: number };
+     private _cssProviders: Gtk.CssProvider[] = [];
+@@ -257,7 +258,7 @@ export class App extends Gtk.Application {
+         return `${this.getWindow(name)?.visible}`;
+     }
+ 
+-    Inspector() { Gtk.Window.set_interactive_debugging(true); }
++    Inspector() { Gtk.Window.set_interactive_debugging(false); }
+ 
+     Quit() { this.quit(); }
+ }
 diff --git a/src/main.ts b/src/main.ts
-index d2b4b50..c88b107 100644
+index 7068f61..fd5486b 100644
 --- a/src/main.ts
 +++ b/src/main.ts
-@@ -41,7 +41,7 @@ function isRunning(dbusName: string) {
+@@ -30,6 +30,7 @@ function isRunning(dbusName: string) {
          '/org/freedesktop/DBus',
          'org.freedesktop.DBus',
          'NameHasOwner',
--        // @ts-expect-error
-+        // @ts-ignore
++	// @ts-ignore
          GLib.Variant.new_tuple([new GLib.Variant('s', dbusName)]),
          new GLib.VariantType('(b)'),
          Gio.DBusCallFlags.NONE,
-@@ -126,7 +126,7 @@ export function main(args: string[]) {
+@@ -113,7 +114,8 @@ export function main(args: string[]) {
+                 break;
          }
      }
- 
--    // @ts-expect-error
+-
++    
 +    // @ts-ignore
-     globalThis.ags = {
-         App,
-         Utils,
-@@ -157,7 +157,7 @@ export function main(args: string[]) {
+     const bus = APP_BUS(flags.busName);
+     const path = APP_PATH(flags.busName);
+ 
+@@ -136,7 +138,7 @@ export function main(args: string[]) {
                  app.Inspector();
          });
  
@@ -29,11 +50,67 @@ index d2b4b50..c88b107 100644
          return app.runAsync(null);
      }
      else {
+diff --git a/src/service.ts b/src/service.ts
+index 2ce3b9b..4f824a9 100644
+--- a/src/service.ts
++++ b/src/service.ts
+@@ -64,7 +64,7 @@ export default class Service extends GObject.Object {
+         if (signals) {
+             Object.keys(signals).forEach(signal => Signals[signal] = {
+                 param_types: signals[signal].map(t =>
+-                    // @ts-expect-error
++                    // @ts-ignore
+                     GObject[`TYPE_${t.toUpperCase()}`]),
+             });
+         }
+@@ -84,7 +84,7 @@ export default class Service extends GObject.Object {
+     }
+ 
+     updateProperty(prop: string, value: unknown) {
+-        // @ts-expect-error
++        // @ts-ignore
+         if (this[`_${prop}`] === value)
+             return;
+ 
+@@ -93,7 +93,7 @@ export default class Service extends GObject.Object {
+             .map((w, i) => i > 0 ? w.charAt(0).toUpperCase() + w.slice(1) : w)
+             .join('');
+ 
+-        // @ts-expect-error
++        // @ts-ignore
+         this[`_${privateProp}`] = value;
+         this.notify(prop);
+     }
+diff --git a/src/service/audio.ts b/src/service/audio.ts
+index d8693b3..160632d 100644
+--- a/src/service/audio.ts
++++ b/src/service/audio.ts
+@@ -113,6 +113,7 @@ export class Audio extends Service {
+     private _microphone!: Stream;
+     private _speakerBinding!: number;
+     private _microphoneBinding!: number;
++    // @ts-ignore
+ 
+     constructor() {
+         super();
+diff --git a/src/service/battery.ts b/src/service/battery.ts
+index 597ae44..6d43b57 100644
+--- a/src/service/battery.ts
++++ b/src/service/battery.ts
+@@ -51,6 +51,8 @@ export class Battery extends Service {
+     get energy_full() { return this._energyFull; }
+     get energy_rate() { return this._energyRate; }
+ 
++    // @ts-ignore
++
+     constructor() {
+         super();
+ 
 diff --git a/src/service/bluetooth.ts b/src/service/bluetooth.ts
-index aa8c024..a461751 100644
+index c4ee440..8cb5ab8 100644
 --- a/src/service/bluetooth.ts
 +++ b/src/service/bluetooth.ts
-@@ -30,14 +30,14 @@ class BluetoothDevice extends Service {
+@@ -30,14 +30,14 @@ export class BluetoothDevice extends Service {
          });
      }
  
@@ -50,7 +127,7 @@ index aa8c024..a461751 100644
      constructor(device: GnomeBluetooth.Device) {
          super();
  
-@@ -96,7 +96,7 @@ class BluetoothService extends Service {
+@@ -99,7 +99,7 @@ export class Bluetooth extends Service {
          });
      }
  
@@ -59,25 +136,25 @@ index aa8c024..a461751 100644
      private _client: GnomeBluetooth.Client;
      private _devices: Map<string, BluetoothDevice>;
  
-@@ -133,7 +133,7 @@ class BluetoothService extends Service {
+@@ -136,7 +136,7 @@ export class Bluetooth extends Service {
          return devices;
      }
  
 -    // @ts-expect-error
 +    // @ts-ignore
-     private _deviceAdded(_c: unknown, device: GnomeBluetooth.Device) {
+     private _deviceAdded(_, device: GnomeBluetooth.Device) {
          if (this._devices.has(device.address))
              return;
-@@ -144,7 +144,7 @@ class BluetoothService extends Service {
-         this.changed('devices');
+@@ -149,7 +149,7 @@ export class Bluetooth extends Service {
+         this.emit('device-added', device.address);
      }
  
 -    // @ts-expect-error
 +    // @ts-ignore
-     private _deviceRemoved(_c: unknown, device: GnomeBluetooth.Device) {
+     private _deviceRemoved(_, device: GnomeBluetooth.Device) {
          if (!this._devices.has(device.address))
              return;
-@@ -165,7 +165,7 @@ class BluetoothService extends Service {
+@@ -171,7 +171,7 @@ export class Bluetooth extends Service {
              device.device.get_object_path(),
              connect,
              null,
@@ -87,11 +164,11 @@ index aa8c024..a461751 100644
                  try {
                      const s = client.connect_service_finish(res);
 diff --git a/src/service/hyprland.ts b/src/service/hyprland.ts
-index 6cbc952..ba6185d 100644
+index 498d3b7..e23b822 100644
 --- a/src/service/hyprland.ts
 +++ b/src/service/hyprland.ts
-@@ -286,7 +286,7 @@ class HyprlandService extends Service {
-                 case 'changefloating': {
+@@ -316,7 +316,7 @@ export class Hyprland extends Service {
+                 case 'changefloatingmode': {
                      const client = this._clients.get('0x' + argv[0]);
                      if (client)
 -                        // @ts-expect-error
@@ -100,60 +177,20 @@ index 6cbc952..ba6185d 100644
                      break;
                  }
 diff --git a/src/service/mpris.ts b/src/service/mpris.ts
-index 757b08a..8faa83e 100644
+index 5766816..4857193 100644
 --- a/src/service/mpris.ts
 +++ b/src/service/mpris.ts
-@@ -198,7 +198,7 @@ class MprisPlayer extends Service {
+@@ -192,7 +192,7 @@ export class MprisPlayer extends Service {
              Gio.File.new_for_path(this._coverPath),
              Gio.FileCopyFlags.OVERWRITE,
              GLib.PRIORITY_DEFAULT,
 -            // @ts-expect-error
 +            // @ts-ignore
-             null, null, (source, result) => {
+             null, null, (source: Gio.File, result: Gio.AsyncResult) => {
                  try {
                      source.copy_finish(result);
-diff --git a/src/service/service.ts b/src/service/service.ts
-index 1494f7d..b76ea78 100644
---- a/src/service/service.ts
-+++ b/src/service/service.ts
-@@ -44,7 +44,7 @@ export default class Service extends GObject.Object {
-             case 'boolean': return GObject.ParamSpec.boolean(
-                 name, name, name, flags, false);
- 
--            // @ts-expect-error
-+            // @ts-ignore
-             default: return GObject.ParamSpec.jsobject(
-                 name, name, name, flags, null);
-         }
-@@ -66,7 +66,7 @@ export default class Service extends GObject.Object {
-         if (signals) {
-             Object.keys(signals).forEach(signal => Signals[signal] = {
-                 param_types: signals[signal].map(t =>
--                    // @ts-expect-error
-+                    // @ts-ignore
-                     GObject[`TYPE_${t.toUpperCase()}`]),
-             });
-         }
-@@ -89,7 +89,7 @@ export default class Service extends GObject.Object {
-     }
- 
-     updateProperty(prop: string, value: unknown) {
--        // @ts-expect-error
-+        // @ts-ignore
-         if (this[`_${prop}`] === value)
-             return;
- 
-@@ -98,7 +98,7 @@ export default class Service extends GObject.Object {
-             .map((w, i) => i > 0 ? w.charAt(0).toUpperCase() + w.slice(1) : w)
-             .join('');
- 
--        // @ts-expect-error
-+        // @ts-ignore
-         this[`_${privateProp}`] = value;
-         this.notify(prop);
-     }
 diff --git a/src/service/systemtray.ts b/src/service/systemtray.ts
-index 8c4ed4e..49cf9a8 100644
+index 9930d86..e09bcc4 100644
 --- a/src/service/systemtray.ts
 +++ b/src/service/systemtray.ts
 @@ -1,3 +1,5 @@
@@ -162,241 +199,34 @@ index 8c4ed4e..49cf9a8 100644
  import Gio from 'gi://Gio';
  import GLib from 'gi://GLib';
  import Gdk from 'gi://Gdk?version=3.0';
-@@ -117,7 +119,7 @@ export class TrayItem extends Service {
-     private _itemProxyAcquired(proxy: StatusNotifierItemProxy) {
-         if (proxy.Menu) {
-             const menu = Widget({
--                // @ts-expect-error
-+                // @ts-ignore
-                 type: DbusmenuGtk3.Menu,
-                 dbus_name: proxy.g_name_owner,
-                 dbus_object: proxy.Menu,
-diff --git a/src/utils.ts b/src/utils.ts
-index 4f8165a..a33b8bb 100644
---- a/src/utils.ts
-+++ b/src/utils.ts
-@@ -99,12 +99,12 @@ export function connect(
-         event, (_s, ...args: unknown[]) => callback(widget, ...args));
- 
-     widget.connect('destroy', () => {
--        // @ts-expect-error
-+        // @ts-ignore
-         widget._destroyed = true;
-         service.disconnect(bind);
-     });
-     GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
--        // @ts-expect-error
-+        // @ts-ignore
-         if (!widget._destroyed)
-             callback(widget);
- 
-diff --git a/src/variable.ts b/src/variable.ts
-index a468ff0..2b9750f 100644
---- a/src/variable.ts
-+++ b/src/variable.ts
-@@ -18,7 +18,7 @@ class AgsVariable extends GObject.Object {
-             GTypeName: 'AgsVariable',
-             Signals: { 'changed': {} },
-             Properties: {
--                // @ts-expect-error
-+                // @ts-ignore
-                 'value': GObject.ParamSpec.jsobject(
-                     'value', 'value', 'value',
-                     GObject.ParamFlags.READWRITE, null,
 diff --git a/src/widget.ts b/src/widget.ts
-index e2f7ca8..de8a88a 100644
+index 879ef39..a417eae 100644
 --- a/src/widget.ts
 +++ b/src/widget.ts
-@@ -21,7 +21,7 @@ export default function Widget({ type, ...params }: { type: ctor }) {
-     return constructor(type, params);
- }
+@@ -52,7 +52,7 @@ export function Widget<
+         `Use Widget.subclass instead, or open up an issue/PR to include ${type.name} on Widget`);
  
--// @ts-expect-error
-+// @ts-ignore
- export const Window = (args: object) => constructor(AgsWindow, args);
- export const Box = (args: object) => constructor(AgsBox, args);
- export const Button = (args: object) => constructor(AgsButton, args);
-diff --git a/src/widgets/constructor.ts b/src/widgets/constructor.ts
-index 3709432..3b2a53d 100644
---- a/src/widgets/constructor.ts
-+++ b/src/widgets/constructor.ts
-@@ -51,20 +51,20 @@ function parseCommon(widget: Gtk.Widget, {
-     connections = [], properties, binds, setup,
- }: CommonParams) {
-     if (className !== undefined)
+     if (ctors.has(type))
 -        // @ts-expect-error
 +        // @ts-ignore
-         widget.className = className;
+         return new ctors.get(type)(props);
  
-     if (style !== undefined)
--        // @ts-expect-error
-+        // @ts-ignore
-         widget.style = style;
- 
-     if (css !== undefined)
--        // @ts-expect-error
-+        // @ts-ignore
-         widget.css = css;
- 
- 
-     if (typeof halign === 'string') {
--        // @ts-expect-error
-+        // @ts-ignore
-         const align = Gtk.Align[halign.toUpperCase()];
-         if (typeof align !== 'number')
-             console.error('wrong halign value');
-@@ -76,7 +76,7 @@ function parseCommon(widget: Gtk.Widget, {
-         widget.halign = halign;
- 
-     if (typeof valign === 'string') {
--        // @ts-expect-error
-+        // @ts-ignore
-         const align = Gtk.Align[valign.toUpperCase()];
-         if (typeof align !== 'number')
-             console.error('wrong valign value');
-@@ -89,7 +89,7 @@ function parseCommon(widget: Gtk.Widget, {
- 
-     if (properties) {
-         properties.forEach(([key, value]) => {
--            // @ts-expect-error
-+            // @ts-ignore
-             widget[`_${key}`] = value;
-         });
-     }
-@@ -101,7 +101,7 @@ function parseCommon(widget: Gtk.Widget, {
-                 return;
-             }
- 
--            // @ts-expect-error
-+            // @ts-ignore
-             const callback = () => widget[prop] = transform(obj[objProp]);
-             connections.push([obj, callback, `notify::${objProp}`]);
-         });
+     const Ctor = AgsWidget(type);
 diff --git a/src/widgets/label.ts b/src/widgets/label.ts
-index d5870f5..f1fa0c0 100644
+index 6c32fe7..cad666a 100644
 --- a/src/widgets/label.ts
 +++ b/src/widgets/label.ts
-@@ -43,7 +43,7 @@ export default class AgsLabel extends Gtk.Label {
-     set label(label: string) {
-         if (this.useMarkup) {
+@@ -39,7 +39,7 @@ export default class AgsLabel extends AgsWidget(Gtk.Label) {
              try {
--                // @ts-expect-error
-+                // @ts-ignore
                  Pango.parse_markup(label, label.length, '0');
              } catch (e) {
+-                // @ts-expect-error
++                // @ts-ignore
                  if (e instanceof GLib.MarkupError)
-@@ -65,7 +65,7 @@ export default class AgsLabel extends Gtk.Label {
-             return;
-         }
- 
--        // @ts-expect-error
-+        // @ts-ignore
-         this.ellipsize = Pango.EllipsizeMode[truncate.toUpperCase()];
-     }
- 
-@@ -79,7 +79,7 @@ export default class AgsLabel extends Gtk.Label {
-             return;
-         }
- 
--        // @ts-expect-error
-+        // @ts-ignore
-         this.justify = Gtk.Justification[justify.toUpperCase()];
-     }
- }
-diff --git a/src/widgets/overrides.ts b/src/widgets/overrides.ts
-index 5419d4e..d67d5c3 100644
---- a/src/widgets/overrides.ts
-+++ b/src/widgets/overrides.ts
-@@ -79,17 +79,17 @@ Object.defineProperty(Gtk.Widget.prototype, 'css', {
-     },
- });
- 
--// @ts-expect-error
-+// @ts-ignore
- Gtk.Widget.prototype.setCss = function(css: string) {
-     setCss(this, css);
- };
- 
--// @ts-expect-error
-+// @ts-ignore
- Gtk.Widget.prototype.setStyle = function(css: string) {
-     setCss(this, `* { ${css} }`);
- };
- 
--// @ts-expect-error
-+// @ts-ignore
- Gtk.Widget.prototype.toggleClassName = function(cn: string, condition = true) {
-     toggleClassName(this, cn, condition);
- };
-diff --git a/src/widgets/revealer.ts b/src/widgets/revealer.ts
-index 6ab3baf..ad3e2f5 100644
---- a/src/widgets/revealer.ts
-+++ b/src/widgets/revealer.ts
-@@ -31,7 +31,7 @@ export default class AgsRevealer extends Gtk.Revealer {
-             return;
-         }
- 
--        // @ts-expect-error
-+        // @ts-ignore
-         this.transitionType = Gtk.RevealerTransitionType[transition.toUpperCase()];
-     }
- }
-diff --git a/src/widgets/scrollable.ts b/src/widgets/scrollable.ts
-index 310813e..ab8abb1 100644
---- a/src/widgets/scrollable.ts
-+++ b/src/widgets/scrollable.ts
-@@ -62,9 +62,9 @@ export default class AgsScrollable extends Gtk.ScrolledWindow {
- 
-     policy() {
-         this.set_policy(
--            // @ts-expect-error
-+            // @ts-ignore
-             Gtk.PolicyType[this._hscroll?.toUpperCase() || 'AUTOMATIC'],
--            // @ts-expect-error
-+            // @ts-ignore
-             Gtk.PolicyType[this._vscroll?.toUpperCase() || 'AUTOMATIC'],
-         );
-     }
-diff --git a/src/widgets/stack.ts b/src/widgets/stack.ts
-index d41b3a6..eeb590c 100644
---- a/src/widgets/stack.ts
-+++ b/src/widgets/stack.ts
-@@ -74,7 +74,7 @@ export default class AgsStack extends Gtk.Stack {
-             return;
-         }
- 
--        // @ts-expect-error
-+        // @ts-ignore
-         this.transitionType = Gtk.StackTransitionType[transition.toUpperCase()];
-     }
- 
-diff --git a/src/widgets/window.ts b/src/widgets/window.ts
-index 97ebfd6..5487ece 100644
---- a/src/widgets/window.ts
-+++ b/src/widgets/window.ts
-@@ -51,6 +51,7 @@ export default class AgsWindow extends Gtk.Window {
-     get monitor() { return this._monitor; }
-     set monitor(monitor: number | null | Gdk.Monitor) {
-         if (monitor === null) {
-+            // @ts-ignore
-             this._monitor = monitor;
-             return;
-         }
-@@ -115,10 +116,10 @@ export default class AgsWindow extends Gtk.Window {
- 
-     _margin: number[] | number = [0];
- 
--    // @ts-expect-error
-+    // @ts-ignore
-     get margin() { return this._margin; }
- 
--    // @ts-expect-error
-+    // @ts-ignore
-     set margin(margin: number[] | number) {
-         let margins: [side: string, index: number][] = [];
-         if (typeof margin === 'number')
+                     label = GLib.markup_escape_text(label, -1) || '';
+                 else
 diff --git a/tsconfig.json b/tsconfig.json
-index d12215a..e73b0d5 100644
+index 7f3406d..3ec43fd 100644
 --- a/tsconfig.json
 +++ b/tsconfig.json
 @@ -8,7 +8,8 @@
@@ -405,7 +235,7 @@ index d12215a..e73b0d5 100644
          "outDir": "_build/tsc-out",
 -        "strict": true,
 +        "strict": false,
-+	"noUnusedParameters": true,
++        "noUnusedParameters": true,
          "moduleResolution": "node",
          "baseUrl": ".",
-         "paths": {
+         "typeRoots": [
