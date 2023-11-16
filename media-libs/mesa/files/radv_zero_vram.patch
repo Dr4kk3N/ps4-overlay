@@ -1,0 +1,13 @@
+diff --git a/src/util/00-radv-defaults.conf b/src/util/00-radv-defaults.conf
+index df89a791df0..5678c5e011f 100644
+--- a/src/util/00-radv-defaults.conf
++++ b/src/util/00-radv-defaults.conf
+@@ -59,6 +59,7 @@ Application bugs worked around in this file:
+         <engine engine_name_match="^UnrealEngine"> <!-- UE4/5 Vulkan RHI -->
+             <option name="radv_flush_before_query_copy" value="true" />
+             <option name="radv_flush_before_timestamp_write" value="true" />
++            <option name="radv_zero_vram" value="true" />
+         </engine>
+ 
+         <engine engine_name_match="DXVK_NvRemix">
+
