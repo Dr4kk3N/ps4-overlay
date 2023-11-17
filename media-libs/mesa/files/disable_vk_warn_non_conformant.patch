@@ -1,0 +1,16 @@
+diff --git a/src/vulkan/util/vk_util.c b/src/vulkan/util/vk_util.c
+index dbcf2c0edd4..727aa2674ed 100644
+--- a/src/vulkan/util/vk_util.c
++++ b/src/vulkan/util/vk_util.c
+@@ -78,8 +78,8 @@ vk_warn_non_conformant_implementation(const char *driver_name)
+    if (debug_get_bool_option("MESA_VK_IGNORE_CONFORMANCE_WARNING", false))
+       return;
+ 
+-   fprintf(stderr, "WARNING: %s is not a conformant Vulkan implementation, "
+-                   "testing use only.\n", driver_name);
++/*   fprintf(stderr, "WARNING: %s is not a conformant Vulkan implementation, "
++                   "testing use only.\n", driver_name); */
+ }
+ 
+ struct nir_spirv_specialization*
+
