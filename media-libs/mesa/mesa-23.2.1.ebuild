@@ -203,8 +203,7 @@ x86? (
 PATCHES=(
 	# Workaround the CMake dependency lookup returning a different LLVM to llvm-config, bug #907965
 	"${FILESDIR}/clang_config_tool.patch"
-	"${FILESDIR}/conformant_implementation.patch"
-	"${FILESDIR}/mesa-ps4pro.patch.23.2.1"
+	"${FILESDIR}/mesa-ps4-23.2.1.patch"
 )
 
 llvm_check_deps() {
