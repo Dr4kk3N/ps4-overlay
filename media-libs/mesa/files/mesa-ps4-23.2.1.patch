@@ -220,7 +220,7 @@ index dbcf2c0edd4..e25f9eca30e 100644
        return;
  
 -   fprintf(stderr, "WARNING: %s is not a conformant Vulkan implementation, "
-+   fprintf(stderr, "Playstation 4 Liverpool/Gladius GPU best performance, "
++   fprintf(stderr, "Playstation 4 %s Liverpool,Gladius GPU best performance, "
                     "testing use only.\n", driver_name);
  }
  
