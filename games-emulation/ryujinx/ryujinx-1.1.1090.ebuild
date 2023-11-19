@@ -58,15 +58,15 @@ NUGETS="avalonia@11.0.5
 	microsoft.codeanalysis.csharp@4.7.0
 	microsoft.codeanalysis.csharp.scripting@3.8.0
 	microsoft.codeanalysis.scripting.common@3.8.0
-	microsoft.codecoverage@17.7.2
+	microsoft.codecoverage@17.8.0
 	microsoft.csharp@4.3.0
 	microsoft.csharp@4.7.0
 	microsoft.dotnet.platformabstractions@3.1.6
 	microsoft.extensions.dependencymodel@6.0.0
-	microsoft.identitymodel.abstractions@7.0.0
-	microsoft.identitymodel.jsonwebtokens@7.0.0
-	microsoft.identitymodel.logging@7.0.0
-	microsoft.identitymodel.tokens@7.0.0
+	microsoft.identitymodel.abstractions@7.0.3
+	microsoft.identitymodel.jsonwebtokens@7.0.3
+	microsoft.identitymodel.logging@7.0.3
+	microsoft.identitymodel.tokens@7.0.3
 	microsoft.io.recyclablememorystream@2.3.2
 	microsoft.netcore.app.host.osx-x64@7.0.12
 	microsoft.netcore.app.host.win-x64@7.0.12
@@ -79,12 +79,12 @@ NUGETS="avalonia@11.0.5
 	microsoft.netcore.platforms@2.1.2
 	microsoft.netcore.targets@1.0.1
 	microsoft.netcore.targets@1.1.0
-	microsoft.net.test.sdk@17.7.2
-	microsoft.testplatform.objectmodel@17.7.2
-	microsoft.testplatform.testhost@17.7.2
+	microsoft.net.test.sdk@17.8.0
+	microsoft.testplatform.objectmodel@17.8.0
+	microsoft.testplatform.testhost@17.8.0
 	microsoft.win32.primitives@4.0.1
 	microsoft.win32.registry@4.5.0
-	microsoft.win32.systemevents@7.0.0
+	microsoft.win32.systemevents@8.0.0
 	msgpack.cli@1.0.1
 	netcoreserver@7.0.0
 	netstandard.library@1.6.0
@@ -94,12 +94,13 @@ NUGETS="avalonia@11.0.5
 	nuget.frameworks@6.5.0
 	nunit@3.13.3
 	nunit3testadapter@4.1.0
-	opentk.core@4.7.7
-	opentk.graphics@4.7.7
-	opentk.mathematics@4.7.7
+	opentk.core@4.8.1
+	opentk.graphics@4.8.1
+	opentk.mathematics@4.8.1
 	opentk.openal@4.7.7
-	opentk.redist.glfw@3.3.8.30
-	opentk.windowing.graphicslibraryframework@4.7.7
+	opentk.audio.openal@4.8.1
+	opentk.redist.glfw@3.3.8.39
+	opentk.windowing.graphicslibraryframework@4.8.1
 	runtime.any.system.collections@4.3.0
 	runtime.any.system.diagnostics.tools@4.3.0
 	runtime.any.system.diagnostics.tracing@4.3.0
@@ -194,6 +195,7 @@ NUGETS="avalonia@11.0.5
 	system.buffers@4.5.1
 	system.codedom@4.4.0
 	system.codedom@7.0.0
+	system.codedom@8.0.0
 	system.collections@4.0.11
 	system.collections@4.3.0
 	system.collections.concurrent@4.0.12
@@ -206,26 +208,26 @@ NUGETS="avalonia@11.0.5
 	system.diagnostics.diagnosticsource@4.0.0
 	system.diagnostics.tools@4.0.1
 	system.diagnostics.tracing@4.1.0
-	system.drawing.common@7.0.0
+	system.drawing.common@8.0.0
 	system.dynamic.runtime@4.3.0
 	system.globalization@4.0.11
 	system.globalization@4.3.0
 	system.globalization.calendars@4.0.1
 	system.globalization.extensions@4.0.1
-	system.identitymodel.tokens.jwt@7.0.0
+	system.identitymodel.tokens.jwt@7.0.3
 	system.io@4.1.0
 	system.io@4.3.0
 	system.io.compression@4.1.0
 	system.io.compression.zipfile@4.0.1
 	system.io.filesystem@4.0.1
 	system.io.filesystem.primitives@4.0.1
-	system.io.hashing@7.0.0
+	system.io.hashing@8.0.0
 	system.io.pipelines@6.0.0
 	system.linq@4.1.0
 	system.linq@4.3.0
 	system.linq.expressions@4.1.0
 	system.linq.expressions@4.3.0
-	system.management@7.0.2
+	system.management@8.0.0
 	system.memory@4.5.4
 	system.memory@4.5.5
 	system.net.http@4.1.0
@@ -309,7 +311,7 @@ inherit desktop dotnet-pkg xdg
 
 DESCRIPTION="Experimental Nintendo Switch emulator written in C#"
 HOMEPAGE="https://ryujinx.org/ https://github.com/Ryujinx/Ryujinx"
-SHA="dcf10561b996cdba111c5a3c3fe128781ab44021"
+SHA="aa96dcb1bede3693877e2f1eca3e169d8ee13ef1"
 MY_PN="R${PN:1}"
 SRC_URI="https://github.com/${MY_PN}/${MY_PN}/archive/${SHA}.tar.gz -> ${P}.tar.gz
 	${NUGET_URIS}"
