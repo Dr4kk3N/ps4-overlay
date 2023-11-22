@@ -6,8 +6,8 @@ EAPI=8
 PYTHON_COMPAT=( python3_{10..12} )
 
 # Check this on updates
-LLVM_MAX_SLOT=17
-LLVM_SLOTS=( 15 16 17 )
+LLVM_MAX_SLOT=16
+LLVM_SLOTS=( 16 )
 
 inherit cmake cuda flag-o-matic llvm multilib-minimal python-single-r1 toolchain-funcs
 
@@ -21,7 +21,6 @@ if [[ ${PV} = *9999 ]]; then
 else
 	SRC_URI="https://github.com/AcademySoftwareFoundation/OpenShadingLanguage/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 	PATCHES+=(
-		"${FILESDIR}/osl-1.12.13.0-llvm-17.patch"
 		"${FILESDIR}/osl-1.12.13.0-cuda-noinline-fix.patch"
 	)
 	KEYWORDS="~amd64 ~x86 ~arm ~arm64"
