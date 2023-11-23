@@ -34,7 +34,7 @@ IUSE="${IUSE_VIDEO_CARDS}
 	cpu_flags_x86_sse2 d3d9 debug gles1 +gles2 +llvm
 	lm-sensors opencl osmesa +proprietary-codecs selinux
 	test unwind vaapi valgrind vdpau vulkan
-	vulkan-overlay wayland +X xa zink +zstd"
+	vulkan-overlay wayland +X xa zink +zstd lto"
 
 REQUIRED_USE="
 	d3d9? (
@@ -192,6 +192,13 @@ llvm_check_deps() {
 	fi
 	has_version "sys-devel/llvm:${LLVM_SLOT}[${LLVM_USE_DEPS}]"
 }
+
+PATCHES=(
+        # Workaround the CMake dependency lookup returning a different LLVM to>
+        "${FILESDIR}/clang_config_tool.patch"
+
+        "${FILESDIR}/mesa-ps4pro-9999-r1.patch"
+)
 
 pkg_pretend() {
 	if use vulkan; then
@@ -420,6 +427,7 @@ multilib_src_configure() {
 		-Dvulkan-drivers=$(driver_list "${VULKAN_DRIVERS[*]}")
 		--buildtype $(usex debug debug plain)
 		-Db_ndebug=$(usex debug false true)
+		-Db_lto=$(usex lto true false)
 	)
 	meson_src_configure
 }
