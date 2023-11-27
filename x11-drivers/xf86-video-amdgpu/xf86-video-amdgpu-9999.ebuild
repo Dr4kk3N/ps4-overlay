@@ -21,7 +21,7 @@ RDEPEND=">=x11-libs/libdrm-2.4.89[video_cards_amdgpu]
 	udev? ( virtual/libudev:= )"
 DEPEND="${RDEPEND}"
 
-PATCHES=( "${FILESDIR}/xf86-video-amdgpu.patch.9999" )
+PATCHES=( "${FILESDIR}/xf86-video-amdgpu-9999.patch" )
 
 src_configure() {
 	local XORG_CONFIGURE_OPTIONS=(

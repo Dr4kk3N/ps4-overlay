@@ -14,9 +14,7 @@ inherit ${GIT_ECLASS} python-any-r1 meson-multilib
 
 DESCRIPTION="X.Org libdrm library"
 HOMEPAGE="https://dri.freedesktop.org/ https://gitlab.freedesktop.org/mesa/drm"
-if [[ ${PV} = 9999* ]]; then
-	SRC_URI=""
-else
+if [[ ${PV} != 9999* ]]; then
 	SRC_URI="https://dri.freedesktop.org/libdrm/${P}.tar.xz"
 	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~loong ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86 ~amd64-linux ~x86-linux"
 fi
@@ -26,31 +24,31 @@ for card in ${VIDEO_CARDS}; do
 	IUSE_VIDEO_CARDS+=" video_cards_${card}"
 done
 
-IUSE="${IUSE_VIDEO_CARDS} udev valgrind"
+IUSE="${IUSE_VIDEO_CARDS} valgrind"
 RESTRICT="test" # see bug #236845
 LICENSE="MIT"
 SLOT="0"
 
-COMMON_DEPEND="
+RDEPEND="
 	video_cards_intel? ( >=x11-libs/libpciaccess-0.13.1-r1:=[${MULTILIB_USEDEP}] )"
-DEPEND="${COMMON_DEPEND}
+DEPEND="${RDEPEND}
 	valgrind? ( dev-util/valgrind )"
-RDEPEND="${COMMON_DEPEND}
-	udev? ( virtual/udev )"
 BDEPEND="${PYTHON_DEPS}
 	$(python_gen_any_dep 'dev-python/docutils[${PYTHON_USEDEP}]')"
-
-PATCHES=(
-        "${FILESDIR}/libdrm-9999.patch"
-)
 
 python_check_deps() {
 	python_has_version "dev-python/docutils[${PYTHON_USEDEP}]"
 }
 
+src_prepare() {
+        eapply -p1 "${FILESDIR}/libdrm-2.4.117.patch"
+        eapply_user
+}
+
 multilib_src_configure() {
 	local emesonargs=(
-		$(meson_use udev)
+		# Udev is only used by tests now.
+		-Dudev=false
 		-Dcairo-tests=disabled
 		$(meson_feature video_cards_amdgpu amdgpu)
 		$(meson_feature video_cards_exynos exynos)

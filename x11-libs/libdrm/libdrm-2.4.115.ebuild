@@ -43,7 +43,7 @@ python_check_deps() {
 }
 
 src_prepare() {
-        eapply -p1 "${FILESDIR}/libdrm.patch.2.4.115"
+        eapply -p1 "${FILESDIR}/libdrm-2.4.115.patch"
         eapply_user
 }
 

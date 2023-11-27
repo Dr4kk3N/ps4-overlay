@@ -30,6 +30,6 @@ src_configure() {
 }
 
 src_prepare() {
-	eapply -p1 "${FILESDIR}/xf86-video-amdgpu.patch.22.0.0"
+	eapply -p1 "${FILESDIR}/xf86-video-amdgpu-22.0.0.patch"
 	eapply_user
 }
