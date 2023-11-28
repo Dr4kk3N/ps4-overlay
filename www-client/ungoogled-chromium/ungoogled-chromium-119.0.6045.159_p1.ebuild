@@ -56,13 +56,13 @@ REQUIRED_USE="
 	qt6? ( qt5 )
 "
 
-#UGC_COMMIT_ID="edbd02632be324eeddccfa6c0c4494daea10245a"
+#UGC_COMMIT_ID="0461ff207b3c4c66cd31f82fb92a08e2021f1bf8"
 # UGC_PR_COMMITS=(
 # 	c917e096342e5b90eeea91ab1f8516447c8756cf
 # 	5794e9d12bf82620d5f24505798fecb45ca5a22d
 # )
 
-UAZO_BROMITE_COMMIT_ID="6e8eab21d5d6995f6f78ab55a83093e5a0c4690f"
+UAZO_BROMITE_COMMIT_ID="dcbb3d0a3ba13fc2dcf1538fb5bdd2071c66234b"
 
 # CHROMIUM_COMMITS=(
 # 	5a8dfcaf84b5af5aeb738702651e98bfc43d6d45
@@ -429,6 +429,7 @@ src_prepare() {
 			"${BR_PA_PATH}/Add-flag-to-configure-maximum-connections-per-host.patch"
 			"${BR_PA_PATH}/Add-a-proxy-configuration-page.patch"
 			"${BR_PA_PATH}/Offer-builtin-autocomplete-for-chrome-flags.patch"
+			"${BR_PA_PATH}/Enable-StrictOriginIsolation-and-SitePerProcess.patch"
 			"${BR_PA_PATH}/Disable-requests-for-single-word-Omnibar-searches.patch"
 			"${BR_PA_PATH}/Reduce-HTTP-headers-in-DoH-requests-to-bare-minimum.patch"
 			"${BR_PA_PATH}/Hardening-against-incognito-mode-detection.patch"
