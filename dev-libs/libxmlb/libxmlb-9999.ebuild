@@ -19,7 +19,7 @@ HOMEPAGE="https://github.com/hughsie/libxmlb"
 LICENSE="LGPL-2.1+"
 SLOT="0/2" # libxmlb.so version
 
-KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
+KEYWORDS=""
 IUSE="doc introspection stemmer test +zstd"
 
 RESTRICT="!test? ( test )"
