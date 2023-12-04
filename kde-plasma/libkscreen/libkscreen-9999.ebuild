@@ -25,7 +25,7 @@ RDEPEND="
 	>=dev-qt/qtbase-${QTMIN}:6[X,dbus,gui]
 	>=kde-frameworks/kconfig-${KFMIN}:6
 	>=kde-frameworks/kcoreaddons-${KFMIN}:6
-	>=kde-frameworks/kwayland-${KFMIN}:6
+	>=kde-plasma/kwayland-${KFMIN}:6
 	x11-libs/libxcb
 "
 DEPEND="${RDEPEND}

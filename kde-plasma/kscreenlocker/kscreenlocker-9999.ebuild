@@ -34,7 +34,7 @@ COMMON_DEPEND="
 	>=kde-frameworks/kio-${KFMIN}:6
 	>=kde-frameworks/knotifications-${KFMIN}:6
 	>=kde-frameworks/kpackage-${KFMIN}:6
-	>=kde-frameworks/kwayland-${KFMIN}:6
+	>=kde-plasma/kwayland-${KFMIN}:6
 	>=kde-frameworks/kwindowsystem-${KFMIN}:6
 	>=kde-frameworks/kxmlgui-${KFMIN}:6
 	>=kde-frameworks/solid-${KFMIN}:6
@@ -51,7 +51,7 @@ DEPEND="${COMMON_DEPEND}
 "
 RDEPEND="${COMMON_DEPEND}
 	>=kde-frameworks/kirigami-${KFMIN}:6
-	>=kde-frameworks/plasma-${KFMIN}:6
+	>=kde-plasma/libplasma-${KFMIN}:6
 "
 BDEPEND="
 	dev-util/wayland-scanner

@@ -21,7 +21,7 @@ RDEPEND="
 	>=dev-qt/qtbase-${QTMIN}:6[dbus,gui,widgets,sql,gles2-only=,X]
 	>=dev-qt/qtdeclarative-${QTMIN}:6
 	>=dev-qt/qtsvg-${QTMIN}:6
-	=kde-frameworks/kactivities-${PVCUT}*:6
+	=kde-plasma/plasma-activities-${PVCUT}*:6
 	=kde-frameworks/karchive-${PVCUT}*:6
 	=kde-frameworks/kconfig-${PVCUT}*:6[qml]
 	=kde-frameworks/kconfigwidgets-${PVCUT}*:6
@@ -43,7 +43,7 @@ RDEPEND="
 	x11-libs/libxcb
 	!gles2-only? ( media-libs/libglvnd[X] )
 	wayland? (
-		=kde-frameworks/kwayland-${PVCUT}*:6
+		=kde-plasma/kwayland-${PVCUT}*:6
 		media-libs/libglvnd
 	)
 "

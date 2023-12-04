@@ -24,7 +24,7 @@ COMMON_DEPEND="
 	>=dev-libs/wayland-1.21.0
 	>=dev-qt/qtdeclarative-${QTMIN}:6
 	>=dev-qt/qtwayland-${QTMIN}:6
-	>=kde-frameworks/kactivities-${KFMIN}:6
+	>=kde-plasma/plasma-activities-${KFMIN}:6
 	>=kde-frameworks/kauth-${KFMIN}:6
 	>=kde-frameworks/kcmutils-${KFMIN}:6
 	>=kde-frameworks/kconfig-${KFMIN}:6[qml]
@@ -41,11 +41,11 @@ COMMON_DEPEND="
 	>=kde-frameworks/knotifications-${KFMIN}:6
 	>=kde-frameworks/kpackage-${KFMIN}:6
 	>=kde-frameworks/kservice-${KFMIN}:6
-	>=kde-frameworks/kwayland-${KFMIN}:6
+	>=kde-plasma/kwayland-${KFMIN}:6
 	>=kde-frameworks/kwidgetsaddons-${KFMIN}:6
 	>=kde-frameworks/kwindowsystem-${KFMIN}:6=[X]
 	>=kde-frameworks/kxmlgui-${KFMIN}:6
-	>=kde-frameworks/plasma-${KFMIN}:6
+	>=kde-plasma/libplasma-${KFMIN}:6
 	>=kde-plasma/kdecoration-${PVCUT}:6
 	media-libs/fontconfig
 	media-libs/freetype
