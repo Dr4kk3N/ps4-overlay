@@ -68,6 +68,7 @@ src_configure() {
 		"-DENABLE_SDL=$(usex sdl)"
 		-DENABLE_VCPKG=OFF
 		"-DENABLE_VULKAN=$(usex vulkan)"
+		"-DENABLE_WAYLAND=$(usex wayland)"
 		-DENABLE_WXWIDGETS=ON
 		-DPORTABLE=OFF
 		"-DwxWidgets_CONFIG_EXECUTABLE=/usr/$(get_libdir)/wx/config/gtk3-unicode-3.2-gtk3"
