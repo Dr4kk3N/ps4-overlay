@@ -31,9 +31,9 @@ BDEPEND="
 	${PYTHON_DEPS}
 "
 
-PATCHES=(
-	"${FILESDIR}"/${PN}-1.19.0-curses-cmake.patch
-)
+#PATCHES=(
+#	"${FILESDIR}"/${PN}-1.19.0-curses-cmake.patch
+#)
 
 pkg_setup() {
 	llvm_pkg_setup
