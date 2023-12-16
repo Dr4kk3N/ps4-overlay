@@ -7,7 +7,7 @@ inherit cmake desktop xdg
 
 DESCRIPTION="Wii U emulator."
 HOMEPAGE="https://cemu.info/ https://github.com/cemu-project/Cemu"
-SHA="09409a51089db5432c0bdd7ec8f2e3907a8b2669"
+SHA="dee764473db26462a898aae8ea73c65a9cbafda1"
 MY_PN="Cemu"
 IMGUI_PV="1.88"
 SRC_URI="https://github.com/cemu-project/${MY_PN}/archive/${SHA}.tar.gz -> ${P}.tar.gz
@@ -16,7 +16,7 @@ SRC_URI="https://github.com/cemu-project/${MY_PN}/archive/${SHA}.tar.gz -> ${P}.
 LICENSE="MPL-2.0 ISC"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE="+cubeb discord +sdl +vulkan wayland"
+IUSE="+cubeb discord +sdl +vulkan"
 
 DEPEND="app-arch/zarchive
 	app-arch/zstd
@@ -29,16 +29,14 @@ DEPEND="app-arch/zarchive
 	dev-libs/openssl
 	dev-libs/pugixml
 	dev-libs/rapidjson
-	wayland? ( dev-libs/wayland
-		   x11-libs/gtk+:3[wayland]
-	)
+	dev-libs/wayland
 	dev-util/glslang
 	media-libs/libglvnd
 	media-libs/libsdl2[haptic,joystick,threads]
 	net-misc/curl
 	sys-libs/zlib
 	vulkan? ( dev-util/vulkan-headers )
-	x11-libs/gtk+:3
+	x11-libs/gtk+:3[wayland]
 	x11-libs/libX11
 	x11-libs/wxGTK:3.2-gtk3[opengl]"
 RDEPEND="${DEPEND}"
@@ -68,7 +66,6 @@ src_configure() {
 		"-DENABLE_SDL=$(usex sdl)"
 		-DENABLE_VCPKG=OFF
 		"-DENABLE_VULKAN=$(usex vulkan)"
-		"-DENABLE_WAYLAND=$(usex wayland)"
 		-DENABLE_WXWIDGETS=ON
 		-DPORTABLE=OFF
 		"-DwxWidgets_CONFIG_EXECUTABLE=/usr/$(get_libdir)/wx/config/gtk3-unicode-3.2-gtk3"
