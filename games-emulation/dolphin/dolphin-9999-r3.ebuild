@@ -60,6 +60,7 @@ RDEPEND="
 	media-libs/libspng:=
 	media-libs/libsfml:=
 	media-libs/mesa[egl(+)]
+	dev-libs/vulkan-memory-allocator
 	net-libs/mbedtls:=
 	net-misc/curl:=
 	sys-libs/readline:=
