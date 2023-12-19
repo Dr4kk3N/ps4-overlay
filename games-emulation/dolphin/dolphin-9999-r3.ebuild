@@ -84,6 +84,7 @@ RDEPEND="
 	pulseaudio? ( media-libs/libpulse )
 	systemd? ( sys-apps/systemd:0= )
 	upnp? ( net-libs/miniupnpc )
+	dev-cpp/gtest
 "
 DEPEND="
 	${RDEPEND}
