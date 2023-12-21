@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-PYTHON_COMPAT=( python3_{8..11} )
+PYTHON_COMPAT=( python3_{8..12} )
 
 inherit cmake xdg-utils python-single-r1 toolchain-funcs
 
@@ -16,7 +16,7 @@ else
 fi
 
 DESCRIPTION="OpenGL window and compositing manager"
-HOMEPAGE="http://www.compiz.org/"
+HOMEPAGE="https://launchpad.net/compiz"
 
 LICENSE="GPL-2 LGPL-2.1 MIT"
 SLOT="0"
