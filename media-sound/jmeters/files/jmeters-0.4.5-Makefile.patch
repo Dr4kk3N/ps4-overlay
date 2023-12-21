@@ -1,0 +1,30 @@
+--- source/Makefile.old	2021-12-20 02:58:59.973577610 +0100
++++ source/Makefile	2021-12-20 03:00:40.198573953 +0100
+@@ -18,7 +18,7 @@
+ #
+ # ----------------------------------------------------------------------
+ 
+-
++CXX ?= g++
+ PROGRAM = jmeters
+ PREFIX ?= /usr/local
+ BINDIR ?= $(PREFIX)/bin
+@@ -26,8 +26,7 @@
+ 
+ VERSION = 0.4.5
+ CPPFLAGS +=  -MMD -MP -DPROGRAM=\"$(PROGRAM)\" -DVERSION=\"$(VERSION)\" -DSHARED=\"$(SHARED)\"
+-CXXFLAGS += -O2 -Wall
+-CXXFLAGS += -march=native
++CXXFLAGS += -Wall -MMD -MP
+ 
+ 
+ all:	jmeters
+@@ -36,7 +35,7 @@
+ JMETERS_O = jmeters.o styles.o mainwin.o jclient.o png2img.o meterwin.o \
+ 	vumeterdsp.o iec1ppmdsp.o iec2ppmdsp.o stcorrdsp.o
+ 
+-jmeters:	CPPFLAGS += $(shell pkgconf --cflags freetype2)
++jmeters:	CPPFLAGS += $(shell pkg-config --cflags freetype2)
+ jmeters:	LDLIBS += -lsndfile -lclxclient -lclthreads -ljack -lpthread \
+ 	-lcairo -lpng -lXft -lX11 -lrt
+ jmeters:	$(JMETERS_O)
