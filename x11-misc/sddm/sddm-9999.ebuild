@@ -11,7 +11,9 @@ else
 	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86"
 fi
 
-QTMIN=6.5.2
+QT5MIN=5.15.2
+QT6MIN=6.6.0
+
 inherit cmake linux-info systemd tmpfiles
 
 DESCRIPTION="Simple Desktop Display Manager"
@@ -19,25 +21,39 @@ HOMEPAGE="https://github.com/sddm/sddm"
 
 LICENSE="GPL-2+ MIT CC-BY-3.0 CC-BY-SA-3.0 public-domain"
 SLOT="0"
-IUSE="+elogind systemd test +X"
+IUSE="+elogind +pam systemd test +X qt6"
 
-REQUIRED_USE="^^ ( elogind systemd )"
+REQUIRED_USE="?? ( elogind systemd )"
 RESTRICT="!test? ( test )"
 
 COMMON_DEPEND="
 	acct-group/sddm
 	acct-user/sddm
-	>=dev-qt/qtbase-${QTMIN}:6[dbus,gui,network]
-	>=dev-qt/qtdeclarative-${QTMIN}:6
-	sys-libs/pam
+	qt6? (
+		>=dev-qt/qtbase-${QT6MIN}:6[dbus,network,gui,wayland,xml]
+		>=dev-qt/qtdeclarative-${QT6MIN}:6
+	)
+	!qt6? (
+		>=dev-qt/qtcore-${QT5MIN}:5
+		>=dev-qt/qtdbus-${QT5MIN}:5
+		>=dev-qt/qtdeclarative-${QT5MIN}:5
+		>=dev-qt/qtgui-${QT5MIN}:5
+		>=dev-qt/qtnetwork-${QT5MIN}:5
+	)
 	x11-libs/libXau
 	x11-libs/libxcb:=
-	elogind? ( sys-auth/elogind[pam] )
-	systemd? ( sys-apps/systemd:=[pam] )
+	elogind? ( sys-auth/elogind )
+	pam? ( sys-libs/pam )
+	!pam? ( virtual/libcrypt:= )
+	systemd? ( sys-apps/systemd:= )
 	!systemd? ( sys-power/upower )
 "
 DEPEND="${COMMON_DEPEND}
-	test? ( >=dev-qt/qtbase-${QTMIN}:6 )
+	test? (
+		qt6? ( >=dev-qt/qtbase-${QT6MIN}:6[test] )
+		!qt6? ( >=dev-qt/qttest-${QT5MIN}:5 )
+
+	)
 "
 RDEPEND="${COMMON_DEPEND}
 	X? ( x11-base/xorg-server )
@@ -45,8 +61,9 @@ RDEPEND="${COMMON_DEPEND}
 "
 BDEPEND="
 	dev-python/docutils
-	>=dev-qt/qttools-${QTMIN}:6[linguist]
-	kde-frameworks/extra-cmake-modules:6
+	qt6? ( >=dev-qt/qtbase-${QT6MIN}:6[nls] )
+	!qt6? ( >=dev-qt/linguist-tools-${QT5MIN}:5 )
+	kde-frameworks/extra-cmake-modules:0
 	virtual/pkgconfig
 "
 
@@ -87,8 +104,10 @@ src_configure() {
 		-DDBUS_CONFIG_FILENAME="org.freedesktop.sddm.conf"
 		-DRUNTIME_DIR=/run/sddm
 		-DSYSTEMD_TMPFILES_DIR="/usr/lib/tmpfiles.d"
+		-DENABLE_PAM=$(usex pam)
 		-DNO_SYSTEMD=$(usex !systemd)
 		-DUSE_ELOGIND=$(usex elogind)
+		-DBUILD_WITH_QT6=$(usex qt6)
 	)
 	cmake_src_configure
 }
