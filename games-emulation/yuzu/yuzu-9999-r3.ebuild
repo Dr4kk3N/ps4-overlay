@@ -16,7 +16,7 @@ LICENSE="|| ( Apache-2.0 GPL-2+ ) 0BSD BSD GPL-2+ ISC MIT
 	!system-vulkan? ( Apache-2.0 )"
 SLOT="0"
 KEYWORDS=""
-IUSE="+compatibility-list +cubeb discord +qt5 sdl +system-libfmt +system-vulkan test webengine +webservice"
+IUSE="+compatibility-list +cubeb discord +qt5 qt6 sdl +system-libfmt +system-vulkan test webengine +webservice"
 
 RDEPEND="
 	<net-libs/mbedtls-3.1[cmac]
@@ -33,6 +33,9 @@ RDEPEND="
 	virtual/libusb:1
 	cubeb? ( media-libs/cubeb )
 	qt5? (
+		|| ( qt6? (
+			>=dev-qt/qtbase-6.6.1:6[gui,dbus,widgets]
+			)
 		>=dev-qt/qtcore-5.15:5
 		>=dev-qt/qtgui-5.15:5
 		>=dev-qt/qtmultimedia-5.15:5
@@ -41,6 +44,11 @@ RDEPEND="
 		>=dev-qt/qtconcurrent-5.15:5
 		>=dev-qt/linguist-tools-5.15:5
 		webengine? ( >=dev-qt/qtwebengine-5.15:5 )
+		)
+	)
+	qt6? (
+		>=dev-qt/qtbase-6.6.1:6[gui,dbus,widgets]
+		webengine? ( >=dev-qt/qtwebengine-6.6.1:6 )
 	)
 	sdl? ( >=media-libs/libsdl2-2.28 )
 	system-libfmt? ( >=dev-libs/libfmt-9:= )
@@ -58,7 +66,7 @@ BDEPEND="
 	dev-util/glslang
 	discord? ( >=dev-libs/rapidjson-1.1.0 )
 "
-REQUIRED_USE="|| ( qt5 sdl ) discord? ( webservice )"
+REQUIRED_USE="|| ( qt5 qt6 sdl ) discord? ( webservice )"
 RESTRICT="!test? ( test )"
 
 pkg_setup() {
@@ -154,6 +162,7 @@ src_configure() {
 		-DENABLE_LIBUSB=ON
 		-DENABLE_QT=$(usex qt5)
 		-DENABLE_QT_TRANSLATION=$(usex qt5)
+		-DENABLE_QT6=$(usex qt6)
 		-DENABLE_SDL2=$(usex sdl)
 		-DENABLE_WEB_SERVICE=$(usex webservice)
 		-DSIRIT_USE_SYSTEM_SPIRV_HEADERS=$([ use system-vulkan ] && echo OFF || echo ON)
