@@ -7,7 +7,7 @@ inherit cmake desktop xdg
 
 DESCRIPTION="Wii U emulator."
 HOMEPAGE="https://cemu.info/ https://github.com/cemu-project/Cemu"
-SHA="dee764473db26462a898aae8ea73c65a9cbafda1"
+SHA="9b0a1d53dc449fedebd5eb6255a312aa334ffad9"
 MY_PN="Cemu"
 IMGUI_PV="1.88"
 SRC_URI="https://github.com/cemu-project/${MY_PN}/archive/${SHA}.tar.gz -> ${P}.tar.gz
@@ -38,7 +38,8 @@ DEPEND="app-arch/zarchive
 	vulkan? ( dev-util/vulkan-headers )
 	x11-libs/gtk+:3[wayland]
 	x11-libs/libX11
-	x11-libs/wxGTK:3.2-gtk3[opengl]"
+	x11-libs/wxGTK:3.2-gtk3[opengl]
+	virtual/libusb"
 RDEPEND="${DEPEND}"
 BDEPEND="media-libs/glm"
 
