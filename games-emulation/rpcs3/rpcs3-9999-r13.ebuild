@@ -31,7 +31,7 @@ RDEPEND="
 	media-libs/openal
 	media-video/ffmpeg
 	pulseaudio? ( media-libs/libpulse )
-	sys-devel/gdb
+	sys-debug/gdb
 	sys-libs/zlib
 	virtual/opengl
 	vulkan? ( media-libs/vulkan-loader )
