@@ -94,12 +94,12 @@ newtonsoft.json@13.0.1
 nuget.frameworks@6.5.0
 nunit3testadapter@4.1.0
 nunit@3.13.3
-opentk.audio.openal@4.8.1
-opentk.core@4.8.1
-opentk.graphics@4.8.1
-opentk.mathematics@4.8.1
+opentk.audio.openal@4.8.2
+opentk.core@4.8.2
+opentk.graphics@4.8.2
+opentk.mathematics@4.8.2
 opentk.redist.glfw@3.3.8.39
-opentk.windowing.graphicslibraryframework@4.8.1
+opentk.windowing.graphicslibraryframework@4.8.2
 runtime.any.system.collections@4.3.0
 runtime.any.system.diagnostics.tools@4.3.0
 runtime.any.system.diagnostics.tracing@4.3.0
