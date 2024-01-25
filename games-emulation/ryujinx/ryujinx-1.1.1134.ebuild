@@ -31,7 +31,7 @@ avalonia@11.0.7
 commandlineparser@2.9.1
 concentus@1.1.7
 discordrichpresence@1.2.1.24
-dynamicdata@7.14.2
+dynamicdata@8.3.27
 excss@4.2.3
 fluentavaloniaui@2.0.5
 fsharp.core@7.0.200
@@ -58,10 +58,10 @@ microcom.runtime@0.11.0
 microsoft.codeanalysis.analyzers@3.0.0
 microsoft.codeanalysis.analyzers@3.3.4
 microsoft.codeanalysis.common@3.8.0
-microsoft.codeanalysis.common@4.7.0
+microsoft.codeanalysis.common@4.8.0
 microsoft.codeanalysis.csharp.scripting@3.8.0
 microsoft.codeanalysis.csharp@3.8.0
-microsoft.codeanalysis.csharp@4.7.0
+microsoft.codeanalysis.csharp@4.8.0
 microsoft.codeanalysis.scripting.common@3.8.0
 microsoft.codecoverage@17.8.0
 microsoft.csharp@4.3.0
@@ -72,7 +72,7 @@ microsoft.identitymodel.abstractions@7.2.0
 microsoft.identitymodel.jsonwebtokens@7.2.0
 microsoft.identitymodel.logging@7.2.0
 microsoft.identitymodel.tokens@7.2.0
-microsoft.io.recyclablememorystream@2.3.2
+microsoft.io.recyclablememorystream@3.0.0
 microsoft.net.test.sdk@17.8.0
 microsoft.netcore.platforms@1.0.1
 microsoft.netcore.platforms@1.1.0
@@ -202,7 +202,7 @@ system.diagnostics.debug@4.3.0
 system.diagnostics.diagnosticsource@4.0.0
 system.diagnostics.tools@4.0.1
 system.diagnostics.tracing@4.1.0
-system.drawing.common@8.0.0
+system.drawing.common@8.0.1
 system.dynamic.runtime@4.3.0
 system.globalization.calendars@4.0.1
 system.globalization.extensions@4.0.1
