@@ -86,7 +86,7 @@ microsoft.win32.primitives@4.0.1
 microsoft.win32.registry@4.5.0
 microsoft.win32.systemevents@8.0.0
 msgpack.cli@1.0.1
-netcoreserver@7.0.0
+netcoreserver@8.0.7
 netstandard.library@1.6.0
 netstandard.library@2.0.0
 netstandard.library@2.0.3
