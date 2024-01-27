@@ -25,7 +25,7 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}"
 BDEPEND="
-	dev-util/ninja
+	dev-build/ninja
 	dev-util/cmake
 "
 
