@@ -164,6 +164,7 @@ silk.net.vulkan@2.16.0
 sixlabors.fonts@1.0.0-beta0013
 sixlabors.imagesharp.drawing@1.0.0-beta11
 sixlabors.imagesharp@1.0.4
+skiasharp.harfbuzz@2.88.6
 skiasharp.harfbuzz@2.88.7
 skiasharp.nativeassets.linux@2.88.3
 skiasharp.nativeassets.linux@2.88.6
