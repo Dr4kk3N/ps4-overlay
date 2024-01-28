@@ -26,7 +26,7 @@ RDEPEND="
 DEPEND="${RDEPEND}"
 BDEPEND="
 	dev-build/ninja
-	dev-util/cmake
+	dev-build/cmake
 "
 
 BUILD_DIR="${WORKDIR}/${P}_build"
