@@ -34,6 +34,18 @@ diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-app/src/MetaData.cpp Emu
  
  MetaDataDecl gameDecls[] = {
  	// key,         type,                   default,            statistic,  name in GuiMetaDataEd,  prompt in GuiMetaDataEd
+diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-app/src/SystemData.cpp EmulationStation-2.9.0/es-app/src/SystemData.cpp
+--- EmulationStation-2.9.0-orig/es-app/src/SystemData.cpp	2020-01-17 06:57:53.791137537 -0300
++++ EmulationStation-2.9.0/es-app/src/SystemData.cpp	2020-01-17 07:00:25.066138789 -0300
+@@ -10,7 +10,7 @@
+ #include "Settings.h"
+ #include "ThemeData.h"
+ #include "views/UIModeController.h"
+-#include <pugixml/src/pugixml.hpp>
++#include <pugixml.hpp>
+ #include <fstream>
+ #ifdef WIN32
+ #include <Windows.h>
 diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-app/src/scrapers/GamesDBJSONScraper.cpp EmulationStation-2.9.0/es-app/src/scrapers/GamesDBJSONScraper.cpp
 --- EmulationStation-2.9.0-orig/es-app/src/scrapers/GamesDBJSONScraper.cpp	2020-01-17 06:57:53.794137537 -0300
 +++ EmulationStation-2.9.0/es-app/src/scrapers/GamesDBJSONScraper.cpp	2020-01-17 06:59:38.146138401 -0300
@@ -58,6 +70,18 @@ diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-app/src/scrapers/ScreenS
  #include <cstring>
  
  using namespace PlatformIds;
+diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-core/src/InputConfig.cpp EmulationStation-2.9.0/es-core/src/InputConfig.cpp
+--- EmulationStation-2.9.0-orig/es-core/src/InputConfig.cpp	2020-01-17 06:57:53.796137537 -0300
++++ EmulationStation-2.9.0/es-core/src/InputConfig.cpp	2020-01-17 07:01:07.778139142 -0300
+@@ -1,7 +1,7 @@
+ #include "InputConfig.h"
+ 
+ #include "Log.h"
+-#include <pugixml/src/pugixml.hpp>
++#include <pugixml.hpp>
+ 
+ //some util functions
+ std::string inputTypeToString(InputType type)
 diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-core/src/InputManager.cpp EmulationStation-2.9.0/es-core/src/InputManager.cpp
 --- EmulationStation-2.9.0-orig/es-core/src/InputManager.cpp	2020-01-17 06:57:53.796137537 -0300
 +++ EmulationStation-2.9.0/es-core/src/InputManager.cpp	2020-01-17 07:01:21.001139252 -0300
@@ -106,3 +130,11 @@ diff '--color=auto' -ruN EmulationStation-2.9.0-orig/es-core/src/ThemeData.cpp E
  #include <algorithm>
  
  std::vector<std::string> ThemeData::sSupportedViews { { "system" }, { "basic" }, { "detailed" }, { "grid" }, { "video" } };
+diff '--color=auto' -ruN EmulationStation-2.9.0-orig/external/CMakeLists.txt EmulationStation-2.9.0/external/CMakeLists.txt
+--- EmulationStation-2.9.0-orig/external/CMakeLists.txt	2020-01-17 06:57:53.799137537 -0300
++++ EmulationStation-2.9.0/external/CMakeLists.txt	2020-01-17 07:05:08.912141138 -0300
+@@ -2,4 +2,3 @@
+ # package managers are included with the project (in the 'external' folder)
+ 
+ add_subdirectory("nanosvg")
+-add_subdirectory("pugixml")

@@ -30,15 +30,17 @@ COMMON_DEPEND="
 RDEPEND="${COMMON_DEPEND}"
 DEPEND="${COMMON_DEPEND}"
 
-#src_prepare() {
-#	eapply -p1 "${FILESDIR}/${P}-include-fix.patch"
-#	eapply_user
-#}
+src_prepare() {
+	epatch \
+		"${FILESDIR}/${P}-include-fix.patch"
+	cmake-utils_src_prepare
+}
 
 src_configure() {
 	local mycmakeargs=(
 		-DCMAKE_INSTALL_PREFIX="${EPREFIX}"/usr
 	)
+	cmake-utils_src_configure
 }
 
 src_install() {
