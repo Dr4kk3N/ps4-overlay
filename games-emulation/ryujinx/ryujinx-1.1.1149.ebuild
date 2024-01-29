@@ -22,8 +22,8 @@ avalonia.remote.protocol@11.0.7
 avalonia.skia@11.0.0
 avalonia.skia@11.0.4
 avalonia.skia@11.0.7
-avalonia.svg.skia@11.0.0.10
-avalonia.svg@11.0.0.10
+avalonia.svg.skia@11.0.0.13
+avalonia.svg@11.0.0.13
 avalonia.themes.simple@11.0.7
 avalonia.win32@11.0.7
 avalonia.x11@11.0.7
@@ -156,7 +156,7 @@ securifybv.propertystore@0.1.0
 securifybv.shelllink@0.1.0
 shaderc.net@0.1.0
 sharpziplib@1.4.2
-shimskiasharp@1.0.0.10
+shimskiasharp@1.0.0.13
 silk.net.core@2.16.0
 silk.net.vulkan.extensions.ext@2.16.0
 silk.net.vulkan.extensions.khr@2.16.0
@@ -182,9 +182,9 @@ skiasharp@2.88.3
 skiasharp@2.88.6
 skiasharp@2.88.7
 spb@0.0.4-build28
-svg.custom@1.0.0.10
-svg.model@1.0.0.10
-svg.skia@1.0.0.10
+svg.custom@1.0.0.13
+svg.model@1.0.0.13
+svg.skia@1.0.0.13
 system.appcontext@4.1.0
 system.buffers@4.0.0
 system.buffers@4.3.0
@@ -349,7 +349,6 @@ DOTNET_PKG_PROJECTS=( "src/${PN^}/${PN^}.csproj" )
 PATCHES=(
 	"${FILESDIR}/${PN}-1.1.1100-better-defaults.patch"
 	"${FILESDIR}/${PN}-1.1.1100-disable-updates.patch"
-	"${FILESDIR}/${PN}-1.1.1100-logs-path.patch"
 )
 
 DOCS=( README.md distribution/legal/THIRDPARTY.md )
