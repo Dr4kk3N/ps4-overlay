@@ -26,6 +26,7 @@ DEPEND="
 	media-video/vlc
 	dev-libs/pugixml
 	dev-libs/rapidjson
+	media-fonts/open-sans-hebrew-condensed
 "
 
 DOCS=( README.md SYSTEMS.md THEMES.md GAMELISTS.md DEVNOTES.md CREDITS.md )
