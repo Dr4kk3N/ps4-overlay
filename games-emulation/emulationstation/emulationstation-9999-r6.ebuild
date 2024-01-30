@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit cmake git-r3 
+inherit cmake desktop git-r3
 
 DESCRIPTION="Frontend for emulators (RetroPie Fork)"
 HOMEPAGE="https://github.com/RetroPie/EmulationStation"
@@ -16,7 +16,7 @@ EGIT_REPO_URI="https://github.com/RetroPie/EmulationStation.git"
 SRC_URI=""
 KEYWORDS=""
 
-COMMON_DEPEND="
+DEPEND="
 	dev-cpp/eigen:3
 	dev-libs/boost
 	media-libs/freeimage[png,jpeg]
@@ -27,19 +27,8 @@ COMMON_DEPEND="
 	dev-libs/pugixml
 	dev-libs/rapidjson
 "
-RDEPEND="${COMMON_DEPEND}"
-DEPEND="${COMMON_DEPEND}"
 
-#src_prepare() {
-#	eapply -p1 "${FILESDIR}/${P}-include-fix.patch"
-#	eapply_user
-#}
-
-src_configure() {
-	local mycmakeargs=(
-		-DCMAKE_INSTALL_PREFIX="${EPREFIX}"/usr
-	)
-}
+DOCS=( README.md SYSTEMS.md THEMES.md GAMELISTS.md DEVNOTES.md CREDITS.md )
 
 src_install() {
 	dobin	emulationstation
