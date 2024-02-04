@@ -28,7 +28,8 @@ RDEPEND="
 	app-arch/lz4:=
 	dev-libs/boost:=[context]
 	media-libs/opus
-	media-libs/vulkan-loader
+	>=media-libs/vulkan-loader-1.3.275
+	>=dev-util/vulkan-utility-libraries-1.3.275
 	sys-libs/zlib
 	virtual/libusb:1
 	cubeb? ( media-libs/cubeb )
@@ -56,7 +57,7 @@ RDEPEND="
 DEPEND="${RDEPEND}
 	dev-cpp/cpp-httplib
 	dev-cpp/cpp-jwt
-	system-vulkan? ( >=dev-util/vulkan-headers-1.3.274
+	system-vulkan? ( >=dev-util/vulkan-headers-1.3.275
 		dev-util/spirv-headers )
 	test? ( >dev-cpp/catch-3:0 )
 "
@@ -169,6 +170,7 @@ src_configure() {
 		-DUSE_DISCORD_PRESENCE=$(usex discord)
 		-DYUZU_TESTS=$(usex test)
 		-DYUZU_USE_EXTERNAL_VULKAN_HEADERS=$([ use system-vulkan ] && echo ON || echo OFF)
+		-DYUZU_USE_EXTERNAL_VULKAN_UTILITY_LIBRARIES=$([ use system-vulkan ] && echo ON || echo OFF)
 		-DYUZU_USE_EXTERNAL_SDL2=OFF
 		-DYUZU_CHECK_SUBMODULES=false
 		-DYUZU_USE_QT_WEB_ENGINE=$(usex webengine)
