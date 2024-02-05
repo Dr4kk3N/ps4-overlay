@@ -181,7 +181,7 @@ skiasharp.nativeassets.win32@2.88.7
 skiasharp@2.88.3
 skiasharp@2.88.6
 skiasharp@2.88.7
-spb@0.0.4-build28
+spb@0.0.4-build32
 svg.custom@1.0.0.13
 svg.model@1.0.0.13
 svg.skia@1.0.0.13

@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -21,8 +21,8 @@ fi
 
 LICENSE="Apache-2.0 BSD BSD-2 GPL-2 JSON MIT"
 SLOT="0"
-IUSE="discord qt5 test"
-RESTRICT="!test? ( test )"
+IUSE="discord qt5"
+RESTRICT="test"
 
 RDEPEND="
 	app-arch/snappy:=
@@ -30,8 +30,9 @@ RDEPEND="
 	dev-libs/libzip:=
 	media-libs/glew:=
 	media-libs/libpng:=
+	media-libs/libglvnd
 	media-libs/libsdl2[joystick]
-	media-video/ffmpeg:0/56.58.58
+	media-video/ffmpeg
 	sys-libs/zlib:=
 	virtual/opengl
 	qt5? (
@@ -51,8 +52,9 @@ BDEPEND="
 "
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-CMakeLists-flags.patch
-	"${FILESDIR}"/${PN}-disable-ccache-autodetection.patch
+	"${FILESDIR}/${PN}-ffmpeg.patch"
+	"${FILESDIR}/${PN}-disable-ccache-autodetection.patch"
+	"${FILESDIR}/${PN}-CMakeLists-flags.patch"
 )
 
 pkg_setup() {
@@ -68,13 +70,9 @@ src_configure() {
 		-DUSE_SYSTEM_LIBZIP=ON
 		-DUSE_SYSTEM_SNAPPY=ON
 		-DUSE_SYSTEM_ZSTD=ON
-		-DUSE_DISCORD=$(usex discord)
-		-DUSING_QT_UI=$(usex qt5)
-		-DUNITTEST=$(usex test)
+		-DUSE_FFMPEG=ON
+		"-DUSE_DISCORD=$(usex discord)"
+		"-DUSING_QT_UI=$(usex qt5)"
 	)
 	cmake_src_configure
-}
-
-src_test() {
-	cmake_src_test -E glslang-testsuite
 }

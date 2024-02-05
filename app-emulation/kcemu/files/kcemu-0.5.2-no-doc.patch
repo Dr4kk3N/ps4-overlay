@@ -1,0 +1,23 @@
+diff --git a/Makefile.am b/Makefile.am
+index f73a20a..ea38b10 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,7 +1,5 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+-docdir = $(datadir)/doc/kcemu
+-
+ ACLOCAL_AMFLAGS = -I config -I config/m4
+ 
+ SUBDIRS = \
+@@ -24,10 +22,6 @@ SUBDIRS = \
+ 
+ EXTRA_DIST = VERSION README.de TODO THANKS COPYING COPYING.de .pc/.[qv]*
+ 
+-install-data-local:
+-	$(mkinstalldirs) $(DESTDIR)$(docdir)
+-	cp ChangeLog $(DESTDIR)$(docdir)/changelog
+-
+ deb:
+ 	unset CFLAGS CXXFLAGS FFLAGS CPPFLAGS LDFLAGS; \
+ 	dpkg-buildpackage -rfakeroot -b -us -uc
