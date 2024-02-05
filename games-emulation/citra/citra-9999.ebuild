@@ -16,12 +16,12 @@ EGIT_SUBMODULES=(
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS=""
-IUSE="cubeb nls openal +gui sdl +system-libfmt +telemetry"
+IUSE="cubeb nls openal sdl +system-libfmt +telemetry +qt6 scripting web-service"
 
 RDEPEND="
 	cubeb? ( media-libs/cubeb )
-	media-video/ffmpeg:=[fdk]
-	gui? ( nls? ( dev-qt/qttools:6[linguist] )
+	media-video/ffmpeg
+	qt6? ( nls? ( dev-qt/qttools:6[linguist] )
 			dev-qt/qtbase:6[widgets,gui,opengl,network]
 			dev-qt/qtmultimedia:6 )
 	sdl? (
@@ -31,7 +31,7 @@ RDEPEND="
 	system-libfmt? ( >=dev-libs/libfmt-9:= )
 	>=dev-libs/openssl-1.1:=
 	app-arch/zstd
-	dev-libs/boost:=
+	dev-libs/boost:0[nls]
 	dev-libs/crypto++:=
 	dev-libs/teakra
 	net-libs/enet:1.3=
@@ -43,7 +43,7 @@ BDEPEND="
 	dev-cpp/robin-map
 	dev-util/spirv-headers
 "
-REQUIRED_USE="|| ( gui sdl )"
+REQUIRED_USE="|| ( qt6 sdl )"
 
 src_unpack() {
 	if ! use system-libfmt; then
@@ -147,16 +147,31 @@ src_configure() {
 		-DENABLE_CUBEB=$(usex cubeb)
 		-DENABLE_MF=ON
 		-DENABLE_OPENAL=$(usex openal)
-		-DENABLE_QT=$(usex gui)
-		-DENABLE_QT_TRANSLATION=$(use gui && usex nls || echo OFF)
+		-DENABLE_SCRIPTING=$(usex scripting)
+		-DENABLE_QT=$(usex qt6)
+		-DENABLE_QT_TRANSLATION=$(use qt6 && usex nls || echo OFF)
 		-DENABLE_SDL2=$(usex sdl)
 		-DENABLE_WEB_SERVICE=$(usex telemetry)
-		-DGENERATE_QT_TRANSLATION=$(use gui && usex nls || echo OFF)
+		-DGENERATE_QT_TRANSLATION=$(use qt6 && usex nls || echo OFF)
 		-DSIRIT_USE_SYSTEM_SPIRV_HEADERS=ON
+		-DCITRA_WARNINGS_AS_ERRORS=OFF
+		-DDISABLE_SUBMODULE_CHECK=ON
 		-DUSE_SYSTEM_BOOST=ON
+		-DUSE_SYSTEM_CATCH2=ON
+                -DUSE_SYSTEM_CRYPTOPP=ON
+                -DUSE_SYSTEM_CUBEB=ON
+                -DUSE_SYSTEM_ENET=ON
+                -DUSE_SYSTEM_FAAD2=ON
+                -DUSE_SYSTEM_FMT=ON
+                -DUSE_SYSTEM_GLSLANG=ON
+                -DUSE_SYSTEM_INIH=ON
 		-DUSE_SYSTEM_LIBUSB=ON
 		-DUSE_SYSTEM_OPENSSL=ON
 		-DUSE_SYSTEM_SDL2=ON
+		-DUSE_SYSTEM_TEAKRA=ON
+                -DUSE_SYSTEM_XBYAK=OFF
+                -DUSE_SYSTEM_ZSTD=ON
+                -Wno-dev
 	)
 	cmake_src_configure
 
