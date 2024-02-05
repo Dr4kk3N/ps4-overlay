@@ -52,21 +52,13 @@ ERROR_ANDROID_BINDER_IPC="CONFIG_ANDROID_BINDER_IPC: need for creating Android-s
 ERROR_MEMFD_CREATE="CONFIG_MEMFD_CREATE: it completely replaced deprecated ISHMEM drivers,
 	therefore it's vital for android-specific memory management"
 
-src_prepare() {
-	eapply_user
-	python_fix_shebang waydroid.py tools
-}
-
 src_compile(){
 	:;
 }
 
 src_install() {
 	python_fix_shebang waydroid.py
-	emake install DESTDIR="${D}" \
-	      USE_SYSTEMD=$(usex systemd 1 0) \
-	      USE_DBUS_ACTIVATION=1 \
-	      USE_NFTABLES=$(usex nftables 1 0)
+	emake install DESTDIR="${D}" USE_SYSTEMD=$(usex systemd 1 0) USE_DBUS_ACTIVATION=1 USE_NFTABLES=$(usex nftables 1 0)
 	if ! use systemd; then
 		elog "Installing waydroid OpenRC daemon"
 		doinitd "${FILESDIR}"/waydroid

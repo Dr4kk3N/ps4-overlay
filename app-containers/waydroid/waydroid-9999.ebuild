@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{10..11} )
+PYTHON_COMPAT=( python3_{10..12} )
 inherit linux-info xdg-utils python-single-r1
 
 DESCRIPTION="Container-based approach to boot a full Android system on Linux systems"
@@ -21,7 +21,7 @@ fi
 LICENSE="GPL-3"
 SLOT="0"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
-IUSE="systemd apparmor"
+IUSE="systemd apparmor nftables"
 
 DEPEND="|| ( virtual/linux-sources virtual/dist-kernel )"
 RDEPEND="
@@ -31,11 +31,14 @@ RDEPEND="
 		dev-python/pygobject[${PYTHON_USEDEP}]
 		>=dev-python/gbinder-1.1.1[${PYTHON_USEDEP}]
 		>=dev-python/pyclip-0.7.0[wayland,${PYTHON_USEDEP}]
+		dev-python/dbus-python[${PYTHON_USEDEP}]
 	')
-	net-firewall/nftables
+	net-firewall/nftables[modern-kernel]
 	net-dns/dnsmasq
 	>=dev-libs/libglibutil-1.0.67
 	>=dev-libs/gbinder-1.1.21
+	app-containers/anbox-modules
+	app-containers/lxc[tools]
 	${PYTHON_DEPS}
 "
 
@@ -55,7 +58,7 @@ src_compile(){
 
 src_install() {
 	python_fix_shebang waydroid.py
-	emake install DESTDIR="${D}" USE_NFTABLES=1 USE_SYSTEMD=$(usex systemd 1 0)
+	emake install DESTDIR="${D}" USE_SYSTEMD=$(usex systemd 1 0) USE_DBUS_ACTIVATION=1 USE_NFTABLES=$(usex nftables 1 0)
 	if ! use systemd; then
 		elog "Installing waydroid OpenRC daemon"
 		doinitd "${FILESDIR}"/waydroid
