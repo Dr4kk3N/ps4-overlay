@@ -1,0 +1,15 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7db7e5b..e5a1a65 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -30,8 +30,8 @@ endfunction()
+ add_subdirectory(third-party)
+ include_directories(src)
+ 
+-set(LIBC_SOURCES src/core/hle/libraries/libc/Libc.cpp
+-                 src/core/hle/libraries/libc/Libc.h
++set(LIBC_SOURCES src/core/hle/libraries/libc/libc.cpp
++                 src/core/hle/libraries/libc/libc.h
+                  src/core/hle/libraries/libc/printf.h
+                  src/core/hle/libraries/libc/va_ctx.h
+                  src/core/hle/libraries/libc/libc_cxa.cpp
