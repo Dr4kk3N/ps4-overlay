@@ -13,13 +13,14 @@ if [[ ${PV} == "9999" ]]; then
 	EGIT_REPO_URI="https://git.libcamera.org/libcamera/libcamera.git"
 else
 	SRC_URI="https://github.com/kbingham/libcamera/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="amd64 x86"
+	KEYWORDS="~amd64 ~x86"
 fi
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
 
-IUSE="debug doc drm gnutls gstreamer jpeg libevent qt5 sdl tiff trace udev unwind v4l2"
+#IUSE="debug doc drm gnutls gstreamer jpeg libevent qt5 sdl tiff trace udev unwind v4l2"
+IUSE="debug drm gnutls gstreamer jpeg libevent qt5 sdl tiff trace udev unwind v4l2"
 REQUIRED_USE="qt5? ( tiff )"
 
 DEPEND="
@@ -55,18 +56,20 @@ RDEPEND="
 	${DEPEND}
 	trace? ( dev-util/lttng-tools )
 "
-BDEPEND="
-	doc?
-	(
-		app-doc/doxygen[dot]
-		dev-python/sphinx
-		dev-texlive/texlive-latexextra
-	)
-"
+#BDEPEND="
+#	doc?
+#	(
+#		app-text/doxygen[dot]
+#		dev-python/sphinx
+#		dev-texlive/texlive-latexextra
+#	)
+#"
 
 src_configure() {
 	local emesonargs=(
-		$(meson_feature doc documentation)
+		# Broken for >=dev-pyhon/sphinx-7
+		# $(meson_feature doc documentation)
+		-Ddocumentation=disabled
 		$(meson_feature libevent cam)
 		$(meson_feature gstreamer)
 		$(meson_feature qt5 qcam)
