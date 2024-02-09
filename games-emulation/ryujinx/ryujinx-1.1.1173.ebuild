@@ -63,7 +63,7 @@ microsoft.codeanalysis.csharp.scripting@3.8.0
 microsoft.codeanalysis.csharp@3.8.0
 microsoft.codeanalysis.csharp@4.8.0
 microsoft.codeanalysis.scripting.common@3.8.0
-microsoft.codecoverage@17.8.0
+microsoft.codecoverage@17.9.0
 microsoft.csharp@4.3.0
 microsoft.csharp@4.7.0
 microsoft.dotnet.platformabstractions@3.1.6
@@ -73,15 +73,15 @@ microsoft.identitymodel.jsonwebtokens@7.3.0
 microsoft.identitymodel.logging@7.3.0
 microsoft.identitymodel.tokens@7.3.0
 microsoft.io.recyclablememorystream@3.0.0
-microsoft.net.test.sdk@17.8.0
+microsoft.net.test.sdk@17.9.0
 microsoft.netcore.platforms@1.0.1
 microsoft.netcore.platforms@1.1.0
 microsoft.netcore.platforms@2.0.0
 microsoft.netcore.platforms@2.1.2
 microsoft.netcore.targets@1.0.1
 microsoft.netcore.targets@1.1.0
-microsoft.testplatform.objectmodel@17.8.0
-microsoft.testplatform.testhost@17.8.0
+microsoft.testplatform.objectmodel@17.9.0
+microsoft.testplatform.testhost@17.9.0
 microsoft.win32.primitives@4.0.1
 microsoft.win32.registry@4.5.0
 microsoft.win32.systemevents@8.0.0
@@ -151,7 +151,7 @@ ryujinx.graphics.nvdec.dependencies@5.0.1-build13
 ryujinx.graphics.vulkan.dependencies.moltenvk@1.2.0
 ryujinx.gtksharp@3.24.24.59-ryujinx
 ryujinx.pangosharp@3.24.24.59-ryujinx
-ryujinx.sdl2-cs@2.28.1-build28
+ryujinx.sdl2-cs@2.30.0-build32
 securifybv.propertystore@0.1.0
 securifybv.shelllink@0.1.0
 shaderc.net@0.1.0
