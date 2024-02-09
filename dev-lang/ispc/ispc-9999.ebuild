@@ -4,7 +4,7 @@
 EAPI=8
 
 PYTHON_COMPAT=( python3_{9..11} )
-LLVM_MAX_SLOT=16
+LLVM_MAX_SLOT=17
 inherit cmake python-any-r1 llvm
 
 DESCRIPTION="Intel SPMD Program Compiler"
