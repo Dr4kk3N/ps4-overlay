@@ -125,7 +125,7 @@ RDEPEND="${RDEPEND}
 # How to use it:
 # 1. Specify LLVM_MAX_SLOT (inclusive), e.g. 16.
 # 2. Specify LLVM_MIN_SLOT (inclusive), e.g. 15.
-LLVM_MAX_SLOT="16"
+LLVM_MAX_SLOT="17"
 LLVM_MIN_SLOT="15"
 LLVM_USE_DEPS="llvm_targets_AMDGPU(+),${MULTILIB_USEDEP}"
 PER_SLOT_DEPSTR="
@@ -167,12 +167,12 @@ DEPEND="${RDEPEND}
 	)
 "
 BDEPEND="
-	>=dev-util/meson-1.0.0
+	>=dev-build/meson-1.0.0
 	${PYTHON_DEPS}
 	opencl? (
 		>=virtual/rust-1.62.0
 		>=dev-util/bindgen-0.58.0
-		>=dev-util/meson-1.2.0
+		>=dev-build/meson-1.2.0
 	)
 	sys-devel/bison
 	sys-devel/flex

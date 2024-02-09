@@ -25,10 +25,8 @@ RDEPEND="
 DEPEND="${RDEPEND}"
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-16.0.0-clang_library_dir.patch
-	"${FILESDIR}"/${PN}-16.0.0-cxx17.patch
-	"${FILESDIR}"/${PN}-16.0.0-llvm.patch
-	"${FILESDIR}"/${PN}-16.0.0-standalone-build.patch
+	"${FILESDIR}"/${PN}-17.0.6-base_llvm_version.patch
+	"${FILESDIR}"/${PN}-17.0.6-clang_library_dir.patch
 )
 
 src_configure() {

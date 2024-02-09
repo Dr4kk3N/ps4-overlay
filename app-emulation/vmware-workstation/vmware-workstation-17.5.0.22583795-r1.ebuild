@@ -4,14 +4,15 @@
 EAPI=8
 
 PYTHON_COMPAT=( python3_{8..12} )
-inherit readme.gentoo-r1 pam python-any-r1 xdg-utils
+inherit readme.gentoo-r1 pam python-any-r1 systemd xdg-utils
 
 MY_PN="VMware-Workstation-Full"
 MY_PV=$(ver_cut 1-3)
 PV_MODULES="${MY_PV}"
 PV_BUILD=$(ver_cut 4)
 MY_P="${MY_PN}-${MY_PV}-${PV_BUILD}"
-VMWARE_FUSION_VER="13.0.0/20802013" # https://softwareupdate.vmware.com/cds/vmw-desktop/fusion/
+VMWARE_FUSION_VER="13.5.0/22583790" # https://softwareupdate.vmware.com/cds/vmw-desktop/fusion/
+SYSTEMD_UNITS_TAG="gentoo-02"
 UNLOCKER_VERSION="3.0.5"
 
 DESCRIPTION="Emulate a complete PC without the performance overhead of most emulators"
@@ -23,6 +24,7 @@ SRC_URI="
 		vmware-tools-darwinPre15? ( https://softwareupdate.vmware.com/cds/vmw-desktop/fusion/${VMWARE_FUSION_VER}/x86/core/com.vmware.fusion.zip.tar -> com.vmware.fusion-${PV}.zip.tar )
 		vmware-tools-darwin? ( https://softwareupdate.vmware.com/cds/vmw-desktop/fusion/${VMWARE_FUSION_VER}/x86/core/com.vmware.fusion.zip.tar -> com.vmware.fusion-${PV}.zip.tar )
 	)
+	systemd? ( https://github.com/akhuettel/systemd-vmware/archive/${SYSTEMD_UNITS_TAG}.tar.gz -> vmware-systemd-${SYSTEMD_UNITS_TAG}.tgz )
 	"
 
 LICENSE="GPL-2 GPL-3 MIT-with-advertising vmware"
@@ -30,7 +32,7 @@ SLOT="0"
 KEYWORDS="~amd64"
 # the kernel modules are optional because they're not needed to connect to VMs
 # running on remote systems - https://bugs.gentoo.org/604426
-IUSE="doc macos-guests +modules ovftool vix"
+IUSE="doc macos-guests +modules ovftool vix systemd"
 DARWIN_GUESTS="darwin darwinPre15"
 IUSE_VMWARE_GUESTS="${DARWIN_GUESTS} linux linuxPreGlibc25 netware solaris windows winPre2k winPreVista"
 for guest in ${IUSE_VMWARE_GUESTS}; do
@@ -350,6 +352,11 @@ src_install() {
 	sed -e "s:@@BINARY@@:${EPREFIX}${VM_INSTALL_DIR}/bin/vmware-netcfg:g" \
 		-e "/^Encoding/d" \
 		-i "${MY_ED}/usr/share/applications/vmware-netcfg.desktop" || die
+
+	# install systemd unit files
+	if use systemd; then
+		systemd_dounit "${WORKDIR}/systemd-vmware-${SYSTEMD_UNITS_TAG}/"*.{service,target}
+	fi
 
 	# enable macOS guests support
 	if use macos-guests; then

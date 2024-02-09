@@ -1,0 +1,24 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5c8cf0f..fb275d6 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,10 +1,5 @@
+ cmake_minimum_required(VERSION 3.13.4)
+ 
+-if(NOT DEFINED BASE_LLVM_VERSION)
+-  set(BASE_LLVM_VERSION 16.0.0)
+-endif(NOT DEFINED BASE_LLVM_VERSION)
+-set(OPENCL_CLANG_VERSION ${BASE_LLVM_VERSION}.0)
+-
+ if(NOT DEFINED OPENCL_CLANG_BUILD_EXTERNAL)
+   # check if we build inside llvm or not
+   if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+@@ -46,7 +41,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+     add_definitions(-DUSE_PREBUILT_LLVM)
+ 
+     if(NOT PREFERRED_LLVM_VERSION)
+-        set(PREFERRED_LLVM_VERSION "16.0.0")
++        set(PREFERRED_LLVM_VERSION "17.0.0")
+     endif(NOT PREFERRED_LLVM_VERSION)
+     message(STATUS "[OPENCL-CLANG] Looking for LLVM version ${PREFERRED_LLVM_VERSION}")
+     find_package(LLVM ${PREFERRED_LLVM_VERSION} REQUIRED)
