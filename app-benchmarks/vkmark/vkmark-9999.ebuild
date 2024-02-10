@@ -5,9 +5,9 @@ EAPI=8
 
 PYTHON_COMPAT=( python3_{10..12} )
 
-inherit meson linux-info git-r3
+inherit meson linux-info flag-o-matic git-r3
 
-#MY_P="${P/_/-}"
+replace-flags -O2 -O3
 
 DESCRIPTION="vkmark is an extensible Vulkan benchmarking suite with targeted, configurable scenes."
 HOMEPAGE="https://github.com/vkmark/vkmark"
@@ -40,9 +40,6 @@ RDEPEND="
 		dev-util/glslang
 	)
 "
-
-#S="${WORKDIR}/${MY_P}"
-#EGIT_CHECKOUT_DIR=${S}
 
 multilib_src_configure() {
 	local emesonargs=()
