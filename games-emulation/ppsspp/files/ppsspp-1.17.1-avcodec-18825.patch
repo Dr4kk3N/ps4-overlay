@@ -1,11 +1,11 @@
-From 3e9f06e9aeb497953200e7d44b814a13994b1f88 Mon Sep 17 00:00:00 2001
+From a8ae43dfd4f06a48a275a684aafee021e591d75e Mon Sep 17 00:00:00 2001
 From: Andrew Udvare <audvare@gmail.com>
 Date: Sun, 4 Feb 2024 18:26:06 -0500
-Subject: [PATCH 1/2] ffmpeg: Improved fix for checking if const AVCodec* is
+Subject: [PATCH] ffmpeg: Improved fix for checking if const AVCodec* is
  necessary
 
 ---
- CMakeLists.txt             | 22 ++++++++++++++++++++++
+ CMakeLists.txt             | 21 +++++++++++++++++++++
  Core/AVIDump.cpp           |  4 +---
  Core/FFMPEGCompat.h        |  8 ++++++++
  Core/HLE/sceAtrac.cpp      |  5 +----
@@ -13,22 +13,14 @@ Subject: [PATCH 1/2] ffmpeg: Improved fix for checking if const AVCodec* is
  Core/HW/MediaEngine.cpp    |  4 +---
  Core/HW/SimpleAudioDec.cpp |  1 +
  Core/HW/SimpleAudioDec.h   |  7 +++----
- 8 files changed, 38 insertions(+), 17 deletions(-)
+ 8 files changed, 37 insertions(+), 17 deletions(-)
  create mode 100644 Core/FFMPEGCompat.h
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index bfd5e6903..f7c43800f 100644
+index 33570d09c024..f7e5ce1d337c 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -117,6 +117,7 @@ if(NOT IOS)
- endif()
- 
- include(ccache)
-+include(CheckCXXSourceCompiles)
- include(GNUInstallDirs)
- 
- add_definitions(-DASSETS_DIR="${CMAKE_INSTALL_FULL_DATADIR}/ppsspp/assets/")
-@@ -949,6 +950,23 @@ if(USE_FFMPEG)
+@@ -953,6 +953,23 @@ if(USE_FFMPEG)
  	endif()
  
  	find_package(FFmpeg REQUIRED avcodec avformat avutil swresample swscale)
@@ -52,7 +44,7 @@ index bfd5e6903..f7c43800f 100644
  endif(USE_FFMPEG)
  
  find_package(ZLIB)
-@@ -2020,6 +2038,7 @@ add_library(${CoreLibName} ${CoreLinkType}
+@@ -2024,6 +2041,7 @@ add_library(${CoreLibName} ${CoreLinkType}
  	Core/ELF/PrxDecrypter.h
  	Core/ELF/ParamSFO.cpp
  	Core/ELF/ParamSFO.h
@@ -60,7 +52,7 @@ index bfd5e6903..f7c43800f 100644
  	Core/FileSystems/tlzrc.cpp
  	Core/FileSystems/BlobFileSystem.cpp
  	Core/FileSystems/BlobFileSystem.h
-@@ -2354,6 +2373,9 @@ target_compile_features(${CoreLibName} PUBLIC cxx_std_17)
+@@ -2358,6 +2376,9 @@ target_compile_features(${CoreLibName} PUBLIC cxx_std_17)
  
  if(FFmpeg_FOUND)
  	target_compile_definitions(${CoreLibName} PRIVATE USE_FFMPEG=1)
@@ -71,7 +63,7 @@ index bfd5e6903..f7c43800f 100644
  	target_include_directories(${CoreLibName} BEFORE PUBLIC ${FFmpeg_INCLUDE_avcodec})
  	target_link_libraries(${CoreLibName}
 diff --git a/Core/AVIDump.cpp b/Core/AVIDump.cpp
-index 7c9576d29..aa8116503 100644
+index 7c9576d2922b..aa811650314d 100644
 --- a/Core/AVIDump.cpp
 +++ b/Core/AVIDump.cpp
 @@ -45,9 +45,7 @@ extern "C" {
@@ -87,7 +79,7 @@ index 7c9576d29..aa8116503 100644
  static AVCodecContext *s_codec_context = nullptr;
 diff --git a/Core/FFMPEGCompat.h b/Core/FFMPEGCompat.h
 new file mode 100644
-index 000000000..fed3b1c85
+index 000000000000..fed3b1c85392
 --- /dev/null
 +++ b/Core/FFMPEGCompat.h
 @@ -0,0 +1,8 @@
@@ -100,7 +92,7 @@ index 000000000..fed3b1c85
 +
 +#endif // FFMPEG_COMPAT_H
 diff --git a/Core/HLE/sceAtrac.cpp b/Core/HLE/sceAtrac.cpp
-index fe0e8a54d..f83d9ffdf 100644
+index fe0e8a54de6b..f83d9ffdf166 100644
 --- a/Core/HLE/sceAtrac.cpp
 +++ b/Core/HLE/sceAtrac.cpp
 @@ -129,10 +129,7 @@ extern "C" {
@@ -116,7 +108,7 @@ index fe0e8a54d..f83d9ffdf 100644
  #endif // USE_FFMPEG
  
 diff --git a/Core/HLE/sceMpeg.cpp b/Core/HLE/sceMpeg.cpp
-index d050d62f3..8be78c73e 100644
+index d050d62f3d73..8be78c73e0f8 100644
 --- a/Core/HLE/sceMpeg.cpp
 +++ b/Core/HLE/sceMpeg.cpp
 @@ -113,9 +113,7 @@ extern "C" {
@@ -131,7 +123,7 @@ index d050d62f3..8be78c73e 100644
  
  #endif
 diff --git a/Core/HW/MediaEngine.cpp b/Core/HW/MediaEngine.cpp
-index 0ed957edf..7e8b37d4d 100644
+index 0ed957edfd26..7e8b37d4dc9b 100644
 --- a/Core/HW/MediaEngine.cpp
 +++ b/Core/HW/MediaEngine.cpp
 @@ -56,9 +56,7 @@ extern "C" {
@@ -146,7 +138,7 @@ index 0ed957edf..7e8b37d4d 100644
  static AVPixelFormat getSwsFormat(int pspFormat)
  {
 diff --git a/Core/HW/SimpleAudioDec.cpp b/Core/HW/SimpleAudioDec.cpp
-index 7994a7f40..80397bf6d 100644
+index 7994a7f4027a..80397bf6da0a 100644
 --- a/Core/HW/SimpleAudioDec.cpp
 +++ b/Core/HW/SimpleAudioDec.cpp
 @@ -33,6 +33,7 @@ extern "C" {
@@ -158,7 +150,7 @@ index 7994a7f40..80397bf6d 100644
  #endif  // USE_FFMPEG
  
 diff --git a/Core/HW/SimpleAudioDec.h b/Core/HW/SimpleAudioDec.h
-index 52a78bf3b..9bf2427a4 100644
+index 52a78bf3b411..9bf2427a4a15 100644
 --- a/Core/HW/SimpleAudioDec.h
 +++ b/Core/HW/SimpleAudioDec.h
 @@ -33,10 +33,6 @@ extern "C" {
@@ -182,6 +174,3 @@ index 52a78bf3b..9bf2427a4 100644
  	AVCodec *codec_;
  	AVCodecContext  *codecCtx_;
  	SwrContext      *swrCtx_;
--- 
-2.43.0
-
