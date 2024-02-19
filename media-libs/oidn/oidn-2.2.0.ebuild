@@ -263,6 +263,8 @@ src_configure() {
 	einfo
 
 	mycmakeargs+=(
+		-DCMAKE_C_COMPILER=clang
+		-DCMAKE_CXX_COMPILER=clang++
 		-DOIDN_APPS=$(usex examples)
 		-DOIDN_INSTALL_DEPENDENCIES=OFF
 		-DOIDN_FILTER_RT=$(usex built-in-weights)
