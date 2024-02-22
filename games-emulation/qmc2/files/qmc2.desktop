@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Qmc2
+GenericName=Qmc2
+Comment=Front-end for MAME
+Exec=qmc2
+Icon=qmc2
+Terminal=false
+Type=Application
+StartupNotify=false
+Categories=Game;Emulator;
+

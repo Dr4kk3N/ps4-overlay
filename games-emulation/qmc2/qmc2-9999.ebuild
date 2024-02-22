@@ -53,7 +53,7 @@ src_prepare() {
 }
 
 src_compile() {
-	FLAGS="DESTDIR=\"${ED}\" PREFIX=\"${GAMES_PREFIX}\" SYSCONFDIR=\"${GAMES_SYSCONFDIR}\" DATADIR=\"${GAMES_DATADIR}\" QMAKE=qmake5 LRELEASE=/usr/lib64/qt5/bin/lrelease LUPDATE=/usr/lib64/qt5/bin/lupdate LIBARCHIVE=1 CTIME=0"
+	FLAGS="DESTDIR=\"${ED}\" PREFIX=\"/usr\" SYSCONFDIR=\"/etc\" DATADIR=\"/usr/share\" QMAKE=qmake5 LRELEASE=/usr/lib64/qt5/bin/lrelease LUPDATE=/usr/lib64/qt5/bin/lupdate LIBARCHIVE=1 CTIME=0"
 	emake ${FLAGS} \
 		DEBUG=$(usex debug "1" "0") \
 		JOYSTICK=$(usex joystick "1" "0") \
@@ -77,4 +77,7 @@ src_install() {
 		emake ${FLAGS} qchdman-install
 
 	prepgamesdirs
+
+	doicon "${FILESDIR}/qmc2.png"
+	domenu "${FILESDIR}/qmc2.desktop"
 }
