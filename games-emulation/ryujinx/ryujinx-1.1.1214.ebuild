@@ -203,7 +203,7 @@ system.diagnostics.debug@4.3.0
 system.diagnostics.diagnosticsource@4.0.0
 system.diagnostics.tools@4.0.1
 system.diagnostics.tracing@4.1.0
-system.drawing.common@8.0.1
+system.drawing.common@8.0.2
 system.dynamic.runtime@4.3.0
 system.globalization.calendars@4.0.1
 system.globalization.extensions@4.0.1
