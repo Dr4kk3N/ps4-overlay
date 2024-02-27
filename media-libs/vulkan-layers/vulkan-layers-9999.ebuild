@@ -39,6 +39,8 @@ DEPEND="${RDEPEND}
 	)
 "
 
+PATCHES="${FILESDIR}/${PN}-9999-Build-shared-libs.patch"
+
 multilib_src_configure() {
 	local mycmakeargs=(
 		-DCMAKE_C_FLAGS="${CFLAGS} -DNDEBUG"
