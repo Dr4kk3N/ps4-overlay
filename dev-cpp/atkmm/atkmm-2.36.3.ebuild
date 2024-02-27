@@ -15,7 +15,7 @@ KEYWORDS="~alpha amd64 arm arm64 ~hppa ~ia64 ~loong ppc ppc64 ~riscv sparc x86 ~
 IUSE="gtk-doc"
 
 DEPEND="
-	>=dev-cpp/glibmm-2.46.2:2[gtk-doc?,${MULTILIB_USEDEP}]
+	>=dev-cpp/glibmm-2.76.0:2.68[gtk-doc?,${MULTILIB_USEDEP}]
 	>=dev-libs/atk-2.18.0[${MULTILIB_USEDEP}]
 	>=dev-libs/libsigc++-2.3.2:2[gtk-doc?,${MULTILIB_USEDEP}]
 "
