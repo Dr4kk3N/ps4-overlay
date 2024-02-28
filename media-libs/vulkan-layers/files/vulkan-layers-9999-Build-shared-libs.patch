@@ -1,13 +1,16 @@
 diff --git a/layers/CMakeLists.txt b/layers/CMakeLists.txt
-index 06b53ff9b..97e388765 100644
+index 8caa8ba0c..d1c1ed243 100644
 --- a/layers/CMakeLists.txt
 +++ b/layers/CMakeLists.txt
-@@ -166,7 +166,7 @@ if (VVL_CODEGEN)
-     )
- endif()
+@@ -116,11 +116,7 @@ endif()
  
--add_library(vvl MODULE)
-+add_library(vvl SHARED)
+ add_subdirectory(gpu_validation/spirv)
+ 
+-if(IOS)
+     add_library(vvl SHARED)
+-else()
+-    add_library(vvl MODULE)
+-endif()
  
  target_sources(vvl PRIVATE
      best_practices/best_practices_error_enums.h
