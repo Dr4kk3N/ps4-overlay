@@ -384,6 +384,4 @@ src_install() {
 
 	einstalldocs
 
-	# CONSIDER: Why is this being created?
-	rm -r "${ED}/usr/share/${P}/share" || die
 }
