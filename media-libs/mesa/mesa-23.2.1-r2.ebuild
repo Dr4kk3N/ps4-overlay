@@ -160,11 +160,8 @@ x86? (
 
 PATCHES=(
 	"${FILESDIR}/clang_config_tool.patch"
-	"${FILESDIR}/mesa-ps4pro-9999-r1.patch"
-	"${FILESDIR}/dri3.patch"
-	"${FILESDIR}/re.patch"
-	"${FILESDIR}/dri2.patch"
-	"${FILESDIR}/vdpau.patch"
+	"${FILESDIR}/mesa-ps4-23.2.1.patch"
+	"${FILESDIR}/atomic.patch"
 )
 
 pkg_pretend() {
@@ -395,12 +392,11 @@ multilib_src_configure() {
 		$(meson_use osmesa)
 		$(meson_use selinux)
 		$(meson_feature unwind libunwind)
-		$(meson_native_use_feature video_cards_intel intel-rt)
 		$(meson_feature zstd)
 		$(meson_use cpu_flags_x86_sse2 sse2)
-		-Dintel-clc=$(usex video_cards_intel system auto)
+		-Dintel-clc=$(usex video_cards_intel disable system )
 		-Dvalgrind=$(usex valgrind auto disabled)
-		-Dvideo-codecs=$(usex proprietary-codecs "all" "all_free")
+		-Dvideo-codecs=$(usex proprietary-codecs "h264dec,h264enc,h265dec,h265enc,vc1dec" "")
 		-Dgallium-drivers=$(driver_list "${GALLIUM_DRIVERS[*]}")
 		-Dvulkan-drivers=$(driver_list "${VULKAN_DRIVERS[*]}")
 		-Dvulkan-beta=$(usex vulkan-beta true false)
