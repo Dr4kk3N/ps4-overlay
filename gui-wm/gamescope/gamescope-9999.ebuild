@@ -69,5 +69,5 @@ DEPEND="
 "
 RDEPEND="${DEPEND}"
 BDEPEND="
-	dev-util/cmake
+	dev-build/cmake
 "
