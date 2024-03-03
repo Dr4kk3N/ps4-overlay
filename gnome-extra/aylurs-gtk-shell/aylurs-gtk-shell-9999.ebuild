@@ -46,12 +46,10 @@ DEPEND="
 BDEPEND="
 	net-libs/nodejs
 	dev-lang/typescript
-	dev-util/meson
+	dev-build/meson
 "
 
-PATCHES=(
-	"${FILESDIR}/typescript-error-suppression.patch"
-)
+# PATCHES=( "${FILESDIR}/typescript-error-suppression.patch" )
 
 src_unpack() {
 	if [[ ${PV} == 9999 ]]; then

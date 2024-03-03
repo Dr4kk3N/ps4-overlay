@@ -161,7 +161,7 @@ x86? (
 PATCHES=(
 	"${FILESDIR}/clang_config_tool.patch"
 	"${FILESDIR}/mesa-ps4-23.2.1.patch"
-	"${FILESDIR}/atomic.patch"
+	"${FILESDIR}/mesa-ps4-23.2.1-atomic.patch"
 )
 
 pkg_pretend() {

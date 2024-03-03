@@ -219,7 +219,7 @@ llvm_check_deps() {
 }
 
 PATCHES=(
-        "${FILESDIR}/mesa-ps4pro.patch.22.1.7"
+        "${FILESDIR}/mesa-ps4-22.1.7.patch"
 )
 
 pkg_pretend() {

@@ -160,7 +160,7 @@ x86? (
 
 PATCHES=(
 	"${FILESDIR}/clang_config_tool.patch"
-	"${FILESDIR}/mesa-ps4pro-9999-r1.patch"
+	"${FILESDIR}/mesa-ps4-9999.patch"
 )
 
 pkg_pretend() {
