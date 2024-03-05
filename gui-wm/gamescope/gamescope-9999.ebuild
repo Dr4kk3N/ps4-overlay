@@ -1,73 +1,59 @@
-# Copyright 2022 Gentoo Authors
+# Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=8
+EAPI=7
 
+PYTHON_COMPAT=( python3_{7..12} )
+
+MYMESONARGS="--wrap-mode nofallback --force-fallback-for vkroots"
 inherit meson
 
-DESCRIPTION="Gamescope"
+DESCRIPTION="Micro-compositor formerly known as steamcompgr"
 HOMEPAGE="https://github.com/Plagman/gamescope"
-if [[ ${PV} == "9999" ]] ; then
+
+if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://github.com/Plagman/gamescope.git"
-	EGIT_BRANCH="master"
+	EGIT_SUBMODULES=( subprojects/libliftoff )
 	inherit git-r3
-	SRC_URI="https://github.com/nothings/stb/archive/refs/heads/master.zip -> stb-master.zip"
 else
-	eerror "Unhandled Case"
-	die
+	SRC_URI="https://github.com/Plagman/gamescope/archive/refs/tags/${PV}.tar.gz -> ${P}.tar.gz"
+	KEYWORDS="~amd64"
 fi
 
-src_prepare() {
-	unpack stb-master.zip
-	echo "project('stb', 'c')
-	inc = include_directories('.')
-	stb_dep = declare_dependency(include_directories : inc)
-	meson.override_dependency('stb', stb_dep)" > stb-master/meson.build
-	mv stb-master subprojects/stb || die
-	default
-}
-
-src_install(){
-	meson_src_install --skip-subprojects
-	setcap cap_sys_nice+eip "${D}"/usr/bin/gamescope
-}
-LICENSE="GPL-3"
+LICENSE="BSD-2"
 SLOT="0"
-KEYWORDS=""
+IUSE="pipewire"
+
+RDEPEND="
+	dev-libs/libliftoff
+	>=gui-libs/wlroots-0.15.0[X]
+	media-libs/libsdl2
+	pipewire? ( media-video/pipewire )
+	x11-libs/libX11
+	x11-libs/libXcomposite
+	x11-libs/libXdamage
+	x11-libs/libdrm
+	x11-libs/libXext
+	x11-libs/libXfixes
+	x11-libs/libxkbcommon
+	x11-libs/libXrender
+	x11-libs/libXres
+	x11-libs/libXtst
+	x11-libs/libXxf86vm
+"
 
 DEPEND="
+	${RDEPEND}
 	dev-libs/stb
-	gui-libs/wlroots[X]
-	x11-base/xwayland
-	x11-libs/libX11
-	x11-libs/libXdamage
-	x11-libs/libXcomposite
-	x11-libs/libXrender
-	x11-libs/libXext
-	x11-libs/libXxf86vm
-	x11-libs/libXtst
-	x11-libs/libXres
-	x11-libs/libdrm
-	media-libs/vulkan-loader
-	dev-util/vulkan-headers
-	dev-libs/wayland
-	dev-libs/wayland-protocols
-	x11-libs/libxkbcommon
-	sys-libs/libcap
-	media-libs/libsdl2
-	media-libs/mesa
-	x11-libs/pixman
-	dev-libs/libinput
-	sys-auth/seatd
-	x11-libs/libxcb
-	x11-libs/xcb-util-wm
-	dev-util/glslang
-	media-video/pipewire
-	x11-misc/xcb
-	media-libs/vkroots
-	sys-apps/hwdata
 "
-RDEPEND="${DEPEND}"
+
 BDEPEND="
-	dev-build/cmake
+	dev-libs/wayland-protocols
+	dev-util/glslang
+	dev-util/vulkan-headers
+	virtual/pkgconfig
 "
+
+PATCHES=(
+	"${FILESDIR}/${PN}-install.patch"
+)
