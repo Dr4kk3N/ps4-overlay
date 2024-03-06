@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=OpenBOR
+Type=Application
+Comment=The ultimate 2D side scrolling engine
+Exec=openbor-bin
+Icon=openbor
+Terminal=false
+StartupNotify=false
+Categories=Game;Emulator;
