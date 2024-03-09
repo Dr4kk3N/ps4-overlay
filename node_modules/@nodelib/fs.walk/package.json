@@ -1,0 +1,49 @@
+{
+  "name": "@nodelib/fs.walk",
+  "version": "2.0.0",
+  "description": "A library for efficiently walking a directory recursively",
+  "license": "MIT",
+  "repository": "https://github.com/nodelib/nodelib/tree/master/packages/fs/fs.walk",
+  "keywords": [
+    "NodeLib",
+    "fs",
+    "FileSystem",
+    "file system",
+    "walk",
+    "scanner",
+    "crawler"
+  ],
+  "engines": {
+    "node": ">=16.14.0"
+  },
+  "files": [
+    "out/**",
+    "!out/benchmark",
+    "!out/**/*.map",
+    "!out/**/*.spec.*",
+    "!out/**/tests/**"
+  ],
+  "main": "out/index.js",
+  "typings": "out/index.d.ts",
+  "scripts": {
+    "clean": "rimraf {tsconfig.tsbuildinfo,out}",
+    "lint": "eslint \"src/**/*.ts\" --cache",
+    "compile": "tsc -b .",
+    "compile:watch": "tsc -b . --watch --sourceMap",
+    "test": "mocha \"out/**/*.spec.js\" -s 0",
+    "build": "npm run clean && npm run compile && npm run lint && npm test",
+    "watch": "npm run clean && npm run compile:watch",
+    "bench": "npm run bench:sync && npm run bench:async && npm run bench:stream",
+    "bench:sync": "hereby bench:sync",
+    "bench:async": "hereby bench:async",
+    "bench:stream": "hereby bench:stream"
+  },
+  "dependencies": {
+    "@nodelib/fs.scandir": "3.0.0",
+    "fastq": "^1.15.0"
+  },
+  "devDependencies": {
+    "@nodelib/fs.macchiato": "2.0.0",
+    "@nodelib/fs.walk.previous": "npm:@nodelib/fs.walk@2"
+  }
+}

@@ -9,14 +9,15 @@ DESCRIPTION="A customizable and extensible shell"
 HOMEPAGE="https://github.com/Aylur/ags"
 
 GVC_URI="https://gitlab.gnome.org/GNOME/libgnome-volume-control"
-GVC_COMMIT="cc46b231cfaabaf99311a5257843e3f9e447f952"
+GVC_COMMIT="8e7a5a4c3e51007ce6579292642517e3d3eb9c50"
+#GVC_COMMIT="cc46b231cfaabaf99311a5257843e3f9e447f952"
 
 GI_URI="https://gitlab.gnome.org/BrainBlasted/gi-typescript-definitions"
 GI_COMMIT="94acb6307e8d467cd9b3e340a18431496636b8f6"
 if [[ ${PV} == 9999 ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/Aylur/ags"
-	EGIT_SUBMODULES=( "subprojects/gvc" "gi-types" )
+	EGIT_SUBMODULES=( "subprojects/gvc" "gutils" )
 else
 	SRC_URI="
 		$HOMEPAGE/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz
@@ -48,7 +49,7 @@ BDEPEND="
 	dev-build/meson
 "
 
-# PATCHES=( "${FILESDIR}/typescript-error-suppression.patch" )
+#PATCHES=( "${FILESDIR}/typescript-error-suppression-9999.patch" )
 
 src_unpack() {
 	if [[ ${PV} == 9999 ]]; then
