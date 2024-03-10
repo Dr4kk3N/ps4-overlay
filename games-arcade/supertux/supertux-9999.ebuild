@@ -4,7 +4,7 @@
 EAPI=8
 
 #: ${CMAKE_MAKEFILE_GENERATOR:=emake}
-inherit cmake
+inherit cmake xdg-utils
 
 MY_PV="${PV/_rc/-rc.}"
 MY_P="SuperTux-v${MY_PV}-Source"
@@ -79,3 +79,12 @@ src_configure() {
 	)
 	cmake_src_configure
 }
+
+pkg_postinst() {
+        xdg_icon_cache_update
+}
+
+pkg_postrm() {
+	xdg_icon_cache_update
+}
+

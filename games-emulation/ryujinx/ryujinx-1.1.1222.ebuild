@@ -78,6 +78,7 @@ microsoft.netcore.platforms@1.0.1
 microsoft.netcore.platforms@1.1.0
 microsoft.netcore.platforms@2.0.0
 microsoft.netcore.platforms@2.1.2
+microsoft.netcore.platforms@5.0.0
 microsoft.netcore.targets@1.0.1
 microsoft.netcore.targets@1.1.0
 microsoft.testplatform.objectmodel@17.9.0
@@ -161,9 +162,9 @@ silk.net.core@2.16.0
 silk.net.vulkan.extensions.ext@2.16.0
 silk.net.vulkan.extensions.khr@2.16.0
 silk.net.vulkan@2.16.0
-sixlabors.fonts@1.0.0-beta0013
-sixlabors.imagesharp.drawing@1.0.0-beta11
-sixlabors.imagesharp@1.0.4
+sixlabors.fonts@1.0.0
+sixlabors.imagesharp.drawing@1.0.0
+sixlabors.imagesharp@2.1.7
 skiasharp.harfbuzz@2.88.6
 skiasharp.harfbuzz@2.88.7
 skiasharp.nativeassets.linux@2.88.3
@@ -282,6 +283,7 @@ system.security.principal.windows@4.3.0
 system.security.principal.windows@4.5.0
 system.security.principal@4.3.0
 system.text.encoding.codepages@4.5.1
+system.text.encoding.codepages@5.0.0
 system.text.encoding.codepages@7.0.0
 system.text.encoding.extensions@4.0.11
 system.text.encoding@4.0.11
