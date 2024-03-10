@@ -15,7 +15,16 @@ HOMEPAGE="https://www.supertux.org"
 if [[ ${PV} == 9999 ]]; then
         inherit git-r3
 	EGIT_REPO_URI="https://github.com/SuperTux/supertux.git"
-
+	EGIT_SUBMODULES=( "external/SDL_SavePNG"
+			  "external/SDL_ttf"
+			  "external/discord-sdk"
+			  "external/findlocale"
+			  "external/obstack"
+			  "external/partio_zip"
+			  "external/sexp-cpp"
+			  "external/squirrel"
+			  "external/tinygettext"
+			)
 else
 	SRC_URI="https://github.com/SuperTux/${PN}/releases/download/v${MY_PV}/${MY_P}.tar.gz"
 	S="${WORKDIR}/${MY_P}"
