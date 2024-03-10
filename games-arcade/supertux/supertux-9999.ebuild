@@ -76,6 +76,7 @@ src_configure() {
 		-DENABLE_SQDBG="$(usex debug)"
 		-DUSE_SYSTEM_PHYSFS=ON
 		-DIS_SUPERTUX_RELEASE=ON
+		-DBUILD_SHARED_LIBS=OFF
 	)
 	cmake_src_configure
 }
