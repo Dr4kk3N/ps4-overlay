@@ -51,6 +51,7 @@ RDEPEND="
 	>=media-libs/sdl2-image-2.0.0[png,jpeg]
 	>=net-misc/curl-7.21.7
 	virtual/opengl
+	>=dev-libs/libraqm-0.10.1
 "
 DEPEND="${RDEPEND}
 	media-libs/glm"
