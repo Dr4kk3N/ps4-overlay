@@ -36,7 +36,7 @@ COMMON_DEPEND="
 	dev-libs/libxslt
 	>=gnome-base/librsvg-2.40.21:2
 	>=media-gfx/mypaint-brushes-2.0.2:=
-	>=media-libs/babl-0.1.98[introspection,lcms,vala?]
+	>=media-libs/babl-0.1.108[introspection,lcms,vala?]
 	>=media-libs/fontconfig-2.12.6
 	>=media-libs/freetype-2.10.2
 	>=media-libs/gegl-0.4.46:0.4[cairo,introspection,lcms,vala?]

@@ -1,27 +1,41 @@
-# Copyright 1999-2022 Gentoo Authors
+# Copyright 2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-inherit meson
+inherit meson git-r3
 
-DESCRIPTION="A client-side decorations library for Wayland client"
+DESCRIPTION="A client-side decorations library for Wayland clients"
 HOMEPAGE="https://gitlab.freedesktop.org/libdecor/libdecor"
-
-if [[ ${PV} == 9999 ]]; then
-    inherit git-r3
-    EGIT_REPO_URI="${HOMEPAGE}"
-    KEYWORDS=""
-else
-	SRC_URI="${HOMEPAGE}/-/archive/${PV}/${P}.tar.gz"
-    KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
-fi
+EGIT_REPO_URI="https://gitlab.freedesktop.org/libdecor/libdecor.git"
 
 LICENSE="MIT"
 SLOT="0"
-IUSE="dbus"
+IUSE="+dbus examples"
 
-DEPEND="dbus? ( sys-apps/dbus )"
+DEPEND="
+	>=dev-libs/wayland-1.18
+	>=dev-libs/wayland-protocols-1.15
+	x11-libs/pango
+	dbus? ( sys-apps/dbus )
+	examples? (
+		virtual/opengl
+		media-libs/mesa[egl(+)]
+		x11-libs/libxkbcommon
+	)
+"
 RDEPEND="${DEPEND}"
-BDEPEND="dev-libs/wayland
-	x11-libs/cairo"
+BDEPEND=""
+
+src_configure() {
+	local emesonargs=(
+		# Avoid auto-magic, built-in feature of meson
+		-Dauto_features=disabled
+
+		$(meson_feature dbus)
+		$(meson_use examples demo)
+		-Dinstall_demo=true
+	)
+
+	meson_src_configure
+}
