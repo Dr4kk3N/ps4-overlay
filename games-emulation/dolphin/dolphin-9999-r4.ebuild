@@ -8,7 +8,7 @@ inherit cmake desktop xdg-utils pax-utils
 if [[ ${PV} == *9999 ]]
 then
 	EGIT_REPO_URI="https://github.com/dolphin-emu/dolphin"
-	EGIT_SUBMODULES=( Externals/mGBA/mgba Externals/zlib-ng/zlib-ng Externals/enet/enet Externals/expr Externals/FatFs Externals/rcheevos/rcheevos Externals/implot/implot )
+	EGIT_SUBMODULES=( Externals/mGBA/mgba Externals/zlib-ng/zlib-ng Externals/enet/enet Externals/expr Externals/FatFs Externals/rcheevos/rcheevos Externals/implot/implot Externals/tinygltf/tinygltf )
 	inherit git-r3
 else
 	EGIT_COMMIT=0f2540a0d1133950467845f20b1e003181147781
@@ -110,6 +110,7 @@ declare -A KEEP_BUNDLED=(
 	[imgui]=MIT
 	[implot]=MIT
 	[glslang]=BSD
+	[tinygltf]=MIT
 	[VulkanMemoryAllocator]=MIT
 	# This is actually minizip-ng and needs minizip-ng[compat], which is masked in base profile.
 	[minizip]=ZLIB

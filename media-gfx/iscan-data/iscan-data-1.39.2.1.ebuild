@@ -35,8 +35,8 @@ src_install() {
 		dodir ${rulesdir}
 		"${D}/usr/$(get_libdir)/iscan-data/make-policy-file" \
 			--force --mode udev \
+			-t "${D}/usr/share/iscan-data/fdi.xsl" \
 			-d "${D}/usr/share/iscan-data/epkowa.desc" \
-			--template "${D}/usr/share/iscan-data/fdi.xsl" \
 			-o "${D}${rulesdir}/99-iscan.rules" || die
 	fi
 }
