@@ -28,7 +28,7 @@ RDEPEND="
 	${PYTHON_DEPS}
 "
 DEPEND="
-	dev-util/scons
+	dev-build/scons
 	${RDEPEND}
 "
 BDEPEND="${PYTHON_DEPS}"
