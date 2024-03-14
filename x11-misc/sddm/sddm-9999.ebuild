@@ -71,7 +71,6 @@ PATCHES=(
 	# Downstream patches
 	"${FILESDIR}/${PN}-0.20.0-respect-user-flags.patch"
 	"${FILESDIR}/${PN}-0.19.0-Xsession.patch" # bug 611210
-	"${FILESDIR}/${PN}-0.20.0-no-default-pam_systemd-module.patch" # bug 669980
 )
 
 pkg_setup() {
