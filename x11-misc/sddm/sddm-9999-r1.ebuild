@@ -3,25 +3,27 @@
 
 EAPI=8
 
+PAM_TAR="${PN}-0.21.0-pam"
 if [[ ${PV} == *9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/${PN}/${PN}.git"
 else
-	SRC_URI="https://github.com/${PN}/${PN}/releases/download/v${PV}/${P}.tar.gz"
+	SRC_URI="https://github.com/${PN}/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86"
 fi
 
-QT5MIN=5.15.2
-QT6MIN=6.6.0
+QT5MIN=5.15.12
+QT6MIN=6.6.2
 
-inherit cmake linux-info systemd tmpfiles
+inherit cmake linux-info pam systemd tmpfiles
 
 DESCRIPTION="Simple Desktop Display Manager"
 HOMEPAGE="https://github.com/sddm/sddm"
+SRC_URI+=" https://dev.gentoo.org/~asturm/distfiles/${PAM_TAR}.tar.xz"
 
 LICENSE="GPL-2+ MIT CC-BY-3.0 CC-BY-SA-3.0 public-domain"
 SLOT="0"
-IUSE="+elogind +pam systemd test +X qt6"
+IUSE="+elogind +pam systemd test +X +qt6"
 
 REQUIRED_USE="?? ( elogind systemd )"
 RESTRICT="!test? ( test )"
@@ -29,6 +31,9 @@ RESTRICT="!test? ( test )"
 COMMON_DEPEND="
 	acct-group/sddm
 	acct-user/sddm
+	pam? ( sys-libs/pam )
+	x11-libs/libXau
+        x11-libs/libxcb:=
 	qt6? (
 		>=dev-qt/qtbase-${QT6MIN}:6[dbus,network,gui,wayland,xml]
 		>=dev-qt/qtdeclarative-${QT6MIN}:6
@@ -40,17 +45,14 @@ COMMON_DEPEND="
 		>=dev-qt/qtgui-${QT5MIN}:5
 		>=dev-qt/qtnetwork-${QT5MIN}:5
 	)
-	x11-libs/libXau
-	x11-libs/libxcb:=
 	elogind? ( sys-auth/elogind )
-	pam? ( sys-libs/pam )
 	!pam? ( virtual/libcrypt:= )
-	systemd? ( sys-apps/systemd:= )
+	systemd? ( sys-apps/systemd:=[pam] )
 	!systemd? ( sys-power/upower )
 "
 DEPEND="${COMMON_DEPEND}
 	test? (
-		qt6? ( >=dev-qt/qtbase-${QT6MIN}:6[test] )
+		qt6? ( >=dev-qt/qtbase-${QT6MIN}:6[network,test] )
 		!qt6? ( >=dev-qt/qttest-${QT5MIN}:5 )
 
 	)
@@ -61,7 +63,8 @@ RDEPEND="${COMMON_DEPEND}
 "
 BDEPEND="
 	dev-python/docutils
-	qt6? ( >=dev-qt/qtbase-${QT6MIN}:6[nls] )
+	>=dev-build/cmake-3.25.0
+	qt6? ( >=dev-qt/qttools-${QT6MIN}[linguist] )
 	!qt6? ( >=dev-qt/linguist-tools-${QT5MIN}:5 )
 	kde-frameworks/extra-cmake-modules:0
 	virtual/pkgconfig
@@ -70,14 +73,17 @@ BDEPEND="
 PATCHES=(
 	# Downstream patches
 	"${FILESDIR}/${PN}-0.20.0-respect-user-flags.patch"
-	"${FILESDIR}/${PN}-0.19.0-Xsession.patch" # bug 611210
-	"${FILESDIR}/${PN}-0.20.0-sddm.pam-use-substack.patch" # bug 728550
-	"${FILESDIR}/${PN}-0.20.0-no-default-pam_systemd-module.patch" # bug 669980
+	"${FILESDIR}/${PN}-0.21.0-Xsession.patch" # bug 611210
 )
 
 pkg_setup() {
 	local CONFIG_CHECK="~DRM"
 	use kernel_linux && linux-info_pkg_setup
+}
+
+src_unpack() {
+	[[ ${PV} == *9999* ]] && git-r3_src_unpack
+        default
 }
 
 src_prepare() {
@@ -95,6 +101,11 @@ EOF
 		sed -e "/^find_package/s/ Test//" -i CMakeLists.txt || die
 		cmake_comment_add_subdirectory test
 	fi
+
+	if use systemd; then
+                sed -e "/pam_elogind.so/s/elogind/systemd/" \
+                        -i "${WORKDIR}"/${PAM_TAR}/${PN}-greeter.pam || die
+        fi
 }
 
 src_configure() {
@@ -116,6 +127,16 @@ src_install() {
 
 	insinto /etc/sddm.conf.d/
 	doins "${S}"/01gentoo.conf
+
+	# with systemd logs are sent to journald, so no point to bother in that case
+        if ! use systemd; then
+                insinto /etc/logrotate.d
+                newins "${FILESDIR}/sddm.logrotate" sddm
+        fi
+
+        newpamd "${WORKDIR}"/${PAM_TAR}/${PN}.pam ${PN}
+        newpamd "${WORKDIR}"/${PAM_TAR}/${PN}-autologin.pam ${PN}-autologin
+        newpamd "${WORKDIR}"/${PAM_TAR}/${PN}-greeter.pam ${PN}-greeter
 }
 
 pkg_postinst() {
