@@ -10,17 +10,23 @@ MY_PV=$(ver_cut 1-2)
 VIDEOS_PV=2.2
 VIDEOS_P=${PN}-videos-${VIDEOS_PV}.wz
 
+if [[ ${PV} == 9999 ]]; then
+	inherit git-r3
+	EGIT_REPO_URI="https://github.com/Warzone2100/warzone2100.git"
+	SRC_URI="videos? ( mirror://sourceforge/warzone2100/warzone2100/Videos/${VIDEOS_PV}/high-quality-en/sequences.wz -> ${VIDEOS_P} )"
+else
+	SRC_URI="mirror://sourceforge/warzone2100/releases/${PV}/${PN}_src.tar.xz -> ${P}.tar.xz
+		 videos? ( mirror://sourceforge/warzone2100/warzone2100/Videos/${VIDEOS_PV}/high-quality-en/sequences.wz -> ${VIDEOS_P} )"
+	KEYWORDS="~amd64 ~arm64 ~x86"
+fi
+
 DESCRIPTION="3D real-time strategy game"
 HOMEPAGE="https://wz2100.net/"
-SRC_URI="
-	mirror://sourceforge/warzone2100/releases/${PV}/${PN}_src.tar.xz -> ${P}.tar.xz
-	videos? ( mirror://sourceforge/warzone2100/warzone2100/Videos/${VIDEOS_PV}/high-quality-en/sequences.wz -> ${VIDEOS_P} )
-"
-S="${WORKDIR}/${PN}"
+
+S="${WORKDIR}/${PN}-${PV}"
 
 LICENSE="GPL-2+ CC-BY-SA-3.0 public-domain vulkan? ( GPL-3 )"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~x86"
 # Upstream requested debug support
 IUSE="debug discord nls videos vulkan"
 
@@ -67,9 +73,11 @@ PATCHES=(
 	"${FILESDIR}"/${PN}-4.1.3-no-compress-manpages.patch
 )
 
-src_unpack() {
-	unpack ${P}.tar.xz
-}
+#src_unpack() {
+#	if [[ ${PV} != 9999 ]]; then
+#		unpack ${P}.tar.xz
+#	fi
+#}
 
 src_prepare() {
 	sed -i -e 's/#top_builddir/top_builddir/' po/Makevars || die
