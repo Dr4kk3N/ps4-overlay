@@ -22,8 +22,8 @@ avalonia.remote.protocol@11.0.10
 avalonia.skia@11.0.0
 avalonia.skia@11.0.4
 avalonia.skia@11.0.10
-avalonia.svg@11.0.0.14
-avalonia.svg.skia@11.0.0.14
+avalonia.svg@11.0.0.16
+avalonia.svg.skia@11.0.0.16
 avalonia.themes.simple@11.0.10
 avalonia.win32@11.0.10
 avalonia.x11@11.0.10
@@ -52,8 +52,10 @@ microsoft.codeanalysis.analyzers@3.0.0
 microsoft.codeanalysis.analyzers@3.3.4
 microsoft.codeanalysis.common@3.8.0
 microsoft.codeanalysis.common@4.8.0
+microsoft.codeanalysis.common@4.9.2
 microsoft.codeanalysis.csharp@3.8.0
 microsoft.codeanalysis.csharp@4.8.0
+microsoft.codeanalysis.csharp@4.9.2
 microsoft.codeanalysis.csharp.scripting@3.8.0
 microsoft.codeanalysis.scripting.common@3.8.0
 microsoft.codecoverage@17.9.0
@@ -61,10 +63,10 @@ microsoft.csharp@4.3.0
 microsoft.csharp@4.7.0
 microsoft.dotnet.platformabstractions@3.1.6
 microsoft.extensions.dependencymodel@6.0.0
-microsoft.identitymodel.abstractions@7.3.0
-microsoft.identitymodel.jsonwebtokens@7.3.0
-microsoft.identitymodel.logging@7.3.0
-microsoft.identitymodel.tokens@7.3.0
+microsoft.identitymodel.abstractions@7.4.0
+microsoft.identitymodel.jsonwebtokens@7.4.0
+microsoft.identitymodel.logging@7.4.0
+microsoft.identitymodel.tokens@7.4.0
 microsoft.io.recyclablememorystream@3.0.0
 microsoft.netcore.platforms@1.0.1
 microsoft.netcore.platforms@1.1.0
@@ -156,7 +158,7 @@ securifybv.propertystore@0.1.0
 securifybv.shelllink@0.1.0
 shaderc.net@0.1.0
 sharpziplib@1.4.2
-shimskiasharp@1.0.0.14
+shimskiasharp@1.0.0.16
 silk.net.core@2.16.0
 silk.net.vulkan@2.16.0
 silk.net.vulkan.extensions.ext@2.16.0
@@ -179,9 +181,9 @@ skiasharp.nativeassets.win32@2.88.3
 skiasharp.nativeassets.win32@2.88.6
 skiasharp.nativeassets.win32@2.88.7
 spb@0.0.4-build32
-svg.custom@1.0.0.14
-svg.model@1.0.0.14
-svg.skia@1.0.0.14
+svg.custom@1.0.0.16
+svg.model@1.0.0.16
+svg.skia@1.0.0.16
 system.appcontext@4.1.0
 system.buffers@4.0.0
 system.buffers@4.3.0
@@ -193,6 +195,7 @@ system.collections@4.3.0
 system.collections.concurrent@4.0.12
 system.collections.immutable@5.0.0
 system.collections.immutable@7.0.0
+system.collections.immutable@8.0.0
 system.componentmodel.annotations@4.5.0
 system.console@4.0.0
 system.diagnostics.debug@4.0.11
@@ -245,6 +248,7 @@ system.reflection.extensions@4.3.0
 system.reflection.metadata@1.6.0
 system.reflection.metadata@5.0.0
 system.reflection.metadata@7.0.0
+system.reflection.metadata@8.0.0
 system.reflection.primitives@4.0.1
 system.reflection.primitives@4.3.0
 system.reflection.typeextensions@4.1.0
@@ -281,6 +285,7 @@ system.text.encoding@4.3.0
 system.text.encoding.codepages@4.5.1
 system.text.encoding.codepages@5.0.0
 system.text.encoding.codepages@7.0.0
+system.text.encoding.codepages@8.0.0
 system.text.encoding.extensions@4.0.11
 system.text.encodings.web@6.0.0
 system.text.json@6.0.0

@@ -5,7 +5,7 @@ EAPI=8
 
 inherit check-reqs toolchain-funcs unpacker
 
-DRIVER_PV="545.23.08"
+DRIVER_PV="550.54.14"
 
 DESCRIPTION="NVIDIA CUDA Toolkit (compiler and friends)"
 HOMEPAGE="https://developer.nvidia.com/cuda-zone"
@@ -54,7 +54,7 @@ pkg_setup() {
 src_prepare() {
 	# ATTENTION: change requires revbump, see link below for supported GCC # versions
 	# https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#system-requirements
-	local cuda_supported_gcc="8.5 9.5 10 11 12"
+	local cuda_supported_gcc="8.5 9.5 10 11 12 13"
 
 	sed \
 		-e "s:CUDA_SUPPORTED_GCC:${cuda_supported_gcc}:g" \
@@ -208,8 +208,10 @@ src_install() {
 		done
 
 		# fix broken RPATHs
-		patchelf --set-rpath '$ORIGIN' "${ED}"/${cudadir}/${ncu_dir}/host/linux-desktop-glibc_2_11_3-x64/{libarrow.so,libparquet.so.500.0.0} || die
-		patchelf --set-rpath '$ORIGIN' "${ED}"/${cudadir}/${nsys_dir}/host-linux-x64/{libarrow.so,libparquet.so.500.0.0} || die
+		patchelf --set-rpath '$ORIGIN' \
+		"${ED}"/${cudadir}/${ncu_dir}/host/linux-desktop-glibc_2_11_3-x64/{libarrow.so,libparquet.so.500.0.0} || die
+		patchelf --set-rpath '$ORIGIN' \
+		"${ED}"/${cudadir}/${nsys_dir}/host-linux-x64/{libarrow.so,libparquet.so.500.0.0} || die
 
 		# remove foreign archs (triggers SONAME warning, #749903)
 		rm -r "${ED}"/${cudadir}/${ncu_dir}/target/linux-desktop-glibc_2_19_0-ppc64le || die
@@ -276,6 +278,22 @@ src_install() {
 	newins - 80${PN} <<-EOF
 		SEARCH_DIRS_MASK="${ecudadir}"
 	EOF
+
+	# To address the sandbox errors encountered in packages with CUDA,
+	# such as those documented in https://bugs.gentoo.org/926116, it is
+	# necessary to modify the sandbox environment settings. This change
+	# specifically targets issues during the execution of
+	# CMakeDetermineCompilerABI_CUDA.bin, as observed in a range of
+	# software including caffe2, opencv, vtk, cholmod, and openvdb
+	# (refer to https://forums.gentoo.org/viewtopic-p-8789206.html).
+	# Granting access to /proc/self within the sandbox is essential for
+	# these applications to correctly determine the CUDA compiler ABI
+	# without triggering sandbox violations. While opening up /proc/self
+	# may seem to have security implications, its impact is limited as
+	# it only exposes information about the processes inside the same
+	# sandbox environment. The proposed configuration is as follows:
+	insinto /etc/sandbox.d
+	newins - 20cuda <<<'SANDBOX_PREDICT="/proc/self/task"'
 }
 
 pkg_postinst_check() {
