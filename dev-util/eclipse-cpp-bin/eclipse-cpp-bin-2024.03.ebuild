@@ -1,12 +1,11 @@
-
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-inherit desktop
+inherit desktop java-utils-2
 
-RNAME="2023-06"
+RNAME="2024-03"
 SR="R"
 
 DESCRIPTION="Eclipse IDE for C/C++"
@@ -19,13 +18,13 @@ SRC_URI="
 "
 
 LICENSE="EPL-1.0"
-SLOT="4.28"
+SLOT="4.31"
 KEYWORDS="-* ~amd64"
 IUSE=""
 
 CDEPEND="
-	>=dev-java/slf4j-api-2.0.7:0
-	>=dev-java/icu4j-73.2:70
+	>=dev-java/slf4j-api-2.0.12:0
+	>=dev-java/icu4j-74.2:70
         >=dev-java/commons-httpclient-3.1-r2:3
         >=dev-java/javax-inject-1-r4:0
         >=dev-java/jsr305-3.0.2:0
@@ -75,7 +74,7 @@ _unbundle_known() {
 
         # https://wiki.gentoo.org/wiki/Eclipse/Building_From_Source
 #	_unbundle_single "${mode}" plugins/org.slf4j.api_1.7.30.v20221112-0806.jar slf4j-api slf4j-api.jar
-         _unbundle_single "${mode}" plugins/com.ibm.icu_73.1.0.jar icu4j-70 icu4j.jar
+         _unbundle_single "${mode}" plugins/com.ibm.icu_74.2.0.jar icu4j-70 icu4j.jar
 #        _unbundle_single "${mode}" plugins/javax.annotation_1.3.5.v20230504-0748.jar jsr305 jsr305.jar
 #        _unbundle_single "${mode}" plugins/javax.inject_1.0.0.v20220405-0441.jar javax-inject javax-inject.jar
 #        _unbundle_single "${mode}" plugins/org.apache.commons.httpclient_3.1.0.v201012070820.jar commons-httpclient-3 commons-httpclient.jar

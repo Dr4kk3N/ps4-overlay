@@ -22,7 +22,7 @@ inherit python-any-r1 qmake-utils readme.gentoo-r1 toolchain-funcs xdg-utils
 
 DESCRIPTION="Modifications to Chromium for removing Google integration and enhancing privacy"
 HOMEPAGE="https://github.com/ungoogled-software/ungoogled-chromium"
-PATCHSET_PPC64="121.0.6167.85-1raptor0~deb12u1"
+PATCHSET_PPC64="122.0.6261.57-1raptor0~deb12u1"
 PATCH_V="${PV%%\.*}-2"
 SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/chromium-${PV/_*}.tar.xz
 	https://gitlab.com/Matt.Jolly/chromium-patches/-/archive/${PATCH_V}/chromium-patches-${PATCH_V}.tar.bz2
@@ -34,9 +34,9 @@ SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/chro
 
 LICENSE="BSD cromite? ( GPL-3 )"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
+KEYWORDS="amd64 ~arm64 ~ppc64 ~x86"
 IUSE_SYSTEM_LIBS="abseil-cpp av1 brotli crc32c double-conversion ffmpeg +harfbuzz +icu jsoncpp +libevent +libusb libvpx +openh264 openjpeg +png re2 snappy woff2 +zstd"
-IUSE="+X bluetooth cfi +clang convert-dict cups cpu_flags_arm_neon custom-cflags debug enable-driver gtk4 hangouts headless hevc kerberos +libcxx nvidia +official optimize-thinlto optimize-webui override-data-dir pax-kernel pgo +proprietary-codecs pulseaudio qt5 qt6 screencast selinux thinlto cromite vaapi wayland widevine"
+IUSE="+X bluetooth cfi +clang convert-dict cups cpu_flags_arm_neon custom-cflags debug enable-driver gtk4 hangouts headless hevc kerberos libcxx nvidia +official optimize-thinlto optimize-webui override-data-dir pax-kernel pgo +proprietary-codecs pulseaudio qt5 qt6 screencast selinux thinlto cromite vaapi wayland widevine"
 RESTRICT="
 	!system-ffmpeg? ( proprietary-codecs? ( bindist ) )
 	!system-openh264? ( bindist )
@@ -48,6 +48,7 @@ REQUIRED_USE="
 	cfi? ( thinlto )
 	pgo? ( clang )
 	x86? ( !thinlto !widevine )
+	debug? ( !official )
 	qt6? ( qt5 )
 	screencast? ( wayland )
 	!headless? ( || ( X wayland ) )
@@ -56,20 +57,25 @@ REQUIRED_USE="
 	vaapi? ( !system-av1 !system-libvpx )
 "
 
-# UGC_COMMIT_ID="223fe76bb263a216341739ce2ee333752642cf47"
+#UGC_COMMIT_ID="2661a6c63e39a03824caf1345df723fbe7783c25"
 # UGC_PR_COMMITS=(
 # 	c917e096342e5b90eeea91ab1f8516447c8756cf
 # 	5794e9d12bf82620d5f24505798fecb45ca5a22d
 # )
 
-CROMITE_COMMIT_ID="f617340fcf4476cf62b767919b16b609ba355fa4"
+CROMITE_COMMIT_ID="fac696b3a422f196f698e6543913946ddaba1ef3"
 
 declare -A CHROMIUM_COMMITS=(
-	["ea4397ee3a3b7b324eb1ef8c90c877ef9db226df"]="."
 	["b6df4d75ada110883fcc194e7b6eb52aea7f522b"]="."
-	["5e9fb4130a537d1a36ab0f8db705a498abeb5d57"]="."
 	["e8e7c38ed76d20abcb4def81196eb9fd32772ea9"]="."
-	["267f9bdd53a37d1cbee760d5af07880198e1beef"]="third_party/webrtc"
+	["-b4d62daa178298eaa6fc8b9bc7ec6835c95ad86e"]="."
+	["8d253767f895b45053c39ea99a8f02bbe7071d3a"]="."
+	["e189c46f1ee584c1721ccfecb38bd8db84b58d5b"]="."
+	["04866680f4f9a8475ae3795ad6ed59649ba478d7"]="."
+	["4b48bc4dd6ce9c56d254e552a33a7b7c2d6fc226"]="."
+	["5b2d53797e5580cbfea00d732fe25a97c7048b5b"]="."
+	["3a75d7f8dc3a08a38dd893031f8996b91a00764b"]="."
+	["214859e3567ea9def85305e4f021a5d407e1ccfe"]="."
 )
 
 UGC_PV="${PV/_p/-}"
@@ -148,6 +154,7 @@ COMMON_SNAPSHOT_DEPEND="
 	media-libs/fontconfig:=
 	>=media-libs/freetype-2.11.0-r1:=
 	system-harfbuzz? ( >=media-libs/harfbuzz-3:0=[icu(-)] )
+	media-libs/lcms
 	media-libs/libjpeg-turbo:=
 	system-png? ( media-libs/libpng:= )
 	system-zstd? ( >=app-arch/zstd-1.5.5:= )
@@ -181,7 +188,16 @@ COMMON_SNAPSHOT_DEPEND="
 		wayland? (
 			dev-libs/libffi:=
 			dev-libs/wayland:=
-			screencast? ( media-video/pipewire:= )
+			screencast? (
+				media-video/pipewire:=
+				|| (
+					sys-apps/xdg-desktop-portal-gnome
+					sys-apps/xdg-desktop-portal-gtk
+					kde-plasma/xdg-desktop-portal-kde
+					gui-libs/xdg-desktop-portal-lxqt
+					gui-libs/xdg-desktop-portal-wlr
+				)
+			)
 		)
 	)
 "
@@ -233,7 +249,6 @@ RDEPEND="${COMMON_DEPEND}
 	!override-data-dir? (
 		!www-client/chromium
 		!www-client/chromium-bin
-		!www-client/ungoogled-chromium-bin
 		!www-client/cromite[-override-data-dir]
 	)
 "
@@ -258,12 +273,12 @@ BDEPEND="
 	)
 	>=dev-build/gn-0.2114
 	dev-lang/perl
-	app-alternatives/ninja
+	>=dev-build/ninja-1.7.2
 	>=dev-util/gperf-3.0.3
 	dev-vcs/git
 	>=net-libs/nodejs-7.6.0[inspector]
 	>=sys-devel/bison-2.4.3
-	app-alternatives/lex
+	sys-devel/flex
 	virtual/pkgconfig
 	clang? (
 		pgo? ( >=sys-devel/clang-18 >=sys-devel/lld-18	)
@@ -337,9 +352,9 @@ pre_build_checks() {
 pkg_pretend() {
 	if use libcxx; then
 		ewarn
-		ewarn "You have enabled libcxx, please be aware that system-*"
+		ewarn "Building with libcxx, please be aware that system-*"
 		ewarn "and some other c++ dependencies need to be compiled"
-		ewarn "with the same library as ungoogled-chromium itself"
+		ewarn "with the same c++ library as ungoogled-chromium itself"
 		ewarn "dev-libs/jsoncpp is most problematic, see #58 #49 #119 for details"
 		ewarn "Simplest solution would be to disable corresponding system-* flags"
 		ewarn
@@ -403,15 +418,18 @@ src_prepare() {
 		"${FILESDIR}/chromium-109-system-zlib.patch"
 		"${FILESDIR}/chromium-111-InkDropHost-crash.patch"
 		"${FILESDIR}/chromium-117-system-zstd.patch"
-		"${FILESDIR}/chromium-119-minizip-cast.patch"
-		"${FILESDIR}/chromium-121-qrcode.patch"
+		"${FILESDIR}/chromium-121-qrcode-r1.patch"
+		"${FILESDIR}/chromium-122-cfi-no-split-lto-unit.patch"
 		"${FILESDIR}/perfetto-system-zlib.patch"
 		"${FILESDIR}/gtk-fix-prefers-color-scheme-query.diff"
 		"${FILESDIR}/restore-x86-r2.patch"
 	)
 
 	if ! use libcxx ; then
-		PATCHES+=( "${FILESDIR}/chromium-120-libstdc++.patch" )
+		PATCHES+=(
+			"${FILESDIR}/chromium-120-libstdc++.patch"
+			"${FILESDIR}/base_to_address.patch"
+		)
 	fi
 
 	if use clang ; then
@@ -446,7 +464,10 @@ src_prepare() {
 				eapply "${WORKDIR}/debian/patches/${p}"
 			fi
 		done
-		PATCHES+=( "${WORKDIR}/ppc64le" )
+		PATCHES+=(
+			"${WORKDIR}/ppc64le"
+			"${WORKDIR}/debian/patches/fixes/rust-clanglib.patch"
+		)
 	fi
 
 	if has_version ">=dev-libs/icu-74.1" && use system-icu ; then
@@ -558,6 +579,10 @@ src_prepare() {
 		if has_version "<media-video/ffmpeg-6.0"; then
 			eapply "${FILESDIR}/reverse-roll-src-third_party-ffmpeg.patch"
 			eapply "${FILESDIR}/reverse-roll-src-third_party-ffmpeg_duration.patch"
+		fi
+		if has_version "<media-video/ffmpeg-6.1"; then
+			eapply -R "${FILESDIR}/ffmpeg-nb_coded_side_data-dolby.diff"
+			eapply -R "${FILESDIR}/ffmpeg-nb_coded_side_data-r1.patch"
 		fi
 	fi
 
@@ -973,7 +998,10 @@ src_prepare() {
 		pushd third_party/libvpx >/dev/null || die
 		mkdir -p source/config/linux/ppc64 || die
 		# requires git and clang, bug #832803
-		sed -i -e "s|^update_readme||g; s|clang-format|${EPREFIX}/bin/true|g" \
+		# Revert https://chromium.googlesource.com/chromium/src/+/b463d0f40b08b4e896e7f458d89ae58ce2a27165%5E%21/third_party/libvpx/generate_gni.sh
+		# and https://chromium.googlesource.com/chromium/src/+/71ebcbce867dd31da5f8b405a28fcb0de0657d91%5E%21/third_party/libvpx/generate_gni.sh
+		# since we're not in a git repo
+		sed -i -e "s|^update_readme||g; s|clang-format|${EPREFIX}/bin/true|g; /^git -C/d; /git cl/d; /cd \$BASE_DIR\/\$LIBVPX_SRC_DIR/ign format --in-place \$BASE_DIR\/BUILD.gn\ngn format --in-place \$BASE_DIR\/libvpx_srcs.gni" \
 			generate_gni.sh || die
 		./generate_gni.sh || die
 		popd >/dev/null || die
@@ -1400,7 +1428,7 @@ src_configure() {
 	fi
 
 	# Don't need nocompile checks and GN crashes with our config
-	myconf_gn+=" enable_nocompile_tests=false enable_nocompile_tests_new=false"
+	myconf_gn+=" enable_nocompile_tests=false"
 
 	# Enable ozone wayland and/or headless support
 	myconf_gn+=" use_ozone=true ozone_auto_platforms=false"
@@ -1681,6 +1709,9 @@ pkg_postinst() {
 			elog "by navigating to chrome://flags/#enable-webrtc-pipewire-capturer"
 			elog "inside Chromium or add --enable-features=WebRTCPipeWireCapturer"
 			elog "to CHROMIUM_FLAGS in /etc/chromium/default."
+			elog
+			elog "Additional setup may be required for screencasting to work."
+			elog "See issue: https://github.com/PF4Public/gentoo-overlay/issues/314"
 		fi
 		if use gtk4; then
 			elog "Chromium prefers GTK3 over GTK4 at runtime. To override this"
