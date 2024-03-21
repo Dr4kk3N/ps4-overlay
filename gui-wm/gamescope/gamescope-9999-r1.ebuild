@@ -12,6 +12,9 @@ MY_PV="${MY_PV//_/-}"
 DESCRIPTION="Efficient micro-compositor for running games"
 HOMEPAGE="https://github.com/ValveSoftware/gamescope"
 
+#url = https://github.com/nothings/stb.git
+#revision = 5736b15f7ea0ffb08dd38af21067c314d6a3aae9
+
 if [[ ${PV} == "9999" ]] ; then
 	EGIT_REPO_URI="https://github.com/Plagman/gamescope.git"
 	EGIT_BRANCH="master"
