@@ -1,23 +1,13 @@
-# Copyright 1999-2022 Gentoo Authors
+# Copyright 1999-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
 MY_P="${P/_/-}"
-S="${WORKDIR}/${MY_P}"
+
 DESCRIPTION="Audacious Player - Your music, your way, no exceptions"
 HOMEPAGE="https://audacious-media-player.org/"
-
-if [[ ${PV} == "9999" ]]; then
-	EGIT_REPO_URI="https://github.com/audacious-media-player/${PN}.git"
-	inherit git-r3
-else
-	KEYWORDS="~amd64 ~x86"
-	SRC_URI="https://distfiles.audacious-media-player.org/${MY_P}.tar.bz2"
-fi
-
-inherit meson
-
+S="${WORKDIR}/${MY_P}"
 # build system: BSD-2
 # embedded libgme, adplug: LGPL-2.1
 # other internal console players, most plugins: GPL-2+
@@ -28,14 +18,26 @@ LICENSE="
 	GPL-2+
 	ampache? ( GPL-3 )
 	flac? ( GPL-3+ )
-	gtk? ( GPL-3 )
+	gtk2? ( GPL-3 )
 	gtk3? ( GPL-3 )
 	libnotify? ( GPL-3+ )
-	qt5? ( GPL-3 )"
+	qt5? ( GPL-3 )
+	qt6? ( GPL-3 )"
 SLOT="0"
 
+if [[ ${PV} == "9999" ]]; then
+	# This ebuild revision is for c1dcb94b32 or later
+	EGIT_REPO_URI="https://github.com/audacious-media-player/${PN}.git"
+	inherit git-r3
+else
+	KEYWORDS="~amd64 ~x86"
+	SRC_URI="https://distfiles.audacious-media-player.org/${MY_P}.tar.bz2"
+fi
+
+inherit meson
+
 # These are split up roughly by how upstream organises them, except the NEED_* lists
-USE_FRONTENDS="mpris2 gtk gtk3 +qt5 moonstone"
+USE_FRONTENDS="mpris2 gtk2 gtk3 qt5 +qt6 moonstone"
 USE_CONTAINERS="cue"
 USE_TRANSPORTS="mms http"
 USE_INPUTS="aac adplug cdda ffmpeg fluidsynth +gme modplug mp3 openmpt opus sid sndfile wavpack"
@@ -44,29 +46,29 @@ USE_OUTPUTS="+alsa coreaudio encode jack oss pipewire pulseaudio qtmedia sdl snd
 
 NEED_GUI="+hotkeys libnotify opengl"
 NEED_GTK="aosd lirc" # XXX 2021-02-02 lirc's dep is currently automagic
-NEED_QT5="ampache moonstone qtmedia streamtuner +vumeter"
+NEED_QT="ampache moonstone qtmedia streamtuner +vumeter"
 
 IUSE="bs2b libsamplerate scrobbler +songchange soxr xml
 	${USE_FRONTENDS} ${USE_CONTAINERS} ${USE_TRANSPORTS}
 	${USE_INPUTS} ${USE_OUTPUTS} ${USE_CODECS}
-	${NEED_GUI} ${NEED_GTK} ${NEED_QT5}"
+	${NEED_GUI} ${NEED_GTK} ${NEED_QT}"
 
 # this is verbose, but it makes user-facing errors more scrutable
 REQUIRED_USE="
 	|| ( ${USE_FRONTENDS//+/} )
 	|| ( ${USE_OUTPUTS//+/} )
+	^^ ( qt5 qt6 )
 	encode?    ( || ( ${USE_CODECS//+/} ) )
 	scrobbler? ( xml )
-	$(for flag in ${NEED_GUI//+/}; do printf '%s?\t( || ( gtk qt5 ) )\n' "$flag"; done)
-	$(for flag in ${NEED_GTK//+/}; do printf '%s?\t( gtk )\n' "$flag"; done)
-	$(for flag in ${NEED_QT5//+/}; do printf '%s?\t( qt5 )\n' "$flag"; done)
+	$(for flag in ${NEED_GUI//+/}; do printf '%s?\t( || ( gtk2 gtk3 qt5 qt6 ) )\n' "${flag}"; done)
+	$(for flag in ${NEED_GTK//+/}; do printf '%s?\t( || ( gtk2 gtk3 ) )\n'         "${flag}"; done)
+	$(for flag in ${NEED_QT//+/};  do printf '%s?\t( || ( qt5 qt6 ) )\n'           "${flag}"; done)
 "
 
 # hotkeys currently has automagic detection
-QT_REQ="5.4:5="
 RDEPEND="
 	>=dev-libs/glib-2.32
-	>=media-sound/audacious-4.1:=[qt5(-)=,gtk(-)=,gtk3(-)=]
+	~media-sound/audacious-${PV}:=[gtk2(-)?,gtk3(-)?,qt5(-)?,qt6(-)?]
 	sys-libs/zlib
 	aac? ( >=media-libs/faad2-2.7 )
 	adplug? ( media-libs/adplug )
@@ -82,7 +84,7 @@ RDEPEND="
 	ffmpeg? ( >=media-video/ffmpeg-4.2.4 )
 	flac? ( >=media-libs/flac-1.2.1[ogg] )
 	fluidsynth? ( >=media-sound/fluidsynth-1.0.6:= )
-	gtk? (
+	gtk2? (
 		>=x11-libs/gtk+-2.24:2
 		aosd? (
 			x11-libs/libXrender
@@ -103,13 +105,19 @@ RDEPEND="
 	http? ( >=net-libs/neon-0.27 )
 	jack? ( virtual/jack )
 	qt5? (
-		>=dev-qt/qtcore-${QT_REQ}
-		>=dev-qt/qtgui-${QT_REQ}
-		>=dev-qt/qtwidgets-${QT_REQ}
-		hotkeys? ( >=dev-qt/qtx11extras-${QT_REQ} )
-		opengl? ( >=dev-qt/qtopengl-${QT_REQ} )
-		qtmedia? ( >=dev-qt/qtmultimedia-${QT_REQ} )
-		streamtuner? ( >=dev-qt/qtnetwork-${QT_REQ} )
+		dev-qt/qtcore:5
+		dev-qt/qtgui:5
+		dev-qt/qtwidgets:5
+		hotkeys? ( dev-qt/qtx11extras:5 )
+		opengl? ( dev-qt/qtopengl:5 )
+		qtmedia? ( dev-qt/qtmultimedia:5 )
+		streamtuner? ( dev-qt/qtnetwork:5 )
+	)
+	qt6? (
+		dev-qt/qtbase:6[gui,widgets]
+		opengl? ( dev-qt/qtbase:6[opengl] )
+		qtmedia? ( dev-qt/qtmultimedia:6 )
+		streamtuner? ( dev-qt/qtbase:6[network] )
 	)
 	lame? ( media-sound/lame )
 	libnotify? (
@@ -126,7 +134,7 @@ RDEPEND="
 		>=media-libs/opusfile-0.4
 	)
 	pipewire? ( >=media-video/pipewire-0.3.26 )
-	pulseaudio? ( >=media-sound/pulseaudio-0.9.5 )
+	pulseaudio? ( media-libs/libpulse )
 	scrobbler? ( net-misc/curl )
 	sdl? ( media-libs/libsdl2 )
 	sid? ( >=media-libs/libsidplayfp-2.0 )
@@ -155,9 +163,10 @@ src_configure() {
 	# As above for IUSE, grouped by how upstream organises them
 	local emesonargs=(
 		# GUI toolkits
-		"$(meson_use "$(usex gtk3 gtk3 gtk)" gtk)"
-		"$(meson_use            gtk3)"
-		"$(meson_use qt5        qt)"
+		"$(meson_use "$(usex gtk3 gtk3 gtk2)" gtk)"
+		"$(meson_use "$(usex qt6 qt6 qt5)" qt)"
+		"$(meson_use gtk3)"
+		"$(meson_use qt5)"
 
 		# container plugins
 		"$(meson_use            cue)"
@@ -226,8 +235,19 @@ src_configure() {
 
 pkg_postinst() {
 	if ! has_version -r app-arch/unzip; then
-		einfo "For full winamp2 skin support either install app-arch/unzip,"
+		einfo "For full winamp2 .wsz skin support either install app-arch/unzip,"
 		einfo "or set the environment variable UNZIPCMD to a drop-in replacement"
 		einfo "(e.g. 'busybox unzip')"
+	fi
+	if use moonstone; then
+		einfo "You may activate the Moonstone UI in the options 'Appearance' tab."
+		einfo "Beware that this is abandonware, and it's possible to get stuck without settings."
+		einfo "If that happens, run 'audacious -G' or 'audtool preferences-show'."
+	fi
+	if use qt6; then
+		einfo "The Winamp skin frontend does not play nice with Qt6's high-DPI support,"
+		einfo "especially with fractional scaling. See https://doc.qt.io/qt-6/highdpi.html for"
+		einfo "a list of environment variables you can tweak to work around this."
+		einfo "Suggested: QT_SCALE_FACTOR_ROUNDING_POLICY=Round QT_USE_PHYSICAL_DPI=1"
 	fi
 }

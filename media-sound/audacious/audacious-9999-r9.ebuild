@@ -1,35 +1,35 @@
-# Copyright 1999-2022 Gentoo Authors
+# Copyright 1999-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
 MY_P="${P/_/-}"
-S="${WORKDIR}/${MY_P}"
+
 DESCRIPTION="Audacious Player - Your music, your way, no exceptions"
 HOMEPAGE="https://audacious-media-player.org/"
+S="${WORKDIR}/${MY_P}"
+LICENSE="BSD-2 BSD CC-BY-SA-4.0"
+SLOT="0/5.5.0"
+IUSE="+dbus gtk2 gtk3 libarchive qt5 +qt6"
 
 if [[ ${PV} == "9999" ]]; then
+	# This ebuild revision is for 784d518581 or later
 	EGIT_REPO_URI="https://github.com/audacious-media-player/${PN}.git"
 	inherit git-r3
 else
-	KEYWORDS="~amd64 ~x86"
 	SRC_URI="https://distfiles.audacious-media-player.org/${MY_P}.tar.bz2"
+	KEYWORDS="~amd64 ~x86"
 fi
 
 inherit meson xdg
 
-LICENSE="BSD-2 BSD CC-BY-SA-4.0"
-SLOT="0/5.4.0"
+REQUIRED_USE="|| ( dbus gtk2 gtk3 qt5 qt6 ) ^^ ( qt5 qt6 )"
 
-IUSE="+dbus gtk gtk3 libarchive +qt5"
-REQUIRED_USE="|| ( dbus gtk qt5 )"
-
-QT_REQ="5.2:5="
 RDEPEND="
 	>=dev-libs/glib-2.32
 	dbus? ( sys-apps/dbus )
 	libarchive? ( app-arch/libarchive )
-	gtk? (
+	gtk2? (
 		>=x11-libs/gtk+-2.24:2
 		x11-libs/cairo
 		x11-libs/pango
@@ -42,26 +42,29 @@ RDEPEND="
 		virtual/libintl
 	)
 	qt5? (
-		>=dev-qt/qtcore-${QT_REQ}
-		>=dev-qt/qtgui-${QT_REQ}
-		>=dev-qt/qtwidgets-${QT_REQ}
+		dev-qt/qtcore:5
+		dev-qt/qtgui:5
+		dev-qt/qtwidgets:5
 		virtual/freedesktop-icon-theme
+	)
+	qt6? (
+		dev-qt/qtbase:6[gui,widgets]
 	)"
 DEPEND="${RDEPEND} virtual/pkgconfig"
 BDEPEND="
 	sys-devel/gettext
 	dbus? ( dev-util/gdbus-codegen )"
-PDEPEND="~media-plugins/audacious-plugins-${PV}"
+PDEPEND="~media-plugins/audacious-plugins-${PV}[gtk2(-)?,gtk3(-)?,qt5(-)?,qt6(-)?]"
 
 src_configure() {
 	local emesonargs=(
 		"--auto-features=disabled"
+		"$(meson_use "$(usex gtk3 gtk3 gtk2)" gtk)"
+		"$(meson_use "$(usex qt6 qt6 qt5)" qt)"
 		"$(meson_use dbus)"
-		"$(meson_use "$(usex gtk3 gtk3 gtk)" gtk)"
 		"$(meson_use gtk3)"
 		"$(meson_use libarchive)"
-		"$(meson_use qt5 qt)"
-		"-Dqt6=false" # soon
+		"$(meson_use qt5)"
 	)
 	meson_src_configure
 }
