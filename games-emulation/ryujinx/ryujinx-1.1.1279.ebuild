@@ -30,7 +30,7 @@ avalonia.x11@11.0.10
 commandlineparser@2.9.1
 concentus@1.1.7
 discordrichpresence@1.2.1.24
-dynamicdata@8.3.27
+dynamicdata@8.4.1
 excss@4.2.3
 fluentavaloniaui@2.0.5
 fsharp.core@7.0.200
@@ -63,10 +63,10 @@ microsoft.csharp@4.3.0
 microsoft.csharp@4.7.0
 microsoft.dotnet.platformabstractions@3.1.6
 microsoft.extensions.dependencymodel@6.0.0
-microsoft.identitymodel.abstractions@7.4.0
-microsoft.identitymodel.jsonwebtokens@7.4.0
-microsoft.identitymodel.logging@7.4.0
-microsoft.identitymodel.tokens@7.4.0
+microsoft.identitymodel.abstractions@7.5.1
+microsoft.identitymodel.jsonwebtokens@7.5.1
+microsoft.identitymodel.logging@7.5.1
+microsoft.identitymodel.tokens@7.5.1
 microsoft.io.recyclablememorystream@3.0.0
 microsoft.netcore.platforms@1.0.1
 microsoft.netcore.platforms@1.1.0
