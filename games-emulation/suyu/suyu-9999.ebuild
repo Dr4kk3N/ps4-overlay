@@ -6,9 +6,9 @@ EAPI=8
 inherit cmake git-r3 toolchain-funcs xdg
 
 DESCRIPTION="An emulator for Nintendo Switch based on yuzu EA 4176"
-HOMEPAGE="https://gitlab.com/suyu-emu/suyu"
-EGIT_REPO_URI="https://gitlab.com/suyu-emu/suyu.git"
-EGIT_SUBMODULES=( '-*' 'dynarmic' 'sirit' 'xbyak' 'tzdb_to_nx' 'externals/nx_tzdb/tzdb_to_nx/externals/tz/tz' 'VulkanMemoryAllocator' 'simpleini' )
+HOMEPAGE="https://git.suyu.dev/suyu/suyu"
+EGIT_REPO_URI="https://git.suyu.dev/suyu/suyu"
+EGIT_SUBMODULES=( '-*' 'dynarmic' 'sirit' 'xbyak' 'tzdb_to_nx' 'externals/nx_tzdb/tzdb_to_nx/externals/tz/tz' 'Vulkan-Headers' 'VulkanMemoryAllocator' 'simpleini' 'enet' 'cubeb' 'libusb' 'mbedtls' 'opus' 'SDL' )
 # Dynarmic is not intended to be generic, it is tweaked to fit emulated processor
 # TODO wait 'xbyak' waiting version bump. see #860816
 
@@ -102,8 +102,8 @@ src_prepare() {
 
 	# Unbundle inih
 	sed -i -e '/^if.*inih/,/^endif()/d' externals/CMakeLists.txt || die
-	sed -i -e '1afind_package(PkgConfig REQUIRED)\npkg_check_modules(INIH REQUIRED INIReader)' \
-		src/yuzu_cmd/CMakeLists.txt || die
+	#sed -i -e '1afind_package(PkgConfig REQUIRED)\npkg_check_modules(INIH REQUIRED INIReader)' \
+	#	src/yuzu_cmd/CMakeLists.txt || die
 #	sed -i -e 's:inih/cpp/::' src/yuzu_cmd/config.cpp || die
 
 	# Unbundle mbedtls
