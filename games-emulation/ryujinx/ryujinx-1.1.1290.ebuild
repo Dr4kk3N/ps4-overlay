@@ -164,7 +164,7 @@ silk.net.vulkan@2.16.0
 silk.net.vulkan.extensions.ext@2.16.0
 silk.net.vulkan.extensions.khr@2.16.0
 sixlabors.fonts@1.0.0
-sixlabors.imagesharp@2.1.7
+sixlabors.imagesharp@2.1.8
 sixlabors.imagesharp.drawing@1.0.0
 skiasharp@2.88.3
 skiasharp@2.88.6

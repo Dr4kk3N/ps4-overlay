@@ -24,7 +24,7 @@ IUSE=""
 
 CDEPEND="
 	>=dev-java/slf4j-api-2.0.12:0
-	>=dev-java/icu4j-74.2:70
+	>=dev-java/icu4j-74.2:0
         >=dev-java/commons-httpclient-3.1-r2:3
         >=dev-java/javax-inject-1-r4:0
         >=dev-java/jsr305-3.0.2:0
