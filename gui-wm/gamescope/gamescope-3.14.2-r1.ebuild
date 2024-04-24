@@ -11,20 +11,21 @@ MY_PV="${MY_PV//_/-}"
 
 DESCRIPTION="Efficient micro-compositor for running games"
 HOMEPAGE="https://github.com/ValveSoftware/gamescope"
-
-#url = https://github.com/nothings/stb.git
-#revision = 5736b15f7ea0ffb08dd38af21067c314d6a3aae9
-
-if [[ ${PV} == "9999" ]] ; then
-	EGIT_REPO_URI="https://github.com/Plagman/gamescope.git"
-	EGIT_BRANCH="master"
-	SRC_URI="https://github.com/nothings/stb/archive/refs/heads/master.zip -> stb-master.zip"
+if [[ ${PV} == "9999" ]]; then
+	EGIT_REPO_URI="https://github.com/ValveSoftware/${PN}.git"
+	# Prevent wlroots and other submodule from being pull
+	# Not messing with system packages
+	EGIT_SUBMODULES=( src/reshade )
 	inherit git-r3
 else
-	SRC_URI="https://github.com/ValveSoftware/${PN}/archive/refs/tags/${MY_PV}.tar.gz -> ${P}.tar.gz
-		https://github.com/Joshua-Ashton/reshade/archive/${RESHADE_COMMIT}.tar.gz -> reshade-${RESHADE_COMMIT}.tar.gz"
+	SRC_URI="
+		https://github.com/ValveSoftware/${PN}/archive/refs/tags/${MY_PV}.tar.gz -> ${P}.tar.gz
+		https://github.com/Joshua-Ashton/reshade/archive/${RESHADE_COMMIT}.tar.gz -> reshade-${RESHADE_COMMIT}.tar.gz
+	"
 	KEYWORDS="~amd64"
 fi
+
+S="${WORKDIR}/${PN}-${MY_PV}"
 
 LICENSE="BSD-2"
 SLOT="0"
@@ -33,14 +34,12 @@ IUSE="pipewire +wsi-layer"
 RDEPEND="
 	=dev-libs/libliftoff-0.4*
 	>=dev-libs/wayland-1.21
-	>=dev-libs/wayland-protocols-1.17
 	gui-libs/wlroots[X,libinput(+)]
 	>=media-libs/libavif-1.0.0:=
 	>=media-libs/libdisplay-info-0.1.1
 	media-libs/libsdl2[video,vulkan]
 	media-libs/vulkan-loader
 	sys-apps/hwdata
-	dev-libs/libei
 	sys-libs/libcap
 	>=x11-libs/libdrm-2.4.109
 	x11-libs/libX11
@@ -61,7 +60,8 @@ RDEPEND="
 "
 DEPEND="
 	${RDEPEND}
-	dev-libs/stb
+	>=dev-libs/wayland-protocols-1.34
+	>=dev-libs/stb-20240201-r1
 	dev-util/vulkan-headers
 	media-libs/glm
 	dev-util/spirv-headers
@@ -71,10 +71,11 @@ BDEPEND="
 	dev-util/glslang
 	dev-util/wayland-scanner
 	virtual/pkgconfig
-	dev-build/cmake
 "
 
-S="${WORKDIR}/${PN}-${MY_PV}"
+PATCHES=(
+	"${FILESDIR}"/${PN}-deprecated-stb.patch
+)
 
 FILECAPS=(
 	cap_sys_nice usr/bin/${PN}
@@ -83,27 +84,19 @@ FILECAPS=(
 src_prepare() {
 	default
 
-	unpack stb-master.zip
-	echo "project('stb', 'c')
-	inc = include_directories('.')
-	stb_dep = declare_dependency(include_directories : inc)
-	meson.override_dependency('stb', stb_dep)" > stb-master/meson.build
-	mv stb-master subprojects/stb || die
-
-	# Normally wraps stb with Meson. Upstream does not ship a pkg-config file so
-	# we don't install one. Work around this using symlinks.
-	#mkdir subprojects/stb || die
-	#ln -sn "${ESYSROOT}"/usr/include/stb/* "${S}"/subprojects/packagefiles/stb/* subprojects/stb/ || die
-
 	# ReShade is bundled as a git submodule, but it references an unofficial
 	# fork, so we cannot unbundle it. Symlink to its extracted sources.
-        #rmdir src/reshade || die
-	#ln -snfT ../../reshade-${RESHADE_COMMIT} src/reshade || die
+	# For 9999, use the bundled submodule.
+	if [[ ${PV} != "9999" ]]; then
+		rmdir src/reshade || die
+		ln -snfT ../../reshade-${RESHADE_COMMIT} src/reshade || die
+	fi
 
 	# SPIRV-Headers is required by ReShade. It is bundled as a git submodule but
 	# not wrapped with Meson, so we can symlink to our system-wide headers.
-	#mkdir thirdparty/SPIRV-Headers/include || die
-	#ln -snf "${ESYSROOT}"/usr/include/spirv thirdparty/SPIRV-Headers/include/ || die
+	# For 9999, this submodule is not included.
+	mkdir -p thirdparty/SPIRV-Headers/include || die
+	ln -snf "${ESYSROOT}"/usr/include/spirv thirdparty/SPIRV-Headers/include/ || die
 }
 
 src_configure() {
