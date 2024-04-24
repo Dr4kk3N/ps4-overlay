@@ -29,7 +29,7 @@ DEPEND="${RDEPEND}
 	${PYTHON_DEPS}
 	>=dev-cpp/robin-hood-hashing-3.11.5
 	~dev-util/glslang-${PV}:=[${MULTILIB_USEDEP}]
-	~dev-util/spirv-headers-99999999
+	~dev-util/spirv-headers-9999
 	~dev-util/vulkan-headers-${PV}
 	~dev-util/vulkan-utility-libraries-${PV}:=[${MULTILIB_USEDEP}]
 	wayland? ( dev-libs/wayland:=[${MULTILIB_USEDEP}] )
