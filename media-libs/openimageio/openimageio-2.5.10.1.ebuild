@@ -3,11 +3,13 @@
 
 EAPI=8
 
+#FONT_PN=OpenImageIO
 PYTHON_COMPAT=( python3_{10..12} )
+OPENVDB_COMPAT=( {7..11} )
 
 TEST_OIIO_IMAGE_COMMIT="aae37a54e31c0e719edcec852994d052ecf6541e"
 TEST_OEXR_IMAGE_COMMIT="df16e765fee28a947244657cae3251959ae63c00"
-inherit cmake flag-o-matic font python-single-r1 virtualx
+inherit cmake flag-o-matic font python-single-r1 virtualx openvdb
 
 DESCRIPTION="A library for reading and writing images"
 HOMEPAGE="https://sites.google.com/site/openimageio/ https://github.com/OpenImageIO"
@@ -40,19 +42,55 @@ S="${WORKDIR}/OpenImageIO-${PV}"
 
 LICENSE="Apache-2.0"
 SLOT="0/$(ver_cut 1-2)"
-KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~riscv"
+KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~x86 ~riscv"
 
 X86_CPU_FEATURES=(
 	aes:aes sse2:sse2 sse3:sse3 ssse3:ssse3 sse4_1:sse4.1 sse4_2:sse4.2
 	avx:avx avx2:avx2 avx512f:avx512f f16c:f16c
 )
 CPU_FEATURES=( "${X86_CPU_FEATURES[@]/#/cpu_flags_x86_}" )
+# font install is enabled upstream
+# building test enabled upstream
+IUSE="aom avif clang color-management cxx17 dicom +doc ffmpeg fits gif gui heif icc jpeg2k
+opencv tools openvdb png ptex +python qt5 qt6 raw rav1e tbb test +truetype wayland webp X
+${CPU_FEATURES[@]%:*}"
 
-IUSE="dicom doc ffmpeg fits gif gui jpeg2k opencv openvdb ptex python qt6 raw test +tools +truetype ${CPU_FEATURES[*]%:*}"
-REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} ) gui? ( tools ) test? ( tools )"
+REQUIRED_USE="
+	aom? (
+		avif
+	)
+	avif? (
+		|| (
+			aom
+			rav1e
+		)
+	)
+	gui? (
+		^^ (
+			qt5
+			qt6
+		)
+	)
+	openvdb? (
+		${OPENVDB_REQUIRED_USE}
+		tbb
+	)
+	python? (
+		${PYTHON_REQUIRED_USE}
+	)
+	tools? (
+		gui
+	)
+	rav1e? (
+		avif
+	)
+"
 
-# Not quite working yet
-RESTRICT="!test? ( test )" # test"
+
+RESTRICT="
+	mirror
+	!test? ( test ) test
+"
 
 BDEPEND="
 	jpeg2k? ( app-arch/unzip )
@@ -71,7 +109,6 @@ RDEPEND="
 	dev-libs/libfmt:=
 	dev-libs/pugixml:=
 	>=media-libs/libheif-1.13.0:=
-	media-libs/libjpeg-turbo:=
 	media-libs/libpng:0=
 	>=media-libs/libwebp-0.2.1:=
 	>=dev-libs/imath-3.1.2-r4:=
@@ -79,6 +116,7 @@ RDEPEND="
 	>=media-libs/openexr-3:0=
 	media-libs/tiff:=
 	sys-libs/zlib:=
+	virtual/jpeg:0
 	dicom? ( sci-libs/dcmtk )
 	ffmpeg? ( media-video/ffmpeg:= )
 	fits? ( sci-libs/cfitsio:= )
@@ -87,7 +125,7 @@ RDEPEND="
 	opencv? ( media-libs/opencv:= )
 	openvdb? (
 		dev-cpp/tbb:=
-		media-gfx/openvdb:=
+		media-gfx/openvdb:=[${OPENVDB_SINGLE_USEDEP}]
 	)
 	ptex? ( media-libs/ptex:= )
 	python? (
@@ -123,14 +161,21 @@ DOCS=(
 	README.md
 )
 
+QA_PRESTRIPPED="usr/lib/python.*/site-packages/.*"
+
 PATCHES=(
 	"${FILESDIR}/${PN}-2.5.8.0-fits.patch"
 	"${FILESDIR}/${PN}-2.5.8.0-fix-unit_simd.patch"
 	"${FILESDIR}/${PN}-2.5.8.0-fix-tests.patch"
 )
 
+pkg_pretend() {
+	use qt5 && use qt6 && einfo "The \"qt5\" USE flag has no effect when the \"qt6\" USE flag is also enabled."
+}
+
 pkg_setup() {
 	use python && python-single-r1_pkg_setup
+	use openvdb && openvdb_pkg_setup
 }
 
 src_prepare() {
@@ -151,6 +196,9 @@ src_prepare() {
 }
 
 src_configure() {
+	CMAKE_BUILD_TYPE=Release
+
+	use openvdb && openvdb_src_configure
 	# Build with SIMD support
 	local cpufeature
 	local mysimd=()
@@ -166,9 +214,6 @@ src_configure() {
 	use arm64 && append-flags -flax-vector-conversions
 
 	local mycmakeargs=(
-		-DCMAKE_CXX_STANDARD="17"
-		-DDOWNSTREAM_CXX_STANDARD="17"
-
 		-DCMAKE_UNITY_BUILD_MODE="BATCH"
 		-DUNITY_SMALL_BATCH_SIZE="$(nproc)"
 
@@ -183,21 +228,23 @@ src_configure() {
 		-DINSTALL_DOCS="$(usex doc)"
 		-DSTOP_ON_WARNING="OFF"
 		-DUSE_CCACHE="OFF"
-
 		-DUSE_EXTERNAL_PUGIXML="ON"
-
 		-DENABLE_DCMTK="$(usex dicom)"
 		-DENABLE_FFMPEG="$(usex ffmpeg)"
 		-DENABLE_GIF="$(usex gif)"
 		-DENABLE_NUKE="OFF" # not in Gentoo
+		-DENABLE_OPENCOLORIO="$(usex color-management)"
 		-DENABLE_OPENJPEG="$(usex jpeg2k)"
 		-DENABLE_OPENCV="$(usex opencv)"
 		-DENABLE_OPENVDB="$(usex openvdb)"
+		-DENABLE_PNG="$(usex png)"
 		-DENABLE_PTEX="$(usex ptex)"
 		-DUSE_PYTHON="$(usex python)"
 		-DENABLE_LIBRAW="$(usex raw)"
 		-DENABLE_FREETYPE="$(usex truetype)"
-
+		-DUSE_TBB="$(usex tbb)"
+		-DENABLE_WEBP="$(usex webp)"
+		-DLINKSTATIC="OFF"
 		-DUSE_SIMD="$(local IFS=','; echo "${mysimd[*]}")"
 
 		-DVERBOSE="yes"
@@ -216,6 +263,11 @@ src_configure() {
 			-DUSE_QT=OFF
 		)
 	fi
+
+	use cxx17 && mycmakeargs+=(
+		-DCMAKE_CXX_STANDARD=17
+		-DDOWNSTREAM_CXX_STANDARD="17"
+	)
 
 	if use python; then
 		mycmakeargs+=(

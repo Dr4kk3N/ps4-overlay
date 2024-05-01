@@ -4,37 +4,31 @@
 EAPI=8
 
 PYTHON_COMPAT=( python3_{9..11} )
-inherit bash-completion-r1 desktop python-any-r1 scons-utils toolchain-funcs xdg
+inherit bash-completion-r1 desktop python-any-r1 scons-utils toolchain-funcs xdg git-r3
 
-MY_P="${PN}-$(ver_rs 2 -)"
-
-DESCRIPTION="Multi-platform 2D and 3D game engine with a feature-rich editor"
-HOMEPAGE="https://godotengine.org/"
-SRC_URI="https://downloads.tuxfamily.org/godotengine/$(ver_rs 2 /)/${MY_P}.tar.xz"
-S="${WORKDIR}/${MY_P}"
+DESCRIPTION="Multi-platform 2D and 3D game engine with a feature-rich editor (wayland PR)"
+HOMEPAGE="https://godotengine.org/ https://github.com/godotengine/godot/pull/57025"
+EGIT_REPO_URI="https://github.com/Riteo/godot.git"
+EGIT_BRANCH="wayland"
 
 LICENSE="
 	MIT
 	Apache-2.0 BSD Boost-1.0 CC0-1.0 Unlicense ZLIB
 	gui? ( CC-BY-4.0 ) tools? ( OFL-1.1 )"
 SLOT="4"
-KEYWORDS="~amd64"
 # Enable roughly same as upstream by default so it works as expected,
 # except raycast (tools-only heavy dependency), and deprecated.
 IUSE="
-	+dbus debug deprecated +fontconfig +gui pulseaudio raycast
-	+runner speech test +theora +tools +udev +upnp +vulkan +webp"
-# disable tests until out of beta, tests themselves are new and can be volatile
+	alsa +dbus debug deprecated +fontconfig +gui pulseaudio raycast
+	+runner speech test +theora +tools +udev +upnp +vulkan wayland +webp X"
+# TODO: tests still need more figuring out
 RESTRICT="test"
 
-# libX11 range is temporary while this is being looked into:
-# - https://github.com/godotengine/godot/issues/69352
-# - https://gitlab.freedesktop.org/xorg/lib/libx11/-/issues/170
-# Should in theory be at least improved for 1.8.4, so allowed preemptively.
-# 1.8.2 caused other issues (i.e. with firefox), fallback to 1.8.1 otherwise.
+REQUIRED_USE="gui? ( || ( wayland X ) )"
 
-# dlopen: alsa-lib,dbus,fontconfig,libX*,pulseaudio,speech-dispatcher,udev
+# dlopen: libglvnd
 RDEPEND="
+	app-arch/brotli:=
 	app-arch/zstd:=
 	dev-games/recastnavigation:=
 	dev-libs/icu:=
@@ -47,37 +41,49 @@ RDEPEND="
 	<net-libs/mbedtls-3:=
 	net-libs/wslay
 	sys-libs/zlib:=
+	alsa? ( media-libs/alsa-lib )
+	dbus? ( sys-apps/dbus )
 	fontconfig? ( media-libs/fontconfig )
 	gui? (
-		media-libs/alsa-lib
-		media-libs/libglvnd[X]
-		x11-libs/libXcursor
-		x11-libs/libXext
-		x11-libs/libXi
-		x11-libs/libXinerama
-		x11-libs/libXrandr
-		x11-libs/libXrender
-		dbus? ( sys-apps/dbus )
-		pulseaudio? ( media-libs/libpulse )
+		media-libs/libglvnd
+		X? (
+			x11-libs/libX11
+			x11-libs/libXcursor
+			x11-libs/libXext
+			x11-libs/libXi
+			x11-libs/libXinerama
+			x11-libs/libXrandr
+			x11-libs/libXrender
+			x11-libs/libxkbcommon
+		)
+		wayland? (
+			gui-libs/libdecor
+			dev-libs/wayland
+		)
 		tools? ( raycast? ( media-libs/embree:3 ) )
-		udev? ( virtual/udev )
-		vulkan? ( media-libs/vulkan-loader[X] )
+		vulkan? ( media-libs/vulkan-loader[X?] )
 	)
+	pulseaudio? ( media-libs/libpulse )
 	speech? ( app-accessibility/speech-dispatcher )
 	theora? ( media-libs/libtheora )
 	tools? ( app-misc/ca-certificates )
+	udev? ( virtual/udev )
 	upnp? ( net-libs/miniupnpc:= )
 	webp? ( media-libs/libwebp:= )"
 DEPEND="
 	${RDEPEND}
-	gui? ( x11-base/xorg-proto )
+	X? ( x11-base/xorg-proto )
+	wayland? ( dev-libs/wayland-protocols )
 	tools? ( test? ( dev-cpp/doctest ) )"
-BDEPEND="virtual/pkgconfig"
+BDEPEND="
+	virtual/pkgconfig
+	wayland? ( dev-util/wayland-scanner )
+"
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-4.0-musl.patch
 	"${FILESDIR}"/${PN}-4.0_beta3-headless-header.patch
-	"${FILESDIR}"/${PN}-4.0_beta8-scons.patch
+	"${FILESDIR}"/${PN}-4.0_rc2-musl.patch
+	"${FILESDIR}"/${PN}-4.0_rc3-scons.patch
 )
 
 src_prepare() {
@@ -92,23 +98,18 @@ src_prepare() {
 
 	# use of builtin_ switches can be messy (see below), delete to be sure
 	local unbundle=(
-		doctest embree freetype graphite harfbuzz icu4c libogg
-		libpng libtheora libvorbis libwebp mbedtls miniupnpc
-		pcre2 recastnavigation volk wslay zlib zstd
+		brotli doctest embree freetype graphite harfbuzz icu4c libogg
+		libpng libtheora libvorbis libwebp linuxbsd_headers mbedtls
+		miniupnpc pcre2 recastnavigation volk wayland wayland-protocols wslay
+		zlib zstd
 		# certs: unused by generated header, but scons panics if not found
 	)
 	rm -r "${unbundle[@]/#/thirdparty/}" || die
 
-	# do symlinks to avoid too much patching with hardcoded header paths
-	mkdir thirdparty/lib{vorbis,ogg} || die
-	ln -s "${ESYSROOT}"/usr/include thirdparty/zstd || die
 	ln -s "${ESYSROOT}"/usr/include/doctest thirdparty/ || die
-	ln -s "${ESYSROOT}"/usr/include/ogg thirdparty/libogg/ || die
-	ln -s "${ESYSROOT}"/usr/include/vorbis thirdparty/libvorbis/ || die
 }
 
 src_compile() {
-	local -x GODOT_VERSION_STATUS=$(ver_cut 3-4) # for dev versions only
 	local -x BUILD_NAME=gentoo # replaces "custom_build" in version string
 
 	local esconsargs=(
@@ -117,32 +118,36 @@ src_compile() {
 		progress=no
 		verbose=yes
 
+		use_sowrap=no
+
+		alsa=$(usex alsa)
+		dbus=$(usex dbus)
 		deprecated=$(usex deprecated)
-		#execinfo=$(usex !elibc_glibc) # libexecinfo is not packaged
 		fontconfig=$(usex fontconfig)
-		minizip=yes # uses a modified bundled copy
 		opengl3=$(usex gui)
-		pulseaudio=$(usex gui $(usex pulseaudio))
+		pulseaudio=$(usex pulseaudio)
 		speechd=$(usex speech)
-		udev=$(usex gui $(usex udev))
-		use_dbus=$(usex gui $(usex dbus))
+		udev=$(usex udev)
 		use_volk=no # unnecessary when linking directly to libvulkan
 		vulkan=$(usex gui $(usex vulkan))
-		x11=$(usex gui)
+		x11=$(usex gui $(usex X))
+		wayland=$(usex gui $(usex wayland))
 
 		system_certs_path="${EPREFIX}"/etc/ssl/certs/ca-certificates.crt
 
 		# platform/*/detect.py uses builtin_* switches to check if need
-		# to link with system libraries, but ignores whether the dep is
-		# actually used, so "enable" deleted builtins on disabled deps
+		# to link with system libraries, but many ignore whether the dep
+		# is actually used, so "enable" deleted builtins on disabled deps
+		builtin_brotli=no
 		builtin_certs=no
 		builtin_embree=$(usex !gui yes $(usex !tools yes $(usex !raycast)))
 		builtin_enet=yes # bundled copy is patched for IPv6+DTLS support
 		builtin_freetype=no
-		builtin_glslang=yes #879111
+		builtin_glslang=yes #879111 (for now, may revisit if more stable)
 		builtin_graphite=no
 		builtin_harfbuzz=no
-		builtin_icu=no
+		builtin_icu4c=no
+		builtin_libdecor=no
 		builtin_libogg=no
 		builtin_libpng=no
 		builtin_libtheora=$(usex !theora)
@@ -152,22 +157,18 @@ src_compile() {
 		builtin_miniupnpc=$(usex !upnp)
 		builtin_msdfgen=yes # not wired for unbundling nor packaged
 		builtin_pcre2=no
-		builtin_recast=no
+		builtin_recastnavigation=no
 		builtin_rvo2=yes # bundled copy has godot-specific changes
 		builtin_squish=yes # ^ likewise, may not be safe to unbundle
+		builtin_wayland=no
 		builtin_wslay=no
 		builtin_xatlas=yes # not wired for unbundling nor packaged
 		builtin_zlib=no
 		builtin_zstd=no
-		# also bundled but lacking a builtin_* switch:
-		#	amd-fsr, basis_universal, cvtt, etcpak, fonts, glad,
-		#	jpeg-compressor, meshoptimizer, minimp3, minizip (patched to
-		#	seek in archives), noise, oidn, openxr, spirv-reflect, thorvg,
-		#	tinyexr, vhacd, vulkan, and the misc directory.
+		# (more is bundled in third_party/ but they lack builtin_* switches)
 
 		# modules with optional dependencies, "possible" to disable more but
 		# gets messy and breaks all sorts of features (expected enabled)
-		module_gridmap_enabled=$(usex deprecated) # fails without deprecated
 		module_mono_enabled=no # unhandled
 		# note raycast is only enabled on amd64+arm64, see raycast/config.py
 		module_raycast_enabled=$(usex gui $(usex tools $(usex raycast)))
@@ -242,14 +243,4 @@ src_install() {
 	insinto /usr/share/zsh/site-functions
 	newins misc/dist/shell/_godot.zsh-completion _${s}
 	dosym _${s} /usr/share/zsh/site-functions/_${s}-runner
-}
-
-pkg_postinst() {
-	xdg_pkg_postinst
-
-	if [[ ! ${REPLACING_VERSIONS} ]] && has_version ${CATEGORY}/${PN}:3; then
-		elog
-		elog "Remember to make backups before opening any Godot <=3.x projects in Godot 4."
-		elog "Automated migration is only partial, and it would be difficult to revert."
-	fi
 }
