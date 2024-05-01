@@ -25,6 +25,7 @@ RDEPEND="
 	>=media-libs/assimp-5.2.5-r1
 	>=dev-libs/expat-2.1.0-r3
 	>=sys-libs/zlib-1.2.8
+	>=media-libs/glm-1.0.1
 	wayland? ( >=dev-libs/wayland-1.18.0
 		   >=dev-libs/wayland-protocols-1.30
 		   dev-util/wayland-scanner
