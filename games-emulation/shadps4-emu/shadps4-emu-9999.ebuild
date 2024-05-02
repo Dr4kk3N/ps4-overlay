@@ -6,21 +6,47 @@ EAPI=8
 inherit cmake desktop fcaps flag-o-matic toolchain-funcs
 
 DESCRIPTION="PlayStation 4 emulator"
-HOMEPAGE="https://github.com/georgemoralis/shadPS4/"
+HOMEPAGE="https://github.com/shadps4-emu/shadPS4"
 
-EGIT_REPO_URI="https://github.com/georgemoralis/shadPS4.git"
-EGIT_SUBMODULES=( 'asmjit' '3rdparty/zydis' \
-		  '3rdparty/SDL' \
-		  '3rdparty/fmt' \
-		  '3rdparty/discord-rpc' \
-		  '3rdparty/spdlog' \
-		  '3rdparty/imgui' \
-		  '3rdparty/magic_enum' \
-		  '3rdparty/toml11' \
-		  '3rdparty/vulkan' \
-		  '3rdparty/winpthread' \
-		  '3rdparty/xxHash'
+if [[ ${PV} == *9999 ]]
+then
+	EGIT_REPO_URI="https://github.com/shadps4-emu/shadPS4.git"
+	EGIT_SUBMODULES=( 'externals/boost' \
+			  'externals/cryptopp' \
+			  'externals/cryptopp-cmake' \
+			  'externals/cryptoppwin' \
+			  'externals/discord-rpc' \
+			  'externals/fmt' \
+			  'externals/glslang' \
+			  'externals/robin-map' \
+			  'externals/sdl3' \
+			  'externals/wma' \
+			  'externals/vulkan-headers' \
+			  'externals/zlib-ng' \
+			  'third-party/magic_enum' \
+			  'third-party/toml11' \
+			  'third-party/vulkan' \
+			  'third-party/winpthread' \
+			  'third-party/xxHash' \
+			  'third-party/zydis/dependencies'
+			)
+	inherit git-r3
+else
+	EGIT_COMMIT=0f2540a0d1133950467845f20b1e003181147781
+	ZYDIS_COMMIT=a6d0c713b71b5009634868389f0ff551871273d6
+	SRC_URI="
+		https://github.com/dolphin-emu/dolphin/archive/${EGIT_COMMIT}.tar.gz
+			-> ${P}.tar.gz
+		https://github.com/zyantific/zydis/archive/${ZYDIS_COMMIT}.tar.gz
+		mgba? (
+			https://github.com/mgba-emu/mgba/archive/${MGBA_COMMIT}.tar.gz
+				-> mgba-${MGBA_COMMIT}.tar.gz
 		)
+	"
+	S=${WORKDIR}/${PN}-${EGIT_COMMIT}
+	KEYWORDS="~amd64 ~arm64"
+fi
+
 LICENSE="GPL-2"
 SLOT="0"
 IUSE="alsa discord pulseaudio sndio vulkan wayland"
@@ -64,9 +90,9 @@ BDEPEND="
 	)
 "
 
-PATCHES=(
-	"${FILESDIR}"/${PN}-typo.patch
-)
+#PATCHES=(
+#	"${FILESDIR}"/${PN}-typo.patch
+#)
 
 src_configure() {
 	local mycmakeargs=(

@@ -61,8 +61,13 @@ src_configure() {
 		$(use_enable gtk gtk2) \
 		$(use_enable systray) \
 		--disable-esd \
-		--disable-sgi \
-		--disable-dependency-tracking
+		--disable-sgi
+}
+
+src_install() {
+	emake DESTDIR="${D}" install
+	einstalldocs
+	find "${D}/usr/lib64" -name '*.la' -delete
 }
 
 pkg_postinst() {
