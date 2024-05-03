@@ -1,4 +1,4 @@
-# Copyright 1999-2023 Gentoo Authors
+# Copyright 1999-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -48,9 +48,12 @@ ADDONS_SRC=(
 	"${ADDONS_URI}/dragonbox-1.1.3.tar.gz"
 	# not packaged in Gentoo, https://www.netlib.org/fp/dtoa.c
 	"${ADDONS_URI}/dtoa-20180411.tgz"
-	# not packaged in Gentoo, https://skia.org/
-	"${ADDONS_URI}/skia-m111-a31e897fb3dcbc96b2b40999751611d029bf5404.tar.xz"
+	# not packaged in Gentoo, https://github.com/serge-sans-paille/frozen
 	"${ADDONS_URI}/frozen-1.1.1.tar.gz"
+	# not packaged in Gentoo, https://skia.org/
+	"${ADDONS_URI}/skia-m116-2ddcf183eb260f63698aa74d1bb380f247ad7ccd.tar.xz"
+	# not packaged in Gentoo, https://github.com/tsyrogit/zxcvbn-c
+	"${ADDONS_URI}/zxcvbn-c-2.5.tar.gz"
 	"base? (
 		${ADDONS_URI}/commons-logging-1.2-src.tar.gz
 		${ADDONS_URI}/ba2930200c9f019c2d93a8c88c651a0f-flow-engine-0.9.4.zip
@@ -65,7 +68,11 @@ ADDONS_SRC=(
 		${ADDONS_URI}/ace6ab49184e329db254e454a010f56d-libxml-1.1.7.zip
 		${ADDONS_URI}/39bb3fcea1514f1369fcfc87542390fd-sacjava-1.3.zip
 	)"
-	"java? ( ${ADDONS_URI}/17410483b5b5f267aa18b7e00b65e6e0-hsqldb_1_8_0.zip )"
+	# Java-WebSocket: not packaged in Gentoo, https://github.com/TooTallNate/Java-WebSocket
+	"java? (
+		${ADDONS_URI}/Java-WebSocket-1.5.4.tar.gz
+		${ADDONS_URI}/17410483b5b5f267aa18b7e00b65e6e0-hsqldb_1_8_0.zip
+	)"
 	# no release for 8 years, should we package it?
 	"libreoffice_extensions_wiki-publisher? ( ${ADDONS_URI}/a7983f859eafb2677d7ff386a023bc40-xsltml_2.1.2.zip )"
 	# Does not build with 1.6 rhino at all
@@ -84,12 +91,13 @@ unset ADDONS_SRC
 LO_EXTS="nlpsolver scripting-beanshell scripting-javascript wiki-publisher"
 
 IUSE="accessibility base bluetooth +branding clang coinmp +cups custom-cflags +dbus debug eds firebird
-googledrive gstreamer +gtk kde ldap +mariadb odk pdfimport postgres test valgrind vulkan
+googledrive gstreamer +gtk kde ldap +mariadb odk pdfimport postgres qt5 qt6 test valgrind vulkan
 $(printf 'libreoffice_extensions_%s ' ${LO_EXTS})"
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}
-	base? ( firebird java )
+	base? ( java )
 	bluetooth? ( dbus )
+	kde? ( || ( qt5 qt6 ) )
 	libreoffice_extensions_nlpsolver? ( java )
 	libreoffice_extensions_scripting-beanshell? ( java )
 	libreoffice_extensions_scripting-javascript? ( java )
@@ -101,12 +109,13 @@ RESTRICT="!test? ( test )"
 LICENSE="|| ( LGPL-3 MPL-1.1 )"
 SLOT="0"
 
-[[ ${MY_PV} == *9999* ]] || \
-KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86 ~amd64-linux"
+#[[ ${MY_PV} == *9999* ]] || \
+#KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86 ~amd64-linux"
 
 COMMON_DEPEND="${PYTHON_DEPS}
 	app-arch/unzip
 	app-arch/zip
+	app-crypt/argon2:=
 	app-crypt/gpgme:=[cxx]
 	app-text/hunspell:=
 	>=app-text/libabw-0.1.0
@@ -125,9 +134,8 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	app-text/libwpg:0.3
 	>=app-text/libwps-0.4
 	app-text/mythes
-	dev-cpp/abseil-cpp:=
 	>=dev-cpp/clucene-2.3.3.4-r2
-	>=dev-cpp/libcmis-0.5.2-r2
+	>=dev-cpp/libcmis-0.6.2:0=
 	dev-db/unixODBC
 	dev-lang/perl
 	dev-libs/boost:=[nls]
@@ -152,7 +160,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	>=media-libs/harfbuzz-5.1.0:=[graphite,icu]
 	media-libs/lcms:2
 	>=media-libs/libcdr-0.1.0
-	>=media-libs/libepoxy-1.3.1
+	>=media-libs/libepoxy-1.3.1[X]
 	>=media-libs/libfreehand-0.1.0
 	media-libs/libjpeg-turbo:=
 	media-libs/libpagemaker
@@ -167,7 +175,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	sci-mathematics/lpsolve:=
 	sys-libs/zlib
 	virtual/opengl
-	x11-libs/cairo
+	x11-libs/cairo[X]
 	x11-libs/libXinerama
 	x11-libs/libXrandr
 	x11-libs/libXrender
@@ -183,7 +191,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	dbus? ( sys-apps/dbus )
 	eds? (
 		dev-libs/glib:2
-		gnome-base/dconf
+		>=gnome-base/dconf-0.40.0
 		gnome-extra/evolution-data-server
 	)
 	firebird? ( >=dev-db/firebird-3.0.2.32703.0-r1[server] )
@@ -192,23 +200,29 @@ COMMON_DEPEND="${PYTHON_DEPS}
 		media-libs/gst-plugins-base:1.0
 	)
 	gtk? (
+		app-accessibility/at-spi2-core:2
 		dev-libs/glib:2
 		dev-libs/gobject-introspection
 		gnome-base/dconf
-		media-libs/mesa
-		x11-libs/gtk+:3
+		media-libs/mesa[egl(+)]
+		x11-libs/gtk+:3[X]
 		x11-libs/pango
 	)
 	kde? (
-		dev-qt/qtcore:5
-		dev-qt/qtgui:5
-		dev-qt/qtwidgets:5
-		dev-qt/qtx11extras:5
-		kde-frameworks/kconfig:5
-		kde-frameworks/kcoreaddons:5
-		kde-frameworks/ki18n:5
-		kde-frameworks/kio:5
-		kde-frameworks/kwindowsystem:5
+		qt5? (
+			kde-frameworks/kconfig:5
+			kde-frameworks/kcoreaddons:5
+			kde-frameworks/ki18n:5
+			kde-frameworks/kio:5
+			kde-frameworks/kwindowsystem:5
+		)
+		qt6? (
+			kde-frameworks/kconfig:6
+			kde-frameworks/kcoreaddons:6
+			kde-frameworks/ki18n:6
+			kde-frameworks/kio:6
+			kde-frameworks/kwindowsystem:6
+		)
 	)
 	ldap? ( net-nds/openldap:= )
 	libreoffice_extensions_scripting-beanshell? ( dev-java/bsh )
@@ -217,6 +231,13 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	!mariadb? ( dev-db/mysql-connector-c:= )
 	pdfimport? ( >=app-text/poppler-22.06:=[cxx] )
 	postgres? ( >=dev-db/postgresql-9.0:*[kerberos] )
+	qt5? (
+		dev-qt/qtcore:5
+		dev-qt/qtgui:5
+		dev-qt/qtwidgets:5
+		dev-qt/qtx11extras:5
+	)
+	qt6? ( dev-qt/qtbase:6[gui,widgets] )
 "
 # FIXME: cppunit should be moved to test conditional
 #        after everything upstream is under gbuild
@@ -233,8 +254,8 @@ DEPEND="${COMMON_DEPEND}
 	x11-libs/libXt
 	x11-libs/libXtst
 	java? (
-		dev-java/ant-core
-		>=virtual/jdk-11
+		dev-java/ant:0
+		>=virtual/jdk-17
 	)
 	test? (
 		app-crypt/gnupg
@@ -242,7 +263,7 @@ DEPEND="${COMMON_DEPEND}
 		media-fonts/dejavu
 		media-fonts/liberation-fonts
 	)
-	valgrind? ( dev-util/valgrind )
+	valgrind? ( dev-debug/valgrind )
 "
 RDEPEND="${COMMON_DEPEND}
 	acct-group/libreoffice
@@ -250,31 +271,34 @@ RDEPEND="${COMMON_DEPEND}
 	!app-office/libreoffice-bin
 	!app-office/libreoffice-bin-debug
 	media-fonts/liberation-fonts
-	|| ( x11-misc/xdg-utils kde-plasma/kde-cli-tools )
+	|| ( x11-misc/xdg-utils kde-plasma/kde-cli-tools:* )
 	java? ( >=virtual/jre-11 )
 	kde? ( kde-frameworks/breeze-icons:* )
 "
 BDEPEND="
 	dev-util/intltool
 	sys-apps/which
-	sys-devel/bison
-	sys-devel/flex
+	app-alternatives/yacc
+	app-alternatives/lex
 	sys-devel/gettext
 	virtual/pkgconfig
 	clang? (
 		|| (
+			(	sys-devel/clang:18
+				sys-devel/llvm:18
+				=sys-devel/lld-18*	)
+			(	sys-devel/clang:17
+				sys-devel/llvm:17
+				=sys-devel/lld-17*	)
 			(	sys-devel/clang:16
 				sys-devel/llvm:16
 				=sys-devel/lld-16*	)
 			(	sys-devel/clang:15
 				sys-devel/llvm:15
 				=sys-devel/lld-15*	)
-			(	sys-devel/clang:14
-				sys-devel/llvm:14
-				=sys-devel/lld-14*	)
 		)
 	)
-	odk? ( >=app-doc/doxygen-1.8.4 )
+	odk? ( >=app-text/doxygen-1.8.4 )
 "
 if [[ ${MY_PV} != *9999* ]] && [[ ${PV} != *_* ]]; then
 	PDEPEND="=app-office/libreoffice-l10n-$(ver_cut 1-2)*"
@@ -290,7 +314,14 @@ PATCHES=(
 	# not upstreamable stuff
 	"${FILESDIR}/${PN}-5.3.4.2-kioclient5.patch"
 	"${FILESDIR}/${PN}-6.1-nomancompress.patch"
-	"${FILESDIR}/${PN}-7.2.0.4-qt5detect.patch"
+	"${FILESDIR}/${PN}-24.2-qtdetect.patch"
+
+	# maybe upstreamable
+	"${FILESDIR}/${PN}-7.5.8.2-icu-74-compatibility.patch"
+
+	# TODO: upstream
+	"${FILESDIR}/${PN}-7.6-unused-qt5network.patch"
+	"${FILESDIR}/${PN}-24.2-unused-qt6network.patch"
 )
 
 S="${WORKDIR}/${PN}-${MY_PV}"
@@ -391,6 +422,9 @@ src_configure() {
 	einfo "Preset CFLAGS:    ${CFLAGS}"
 	einfo "Preset LDFLAGS:   ${LDFLAGS}"
 
+	# Workaround for bug #915067
+	append-ldflags $(test-flags-CCLD -Wl,--undefined-version)
+
 	if use clang ; then
 		# Force clang
 		einfo "Enforcing the use of clang due to USE=clang ..."
@@ -400,6 +434,9 @@ src_configure() {
 		NM=llvm-nm
 		RANLIB=llvm-ranlib
 		LDFLAGS+=" -fuse-ld=lld"
+
+		# Workaround for bug #907905
+		filter-lto
 
 		# Not implemented by Clang, bug #903889
 		filter-flags -Wlto-type-mismatch -Werror=lto-type-mismatch
@@ -440,7 +477,12 @@ src_configure() {
 	export PYTHON_CFLAGS=$(python_get_CFLAGS)
 	export PYTHON_LIBS=$(python_get_LIBS)
 
-	use kde && export QT5DIR="$(qt5_get_bindir)/.."
+	if use qt5; then
+		export QT5DIR="$(qt5_get_bindir)/.."
+	fi
+	if use qt6; then
+		export QT6DIR="$(qt6_get_bindir)/.."
+	fi
 
 	local gentoo_buildid="Gentoo official package"
 	if [[ -n ${LOCOREGIT_VERSION} ]]; then
@@ -467,22 +509,20 @@ src_configure() {
 		--with-system-libs
 		--enable-build-opensymbol
 		--enable-cairo-canvas
-		--enable-gui
 		--enable-largefile
-		--enable-mergelibs
+		--enable-mergelibs=more
 		--enable-python=system
 		--enable-randr
 		--enable-release-build
 		--disable-breakpad
 		--disable-bundle-mariadb
-		--disable-libcmis
+		--disable-ccache
 		--disable-epm
 		--disable-fetch-external
 		--disable-gtk3-kde5
 		--disable-online-update
 		--disable-openssl
 		--disable-pdfium
-		--disable-qt6
 		--with-extra-buildid="${gentoo_buildid}"
 		--enable-extension-integration
 		--with-external-dict-dir="${EPREFIX}/usr/share/myspell"
@@ -491,19 +531,22 @@ src_configure() {
 		--with-external-tar="${DISTDIR}"
 		--with-lang=""
 		--with-parallelism=$(makeopts_jobs)
-		--with-system-abseil
 		--with-system-openjpeg
 		--with-tls=nss
 		--with-vendor="Gentoo Foundation"
+		--with-x
 		--without-fonts
 		--without-myspell-dicts
 		--with-help="html"
 		--without-helppack-integration
 		--with-system-gpgmepp
+		--without-system-abseil
 		--without-system-dragonbox
+		--without-system-frozen
 		--without-system-jfreereport
 		--without-system-libfixmath
 		--without-system-sane
+		--without-system-zxcvbn
 		$(use_enable base report-builder)
 		$(use_enable bluetooth sdremote-bluetooth)
 		$(use_enable coinmp)
@@ -514,12 +557,12 @@ src_configure() {
 		$(use_enable firebird firebird-sdbc)
 		$(use_enable gstreamer gstreamer-1-0)
 		$(use_enable gtk gtk3)
-		$(use_enable kde kf5)
-		$(use_enable kde qt5)
 		$(use_enable ldap)
 		$(use_enable odk)
 		$(use_enable pdfimport)
 		$(use_enable postgres postgresql-sdbc)
+		$(use_enable qt5)
+		$(use_enable qt6)
 		$(use_enable vulkan skia)
 		$(use_with accessibility lxml)
 		$(use_with coinmp system-coinmp)
@@ -528,8 +571,10 @@ src_configure() {
 		$(use_with java)
 		$(use_with odk doxygen)
 		$(use_with valgrind)
-		--without-system-frozen
 	)
+
+	use qt5 && myeconfargs+=( $(use_enable kde kf5) )
+	use qt6 && myeconfargs+=( $(use_enable kde kf6) )
 
 	if use eds || use gtk; then
 		myeconfargs+=( --enable-dconf --enable-gio )
@@ -562,7 +607,7 @@ src_configure() {
 			myeconfargs+=( --with-rhino-jar=$(java-pkg_getjar rhino-1.6 rhino.jar) )
 	fi
 
-	is-flagq "-flto*" && myeconfargs+=( --enable-lto )
+	tc-is-lto && myeconfargs+=( --enable-lto )
 
 	MARIADBCONFIG="$(type -p $(usex mariadb mariadb mysql)_config)" \
 	econf "${myeconfargs[@]}"
