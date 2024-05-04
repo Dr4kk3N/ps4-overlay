@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Gentoo Authors
+# Copyright 2022-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -24,7 +24,7 @@ HOMEPAGE="https://dosbox-x.com/"
 LICENSE="GPL-2"
 SLOT="0"
 
-IUSE="X debug ffmpeg fluidsynth freetype opengl png slirp"
+IUSE="X debug ffmpeg fluidsynth opengl png slirp truetype"
 # Unit tests are only available in debug builds
 RESTRICT="!debug? ( test )"
 
@@ -47,7 +47,7 @@ BDEPEND="
 # one available backend (https://bugs.gentoo.org/901303).  Unconditionally
 # depending on media-libs/libsdl2[alsa] to satisfy this requirement since
 # this ebuild already unconditionally pulls in media-libs/alsa-lib.
-RDEPEND="
+COMMON_DEPEND="
 	media-libs/alsa-lib
 	media-libs/libsdl2[X,alsa,opengl?,sound,threads,video]
 	media-libs/sdl2-net
@@ -61,14 +61,32 @@ RDEPEND="
 	debug? ( sys-libs/ncurses:= )
 	ffmpeg? ( media-video/ffmpeg:= )
 	fluidsynth? ( media-sound/fluidsynth:= )
-	freetype? ( media-libs/freetype )
 	opengl? ( media-libs/libglvnd[X] )
 	png? ( media-libs/libpng:= )
 	slirp? ( net-libs/libslirp )
+	truetype? ( media-libs/freetype )
 "
 
 DEPEND="
-	${RDEPEND}
+	${COMMON_DEPEND}
+"
+
+# DOSBox-X can still run normally without any of these dependencies --
+# it just cannot show a file dialog.  However, upon the initial launch,
+# DOSBox-X will try to show a file dialog to let the user choose the
+# working directory; without one of these dependencies, the user would
+# see nothing when they launch DOSBox-X for the first time.
+FILE_DIALOG_DEPEND="
+	|| (
+		gnome-extra/zenity
+		kde-apps/kdialog
+		x11-misc/xdialog
+	)
+"
+
+RDEPEND="
+	${COMMON_DEPEND}
+	${FILE_DIALOG_DEPEND}
 "
 
 pkg_pretend() {
@@ -118,10 +136,10 @@ src_configure() {
 		$(use_enable X x11)
 		$(use_enable ffmpeg avcodec)
 		$(use_enable fluidsynth libfluidsynth)
-		$(use_enable freetype)
 		$(use_enable opengl)
 		$(use_enable png screenshots)
 		$(use_enable slirp libslirp)
+		$(use_enable truetype freetype)
 	)
 
 	econf "${myconf[@]}"
