@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{10..11} )
+PYTHON_COMPAT=( python3_{11..12} )
 PYTHON_REQ_USE="xml(+)"
 
 CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu he
@@ -22,8 +22,8 @@ inherit python-any-r1 qmake-utils readme.gentoo-r1 toolchain-funcs xdg-utils
 
 DESCRIPTION="Modifications to Chromium for removing Google integration and enhancing privacy"
 HOMEPAGE="https://github.com/ungoogled-software/ungoogled-chromium"
-PATCHSET_PPC64="122.0.6261.57-1raptor0~deb12u1"
-PATCH_V="${PV%%\.*}-2"
+PATCHSET_PPC64="124.0.6367.78-1raptor0~deb12u1"
+PATCH_V="${PV%%\.*}"
 SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/chromium-${PV/_*}.tar.xz
 	https://gitlab.com/Matt.Jolly/chromium-patches/-/archive/${PATCH_V}/chromium-patches-${PATCH_V}.tar.bz2
 	ppc64? (
@@ -34,7 +34,7 @@ SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/chro
 
 LICENSE="BSD cromite? ( GPL-3 )"
 SLOT="0"
-KEYWORDS="amd64 ~arm64 ~ppc64 ~x86"
+KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
 IUSE_SYSTEM_LIBS="abseil-cpp av1 brotli crc32c double-conversion ffmpeg +harfbuzz +icu jsoncpp +libevent +libusb libvpx +openh264 openjpeg +png re2 snappy woff2 +zstd"
 IUSE="+X bluetooth cfi +clang convert-dict cups cpu_flags_arm_neon custom-cflags debug enable-driver gtk4 hangouts headless hevc kerberos libcxx nvidia +official optimize-thinlto optimize-webui override-data-dir pax-kernel pgo +proprietary-codecs pulseaudio qt5 qt6 screencast selinux thinlto cromite vaapi wayland widevine"
 RESTRICT="
@@ -57,26 +57,17 @@ REQUIRED_USE="
 	vaapi? ( !system-av1 !system-libvpx )
 "
 
-#UGC_COMMIT_ID="2661a6c63e39a03824caf1345df723fbe7783c25"
+#UGC_COMMIT_ID="d5773b0fb696ef107cc6df6a94cbe732c9e905f9"
 # UGC_PR_COMMITS=(
 # 	c917e096342e5b90eeea91ab1f8516447c8756cf
 # 	5794e9d12bf82620d5f24505798fecb45ca5a22d
 # )
 
-CROMITE_COMMIT_ID="fac696b3a422f196f698e6543913946ddaba1ef3"
+CROMITE_COMMIT_ID="8dca688ad4d06a58885606da01a2b32041275c64"
 
-declare -A CHROMIUM_COMMITS=(
-	["b6df4d75ada110883fcc194e7b6eb52aea7f522b"]="."
-	["e8e7c38ed76d20abcb4def81196eb9fd32772ea9"]="."
-	["-b4d62daa178298eaa6fc8b9bc7ec6835c95ad86e"]="."
-	["8d253767f895b45053c39ea99a8f02bbe7071d3a"]="."
-	["e189c46f1ee584c1721ccfecb38bd8db84b58d5b"]="."
-	["04866680f4f9a8475ae3795ad6ed59649ba478d7"]="."
-	["4b48bc4dd6ce9c56d254e552a33a7b7c2d6fc226"]="."
-	["5b2d53797e5580cbfea00d732fe25a97c7048b5b"]="."
-	["3a75d7f8dc3a08a38dd893031f8996b91a00764b"]="."
-	["214859e3567ea9def85305e4f021a5d407e1ccfe"]="."
-)
+# declare -A CHROMIUM_COMMITS=(
+# 	["3cfdfdc2213597398cb2876904cb5cecedc91875"]="."
+# )
 
 UGC_PV="${PV/_p/-}"
 UGC_PF="${PN}-${UGC_PV}"
@@ -272,8 +263,8 @@ BDEPEND="
 		qt6? ( dev-qt/qtbase:6 )
 	)
 	>=dev-build/gn-0.2114
-	dev-lang/perl
 	>=dev-build/ninja-1.7.2
+	dev-lang/perl
 	>=dev-util/gperf-3.0.3
 	dev-vcs/git
 	>=net-libs/nodejs-7.6.0[inspector]
@@ -413,12 +404,15 @@ src_prepare() {
 		"${WORKDIR}/chromium-patches-${PATCH_V}"
 		"${FILESDIR}/chromium-cross-compile.patch"
 		"${FILESDIR}/chromium-use-oauth2-client-switches-as-default.patch"
-		"${FILESDIR}/chromium-108-EnumTable-crash.patch"
 		"${FILESDIR}/chromium-109-system-openh264.patch"
 		"${FILESDIR}/chromium-109-system-zlib.patch"
 		"${FILESDIR}/chromium-111-InkDropHost-crash.patch"
 		"${FILESDIR}/chromium-117-system-zstd.patch"
-		"${FILESDIR}/chromium-121-qrcode-r1.patch"
+		"${FILESDIR}/chromium-124-libwebp-shim-sharpyuv.patch"
+		"${FILESDIR}/chromium-125-ninja-1-12.patch"
+		"${FILESDIR}/chromium-123-qrcode.patch"
+		"${FILESDIR}/chromium-123-cloud_authenticator.patch"
+		"${FILESDIR}/chromium-123-stats-collector.patch"
 		"${FILESDIR}/chromium-122-cfi-no-split-lto-unit.patch"
 		"${FILESDIR}/perfetto-system-zlib.patch"
 		"${FILESDIR}/gtk-fix-prefers-color-scheme-query.diff"
@@ -427,8 +421,15 @@ src_prepare() {
 
 	if ! use libcxx ; then
 		PATCHES+=(
-			"${FILESDIR}/chromium-120-libstdc++.patch"
-			"${FILESDIR}/base_to_address.patch"
+			"${FILESDIR}/chromium-124-libstdc++.patch"
+			"${FILESDIR}/bad-font-gc0000.patch"
+			"${FILESDIR}/bad-font-gc000.patch"
+			"${FILESDIR}/bad-font-gc00.patch"
+			"${FILESDIR}/bad-font-gc0.patch"
+			"${FILESDIR}/bad-font-gc1.patch"
+			"${FILESDIR}/bad-font-gc11.patch"
+			"${FILESDIR}/bad-font-gc2.patch"
+			"${FILESDIR}/bad-font-gc3.patch"
 		)
 	fi
 
@@ -468,10 +469,6 @@ src_prepare() {
 			"${WORKDIR}/ppc64le"
 			"${WORKDIR}/debian/patches/fixes/rust-clanglib.patch"
 		)
-	fi
-
-	if has_version ">=dev-libs/icu-74.1" && use system-icu ; then
-		PATCHES+=( "${FILESDIR}/chromium-119.0.6045.159-icu-74.patch" )
 	fi
 
 	default
@@ -765,7 +762,6 @@ src_prepare() {
 		third_party/devtools-frontend/src/front_end/third_party/puppeteer/package/lib/esm/third_party/rxjs
 		third_party/devtools-frontend/src/front_end/third_party/vscode.web-custom-data
 		third_party/devtools-frontend/src/front_end/third_party/wasmparser
-		third_party/devtools-frontend/src/test/unittests/front_end/third_party/i18n
 		third_party/devtools-frontend/src/third_party
 		third_party/distributed_point_functions
 		third_party/dom_distiller_js
@@ -859,7 +855,6 @@ src_prepare() {
 		third_party/ots
 		third_party/pdfium
 		third_party/pdfium/third_party/agg23
-		third_party/pdfium/third_party/base
 		third_party/pdfium/third_party/bigint
 		third_party/pdfium/third_party/freetype
 		third_party/pdfium/third_party/lcms
@@ -1305,6 +1300,7 @@ src_configure() {
 	myconf_gn+=" use_system_zlib=true"
 	myconf_gn+=" use_system_libjpeg=true"
 	myconf_gn+=" rtc_build_examples=false"
+	myconf_gn+=" enable_chromium_prelude=false"
 
 	# Disable pseudolocales, only used for testing
 	myconf_gn+=" enable_pseudolocales=false"
