@@ -63,11 +63,17 @@ REQUIRED_USE="
 # 	5794e9d12bf82620d5f24505798fecb45ca5a22d
 # )
 
-CROMITE_COMMIT_ID="8dca688ad4d06a58885606da01a2b32041275c64"
+CROMITE_COMMIT_ID="9af3274988743133252d27054a6b6d4670785d27"
 
-# declare -A CHROMIUM_COMMITS=(
-# 	["3cfdfdc2213597398cb2876904cb5cecedc91875"]="."
-# )
+declare -A CHROMIUM_COMMITS=(
+	["2f934a47e9709cac9ce04d312b7aa496948bced6"]="third_party/angle"
+	["df291ec5472fa14e828633378b8c97a8c7a2e7de"]="."
+	["59843523390481e52d3a397687a09a7582c44114"]="."
+	["072b9f3bc340020325cf3dd7bff1991cd22de171"]="."
+	["8be4d17beb71c29118c3337268f3e7b3930a657f"]="."
+	["b3330cb62d7be253a5b99e40b88e2290c329ac08"]="."
+	["15e24abc1646ad9984923234a041cd0c3b8b1607"]="."
+)
 
 UGC_PV="${PV/_p/-}"
 UGC_PF="${PN}-${UGC_PV}"
@@ -96,6 +102,9 @@ if [ ! -z "${CHROMIUM_COMMITS[*]}" ]; then
 		if [[ ${CHROMIUM_COMMITS[$i]} =~ webrtc ]]; then
 		#TODO: is it safe to use this mirror?
 		SRC_URI+="https://github.com/webrtc-mirror/webrtc/commit/${i/-}.patch?full_index=true -> webrtc-${i/-}.patch
+		"
+		elif [[ ${CHROMIUM_COMMITS[$i]} =~ angle ]]; then
+		SRC_URI+="https://github.com/google/angle/commit/${i/-}.patch?full_index=true -> angle-${i/-}.patch
 		"
 		else
 		SRC_URI+="https://github.com/chromium/chromium/commit/${i/-}.patch?full_index=true -> chromium-${i/-}.patch
@@ -361,7 +370,7 @@ pkg_pretend() {
 		ewarn "Cromite patches are very experimental and unstable"
 		ewarn "Please consider testing them and giving feedback upstream:"
 		ewarn "https://github.com/uazo/cromite/issues"
-		ewarn "Not all patches are applied, let me know if any other are worthy of inclusion"
+		ewarn "Not all patches are applied, let me know if others should be considered too"
 		ewarn
 	fi
 	if use system-abseil-cpp; then
@@ -441,6 +450,8 @@ src_prepare() {
 		for i in "${!CHROMIUM_COMMITS[@]}"; do
 			if [[ ${CHROMIUM_COMMITS[$i]} =~ webrtc ]]; then
 				patch_prefix="webrtc"
+			elif [[ ${CHROMIUM_COMMITS[$i]} =~ angle ]]; then
+				patch_prefix="angle"
 			else
 				patch_prefix="chromium"
 			fi
@@ -510,6 +521,8 @@ src_prepare() {
 			"${BR_PA_PATH}/Add-webRTC-site-settings.patch"
 			"${BR_PA_PATH}/Show-site-settings-for-cookies-javascript-and-ads.patch"
 			"${BR_PA_PATH}/Viewport-Protection-flag.patch"
+			"${BR_PA_PATH}/Revert-remove-allowscript-content-setting-secondary-url.patch"
+			"${BR_PA_PATH}/Revert-remove-allowimage-content-setting-secondary-url.patch"
 			"${BR_PA_PATH}/Timezone-customization.patch"
 			"${BR_PA_PATH}/Disable-speechSynthesis-getVoices-API.patch"
 			"${BR_PA_PATH}/Remove-support-for-device-memory-and-cpu-recovery.patch"
@@ -688,6 +701,7 @@ src_prepare() {
 	keeplibs+=(
 		third_party/angle
 		third_party/angle/src/common/third_party/xxhash
+		third_party/angle/src/libANGLE/renderer/vulkan/shaders/src/third_party/ffx_spd
 		third_party/angle/src/third_party/ceval
 	)
 	use nvidia || keeplibs+=(
@@ -1346,12 +1360,17 @@ src_configure() {
 		fi
 	fi
 
+	local dest_cpu=""
+
 	if [[ $myarch = amd64 ]] ; then
+		dest_cpu=x64
 		myconf_gn+=" target_cpu=\"x64\""
 		ffmpeg_target_arch=x64
+		dest_cpu="x64"
 	elif [[ $myarch = x86 ]] ; then
 		myconf_gn+=" target_cpu=\"x86\""
 		ffmpeg_target_arch=ia32
+		dest_cpu="x86"
 
 		# This is normally defined by compiler_cpu_abi in
 		# build/config/compiler/BUILD.gn, but we patch that part out.
@@ -1359,12 +1378,15 @@ src_configure() {
 	elif [[ $myarch = arm64 ]] ; then
 		myconf_gn+=" target_cpu=\"arm64\""
 		ffmpeg_target_arch=arm64
+		dest_cpu="arm64"
 	elif [[ $myarch = arm ]] ; then
 		myconf_gn+=" target_cpu=\"arm\""
 		ffmpeg_target_arch=$(usex cpu_flags_arm_neon arm-neon arm)
+		dest_cpu="arm"
 	elif [[ $myarch = ppc64 ]] ; then
 		myconf_gn+=" target_cpu=\"ppc64\""
 		ffmpeg_target_arch=ppc64
+		dest_cpu="ppc64"
 	else
 		die "Failed to determine target arch, got '$myarch'."
 	fi
