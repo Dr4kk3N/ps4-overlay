@@ -22,8 +22,8 @@ avalonia.remote.protocol@11.0.10
 avalonia.skia@11.0.0
 avalonia.skia@11.0.4
 avalonia.skia@11.0.10
-avalonia.svg@11.0.0.16
-avalonia.svg.skia@11.0.0.16
+avalonia.svg@11.0.0.18
+avalonia.svg.skia@11.0.0.18
 avalonia.themes.simple@11.0.10
 avalonia.win32@11.0.10
 avalonia.x11@11.0.10
@@ -158,7 +158,7 @@ securifybv.propertystore@0.1.0
 securifybv.shelllink@0.1.0
 shaderc.net@0.1.0
 sharpziplib@1.4.2
-shimskiasharp@1.0.0.16
+shimskiasharp@1.0.0.18
 silk.net.core@2.16.0
 silk.net.vulkan@2.16.0
 silk.net.vulkan.extensions.ext@2.16.0
@@ -181,9 +181,9 @@ skiasharp.nativeassets.win32@2.88.3
 skiasharp.nativeassets.win32@2.88.6
 skiasharp.nativeassets.win32@2.88.7
 spb@0.0.4-build32
-svg.custom@1.0.0.16
-svg.model@1.0.0.16
-svg.skia@1.0.0.16
+svg.custom@1.0.0.18
+svg.model@1.0.0.18
+svg.skia@1.0.0.18
 system.appcontext@4.1.0
 system.buffers@4.0.0
 system.buffers@4.3.0
