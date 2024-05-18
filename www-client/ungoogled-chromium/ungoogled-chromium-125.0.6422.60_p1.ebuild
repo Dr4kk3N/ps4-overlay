@@ -23,9 +23,11 @@ inherit python-any-r1 qmake-utils readme.gentoo-r1 toolchain-funcs xdg-utils
 DESCRIPTION="Modifications to Chromium for removing Google integration and enhancing privacy"
 HOMEPAGE="https://github.com/ungoogled-software/ungoogled-chromium"
 PATCHSET_PPC64="124.0.6367.78-1raptor0~deb12u1"
+PATCHSET_DEBIAN="${PV/_*}-1"
 PATCH_V="${PV%%\.*}"
 SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/chromium-${PV/_*}.tar.xz
 	https://gitlab.com/Matt.Jolly/chromium-patches/-/archive/${PATCH_V}/chromium-patches-${PATCH_V}.tar.bz2
+	https://salsa.debian.org/chromium-team/chromium/-/archive/debian/${PATCHSET_DEBIAN}/chromium-debian-${PATCHSET_DEBIAN}.tar.bz2
 	ppc64? (
 		https://quickbuild.io/~raptor-engineering-public/+archive/ubuntu/chromium/+files/chromium_${PATCHSET_PPC64}.debian.tar.xz
 		https://deps.gentoo.zip/chromium-ppc64le-gentoo-patches-1.tar.xz
@@ -34,7 +36,7 @@ SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/chro
 
 LICENSE="BSD cromite? ( GPL-3 )"
 SLOT="0"
-KEYWORDS="amd64 ~arm64 ~ppc64 ~x86"
+KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
 IUSE_SYSTEM_LIBS="abseil-cpp av1 brotli crc32c double-conversion ffmpeg +harfbuzz +icu jsoncpp +libevent +libusb libvpx +openh264 openjpeg +png re2 snappy woff2 +zstd"
 IUSE="+X bluetooth cfi +clang convert-dict cups cpu_flags_arm_neon custom-cflags debug enable-driver gtk4 hangouts headless hevc kerberos libcxx nvidia +official optimize-thinlto optimize-webui override-data-dir pax-kernel pgo +proprietary-codecs pulseaudio qt5 qt6 screencast selinux thinlto cromite vaapi wayland widevine"
 RESTRICT="
@@ -63,17 +65,17 @@ REQUIRED_USE="
 # 	5794e9d12bf82620d5f24505798fecb45ca5a22d
 # )
 
-CROMITE_COMMIT_ID="5e764c70a2176e8c55c6050f86478a406b324410"
+CROMITE_COMMIT_ID="00b3446da5fbcdab403f66604024bbbfcc428f81"
 
-declare -A CHROMIUM_COMMITS=(
-	["2f934a47e9709cac9ce04d312b7aa496948bced6"]="third_party/angle"
-	["df291ec5472fa14e828633378b8c97a8c7a2e7de"]="."
-	["59843523390481e52d3a397687a09a7582c44114"]="."
-	["072b9f3bc340020325cf3dd7bff1991cd22de171"]="."
-	["8be4d17beb71c29118c3337268f3e7b3930a657f"]="."
-	["b3330cb62d7be253a5b99e40b88e2290c329ac08"]="."
-	["15e24abc1646ad9984923234a041cd0c3b8b1607"]="."
-)
+# declare -A CHROMIUM_COMMITS=(
+# 	["2f934a47e9709cac9ce04d312b7aa496948bced6"]="third_party/angle"
+# 	["df291ec5472fa14e828633378b8c97a8c7a2e7de"]="."
+# 	["59843523390481e52d3a397687a09a7582c44114"]="."
+# 	["072b9f3bc340020325cf3dd7bff1991cd22de171"]="."
+# 	["8be4d17beb71c29118c3337268f3e7b3930a657f"]="."
+# 	["b3330cb62d7be253a5b99e40b88e2290c329ac08"]="."
+# 	["15e24abc1646ad9984923234a041cd0c3b8b1607"]="."
+# )
 
 UGC_PV="${PV/_p/-}"
 UGC_PF="${PN}-${UGC_PV}"
@@ -281,7 +283,7 @@ BDEPEND="
 	sys-devel/flex
 	virtual/pkgconfig
 	clang? (
-		pgo? ( >=sys-devel/clang-18 >=sys-devel/lld-18	)
+		pgo? ( >=sys-devel/clang-19 >=sys-devel/lld-19	)
 		!pgo? ( sys-devel/clang sys-devel/lld )
 	)
 	cfi? ( sys-devel/clang-runtime[sanitize] )
@@ -412,15 +414,15 @@ src_prepare() {
 	local PATCHES=(
 		"${WORKDIR}/chromium-patches-${PATCH_V}"
 		"${FILESDIR}/chromium-cross-compile.patch"
-		"${FILESDIR}/chromium-use-oauth2-client-switches-as-default.patch"
 		"${FILESDIR}/chromium-109-system-openh264.patch"
 		"${FILESDIR}/chromium-109-system-zlib.patch"
 		"${FILESDIR}/chromium-111-InkDropHost-crash.patch"
-		"${FILESDIR}/chromium-117-system-zstd.patch"
 		"${FILESDIR}/chromium-124-libwebp-shim-sharpyuv.patch"
+		"${FILESDIR}/chromium-125-oauth2-client-switches.patch"
+		"${FILESDIR}/chromium-125-system-zstd.patch"
 		"${FILESDIR}/chromium-125-ninja-1-12.patch"
+		"${FILESDIR}/chromium-125-cloud_authenticator.patch"
 		"${FILESDIR}/chromium-123-qrcode.patch"
-		"${FILESDIR}/chromium-123-cloud_authenticator.patch"
 		"${FILESDIR}/chromium-123-stats-collector.patch"
 		"${FILESDIR}/chromium-122-cfi-no-split-lto-unit.patch"
 		"${FILESDIR}/perfetto-system-zlib.patch"
@@ -428,17 +430,19 @@ src_prepare() {
 		"${FILESDIR}/restore-x86-r2.patch"
 	)
 
+	PATCHES_DEB="${WORKDIR}/chromium-debian-${PATCHSET_DEBIAN}/debian/patches"
 	if ! use libcxx ; then
 		PATCHES+=(
 			"${FILESDIR}/chromium-124-libstdc++.patch"
-			"${FILESDIR}/bad-font-gc0000.patch"
-			"${FILESDIR}/bad-font-gc000.patch"
-			"${FILESDIR}/bad-font-gc00.patch"
-			"${FILESDIR}/bad-font-gc0.patch"
-			"${FILESDIR}/bad-font-gc1.patch"
-			"${FILESDIR}/bad-font-gc11.patch"
-			"${FILESDIR}/bad-font-gc2.patch"
-			"${FILESDIR}/bad-font-gc3.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc00000.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc0000.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc000.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc00.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc0.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc1.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc11.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc2.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc3.patch"
 		)
 	fi
 
@@ -487,9 +491,6 @@ src_prepare() {
 	if use cromite ; then
 		BR_PA_PATH="${WORKDIR}/cromite-${CROMITE_COMMIT_ID}/build/patches"
 
-		# #! conflicting patches
-		# sed -i '/kMediaFoundationClearKeyCdmPathForTesting/,+8d' "${BR_PA_PATH}/00Disable-speechSynthesis-getVoices-API.patch" || die
-
 		sed -i '/b\/components\/components_strings\.grd/,+10d' "${BR_PA_PATH}/Add-cromite-flags-support.patch" || die
 		sed -i '/b\/chrome\/android\/java\/res\/xml\/privacy_preferences\.xml/,+13d' "${BR_PA_PATH}/Add-cromite-flags-support.patch" || die
 		sed -i '/webapps_strings.grdp" \/>/{s++webapps_strings.grdp" /><part file="cromite_components_strings_grd/placeholder.txt"/>+;h};${x;/./{x;q0};x;q1}' \
@@ -522,7 +523,6 @@ src_prepare() {
 			"${BR_PA_PATH}/Show-site-settings-for-cookies-javascript-and-ads.patch"
 			"${BR_PA_PATH}/Viewport-Protection-flag.patch"
 			"${BR_PA_PATH}/Revert-remove-allowscript-content-setting-secondary-url.patch"
-			"${BR_PA_PATH}/Revert-remove-allowimage-content-setting-secondary-url.patch"
 			"${BR_PA_PATH}/Timezone-customization.patch"
 			"${BR_PA_PATH}/Disable-speechSynthesis-getVoices-API.patch"
 			"${BR_PA_PATH}/Remove-support-for-device-memory-and-cpu-recovery.patch"
@@ -542,6 +542,14 @@ src_prepare() {
 				eapply  "$i"
 			fi
 		done
+
+		#! conflicting patches
+		sed -i '/browser_features.cc/,+17d' \
+			"${UGC_WD}/patches/extra/ungoogled-chromium/add-flag-to-clear-data-on-exit.patch" || die
+		sed -i 's$}  // namespace features$BASE_FEATURE(kClearDataOnExit, "ClearDataOnExit", base::FEATURE_DISABLED_BY_DEFAULT);}$' \
+			chrome/browser/browser_features.cc || die
+		sed -i 's$}  // namespace features$BASE_DECLARE_FEATURE(kClearDataOnExit);}$' \
+			chrome/browser/browser_features.h || die
 	fi
 
 	mkdir -p third_party/node/linux/node-linux-x64/bin || die
@@ -556,7 +564,7 @@ src_prepare() {
 	sed -i '/^.*deps.*third_party\/jsoncpp.*$/{s++public_deps \+= [ "//third_party/jsoncpp" ]+;h};${x;/./{x;q0};x;q1}' \
 		third_party/webrtc/rtc_base/BUILD.gn || die
 
-	use bluetooth || eapply "${FILESDIR}/disable-bluez.patch"
+	use bluetooth || eapply "${FILESDIR}/disable-bluez-r1.patch"
 
 	use convert-dict && eapply "${FILESDIR}/chromium-ucf-dict-utility.patch"
 
@@ -810,6 +818,7 @@ src_prepare() {
 	keeplibs+=(
 		third_party/jstemplate
 		third_party/khronos
+		third_party/lens_server_proto
 		third_party/leveldatabase
 		third_party/libaddressinput
 		third_party/libavif
@@ -920,6 +929,7 @@ src_prepare() {
 		third_party/tflite/src/third_party/eigen3
 		third_party/tflite/src/third_party/fft2d
 		third_party/tflite/src/third_party/xla/third_party/tsl
+		third_party/tflite/src/third_party/xla/xla/tsl/util
 		third_party/ruy
 		third_party/six
 		third_party/ukey2
