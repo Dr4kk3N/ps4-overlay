@@ -36,12 +36,12 @@
 # and set OPENVDB_ABI USE_EXPAND variable in make.conf.
 #
 # When the client package inherits this eclass, it can use the
-# OPENVDB_COMPAT variable in the ebuild to specify which ABI it
+# OPENVDB_ABI variable in the ebuild to specify which ABI it
 # supports, and then use the OPENVDB_SINGLE_USEDEP variable that the
 # eclass produces to force the package to link using ABI selected in
 # OPENVDB_ABI
 # eg. openvdb? ( media-gfx/openvdb[${OPENVDB_SINGLE_USEDEP}] )
-# When OPENVDB_COMPAT="X Y" the variable evaluates to
+# When OPENVDB_ABI="X Y" the variable evaluates to
 # abiX-compat(-)? abiY-compat(-)?
 #
 # The client can pass the ABI version to the build system as follows:
@@ -66,7 +66,7 @@
 #
 # @CODE
 # inherit openvdb
-# OPENVDB_COMPAT=( 4 5 6 7 )
+# OPENVDB_ABI=( 4 5 6 7 )
 # REQUIRED_USE="openvdb? ( ${OPENVDB_REQUIRED_USE} )"
 # RDEPEND="openvdb? ( media-gfx/openvdb[${OPENVDB_SINGLE_USEDEP}] )"
 #
@@ -85,7 +85,7 @@ inherit flag-o-matic
 
 if [[ -z ${_OPENVDB_ECLASS} ]]; then
 _OPENVDB_ECLASS=1
-# @ECLASS-VARIABLE: OPENVDB_COMPAT
+# @ECLASS-VARIABLE: OPENVDB_ABI
 # @REQUIRED
 # @DESCRIPTION:
 # This variable contains a list of OpenVDB ABI the package supports.
@@ -93,7 +93,7 @@ _OPENVDB_ECLASS=1
 #
 # Example use:
 # @CODE
-# OPENVDB_COMPAT=( 4 5 6 7 )
+# OPENVDB_ABI=( 4 5 6 7 )
 # @CODE
 #
 # @ECLASS-VARIABLE: OPENVDB_SINGLE_USEDEP
@@ -153,16 +153,16 @@ readonly _OPENVDB_ALL_ABI
 # use by the inheriting ebuild
 _openvdb_set_globals() {
     local i
-    if ! declare -p OPENVDB_COMPAT &>/dev/null; then
-        die 'OPENVDB_COMPAT not declared.'
+    if ! declare -p OPENVDB_ABI &>/dev/null; then
+        die 'OPENVDB_ABI not declared.'
     fi
-    if [[ $(declare -p OPENVDB_COMPAT) != "declare -a"* ]]; then
-        die 'OPENVDB_COMPAT must be an array.'
+    if [[ $(declare -p OPENVDB_ABI) != "declare -a"* ]]; then
+        die 'OPENVDB_ABI must be an array.'
     fi
     local flags=()
     for i in "${_OPENVDB_ALL_ABI[@]}"; do
-        if has "${i}" "${OPENVDB_COMPAT[@]}"; then
-            flags+=( "abi${i}-compat" )
+        if has "${i}" "${OPENVDB_ABI[@]}"; then
+            flags+=( "openvdb_abi_${i}" )
         fi
     done
     if [[ ${#supp[@]} -eq 1 ]]; then
@@ -171,7 +171,7 @@ _openvdb_set_globals() {
         IUSE="${flags[*]}"
     fi
     if [[ ! ${#flags[@]} ]]; then
-        die "No supported OpenVDB ABI in OPENVDB_COMPAT."
+        die "No supported OpenVDB ABI in OPENVDB_ABI."
     fi
     local single_flags="${flags[@]/%/(-)?}"
     local single_usedep=${single_flags// /,}
@@ -194,7 +194,7 @@ openvdb_setup() {
         eerror "of the values contained in all of:"
         eerror
         eerror "- the entire list of ABI: ${_OPENVDB_ALL_ABI[*]}"
-        eerror "- the ABI supported by this package: ${OPENVDB_COMPAT[*]}"
+        eerror "- the ABI supported by this package: ${OPENVDB_ABI[*]}"
         eerror "- and the ABI supported by all other packages on your system"
         echo
         die "No supported OpenVDB ABI version in OPENVDB_ABI."

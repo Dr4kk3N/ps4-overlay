@@ -3,7 +3,7 @@
 
 EAPI=8
 
-OPENVDB_COMPAT=( {7..11} )
+OPENVDB_ABI=( {7..11} )
 PYTHON_COMPAT=( python3_{10..12} )
 inherit cmake cuda flag-o-matic llvm python-single-r1 toolchain-funcs openvdb
 
