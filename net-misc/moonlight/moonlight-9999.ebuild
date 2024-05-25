@@ -19,7 +19,7 @@ DESCRIPTION="NVIDIA GameStream (and Sunshine) client"
 HOMEPAGE="https://github.com/moonlight-stream/moonlight-qt"
 LICENSE="GPL-3"
 SLOT="0"
-IUSE="cuda +libdrm embedded glslow soundio +vaapi vdpau wayland X"
+IUSE="cuda +libdrm embedded glslow soundio +vaapi vdpau hdr wayland X"
 
 QT_PV=6.2.0:6 # IDE_QT_VERSION_MIN
 
@@ -41,6 +41,7 @@ RDEPEND="
 		x11-libs/libvdpau
 		media-libs/libsdl2[X]
 	)
+	hdr? ( >=media-libs/libplacebo-6.338.2 )
 	wayland? ( dev-libs/wayland )
 	X? ( x11-libs/libX11 )
 "
@@ -50,7 +51,7 @@ DEPEND="
 "
 
 BDEPEND="
-	dev-qt/qtcore
+	dev-qt/qtbase
 	virtual/pkgconfig
 "
 
@@ -62,7 +63,7 @@ src_prepare() {
 }
 
 src_configure() {
-	eqmake6 PREFIX="${EPREFIX}/usr" CONFIG+=" \
+	qmake6 PREFIX="${EPREFIX}/usr" CONFIG+=" \
 		$(usex cuda "" disable-cuda) \
 		$(usex libdrm "" disable-libdrm) \
 		--disable-mmal \
@@ -70,19 +71,14 @@ src_configure() {
 		$(usex vdpau "" disable-libvdpau) \
 		$(usex wayland "" disable-wayland) \
 		$(usex X "" disable-x11) \
+		$(usex hdr "" disable-hdr) \
 		$(usev embedded) \
 		$(usev glslow) \
 		$(usev soundio) \
 	"
 }
 
-src_compile() {
-	default
-}
-
 src_install() {
-	if [[ -f Makefile ]] || [[ -f GNUmakefile ]] || [[ -f makefile ]] ; then
-		emake INSTALL_ROOT="${D}" install
-	fi
+	emake install INSTALL_ROOT="${D}"
 	einstalldocs
 }
