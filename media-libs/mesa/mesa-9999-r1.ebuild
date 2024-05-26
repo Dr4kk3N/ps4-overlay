@@ -188,7 +188,7 @@ src_unpack() {
 }
 
 PATCHES=(
-        "${FILESDIR}/mesa-ps4-9999.patch"
+        "${FILESDIR}/mesa-ps4-9999-r1.patch"
 )
 
 

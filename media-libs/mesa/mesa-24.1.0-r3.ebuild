@@ -188,7 +188,7 @@ src_unpack() {
 }
 
 PATCHES=(
-        "${FILESDIR}/mesa-ps4-23.2.1.patch"
+        "${FILESDIR}/mesa-ps4-24.1.0-r2.patch"
 )
 
 pkg_pretend() {
@@ -272,7 +272,7 @@ pkg_setup() {
 }
 
 PATCHES=(
-        "${FILESDIR}/mesa-ps4-24.1.0-r2.patch"
+        "${FILESDIR}/mesa-ps4-24.1.0-r3.patch"
 )
 
 src_prepare() {
