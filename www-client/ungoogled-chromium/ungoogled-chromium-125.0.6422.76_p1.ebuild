@@ -36,7 +36,7 @@ SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/chro
 
 LICENSE="BSD cromite? ( GPL-3 )"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
+KEYWORDS="amd64 ~arm64 ~ppc64 ~x86"
 IUSE_SYSTEM_LIBS="abseil-cpp av1 brotli crc32c double-conversion ffmpeg +harfbuzz +icu jsoncpp +libevent +libusb libvpx +openh264 openjpeg +png re2 snappy woff2 +zstd"
 IUSE="+X bluetooth cfi +clang convert-dict cups cpu_flags_arm_neon custom-cflags debug enable-driver gtk4 hangouts headless hevc kerberos libcxx nvidia +official optimize-thinlto optimize-webui override-data-dir pax-kernel pgo +proprietary-codecs pulseaudio qt5 qt6 screencast selinux thinlto cromite vaapi wayland widevine"
 RESTRICT="
@@ -65,17 +65,19 @@ REQUIRED_USE="
 # 	5794e9d12bf82620d5f24505798fecb45ca5a22d
 # )
 
-CROMITE_COMMIT_ID="00b3446da5fbcdab403f66604024bbbfcc428f81"
+CROMITE_COMMIT_ID="f0a26f7549522b40b5f37e792f12fe7c70133773"
 
-# declare -A CHROMIUM_COMMITS=(
-# 	["2f934a47e9709cac9ce04d312b7aa496948bced6"]="third_party/angle"
-# 	["df291ec5472fa14e828633378b8c97a8c7a2e7de"]="."
-# 	["59843523390481e52d3a397687a09a7582c44114"]="."
-# 	["072b9f3bc340020325cf3dd7bff1991cd22de171"]="."
-# 	["8be4d17beb71c29118c3337268f3e7b3930a657f"]="."
-# 	["b3330cb62d7be253a5b99e40b88e2290c329ac08"]="."
-# 	["15e24abc1646ad9984923234a041cd0c3b8b1607"]="."
-# )
+declare -A CHROMIUM_COMMITS=(
+	["23646607e16c63231ae9f49ce5355c270145cf30"]="."
+	["39735a1167272326da5ff85e0096b52ca7f47d6c"]="."
+	["37ef38092ab783d0126922e8d463024341c481b9"]="."
+	["0bed9a54baa5058e711a1f051a766f67e1842ec5"]="."
+	["54c4f460f35e0a4003aa4dd01007188ff00295cc"]="."
+	["251c365ea2c268a475f91c9913fabba6b41e2b6b"]="."
+	["587c2cf8b11d3c32fa26887063eda3171a3d353e"]="third_party/ruy/src"
+	["bbd4b7752f0a9e5f486fa55c9f2b80071ef99d01"]="third_party/vulkan-deps/vulkan-utility-libraries/src"
+	["c1af894e0f5c4f732a983e7c93227854e203570e"]="net/third_party/quiche/src"
+)
 
 UGC_PV="${PV/_p/-}"
 UGC_PF="${PN}-${UGC_PV}"
@@ -107,6 +109,15 @@ if [ ! -z "${CHROMIUM_COMMITS[*]}" ]; then
 		"
 		elif [[ ${CHROMIUM_COMMITS[$i]} =~ angle ]]; then
 		SRC_URI+="https://github.com/google/angle/commit/${i/-}.patch?full_index=true -> angle-${i/-}.patch
+		"
+		elif [[ ${CHROMIUM_COMMITS[$i]} =~ quiche ]]; then
+		SRC_URI+="https://github.com/google/quiche/commit/${i/-}.patch?full_index=true -> quiche-${i/-}.patch
+		"
+		elif [[ ${CHROMIUM_COMMITS[$i]} =~ vulkan-utility-libraries ]]; then
+		SRC_URI+="https://github.com/KhronosGroup/Vulkan-Utility-Libraries/commit/${i/-}.patch?full_index=true -> vulkan-utility-libraries-${i/-}.patch
+		"
+		elif [[ ${CHROMIUM_COMMITS[$i]} =~ ruy ]]; then
+		SRC_URI+="https://github.com/google/ruy/commit/${i/-}.patch?full_index=true -> ruy-${i/-}.patch
 		"
 		else
 		SRC_URI+="https://github.com/chromium/chromium/commit/${i/-}.patch?full_index=true -> chromium-${i/-}.patch
@@ -283,7 +294,7 @@ BDEPEND="
 	sys-devel/flex
 	virtual/pkgconfig
 	clang? (
-		pgo? ( >=sys-devel/clang-19 >=sys-devel/lld-19	)
+		pgo? ( >sys-devel/clang-19.0.0_pre20240518 >sys-devel/lld-19.0.0_pre20240518	)
 		!pgo? ( sys-devel/clang sys-devel/lld )
 	)
 	cfi? ( sys-devel/clang-runtime[sanitize] )
@@ -456,6 +467,12 @@ src_prepare() {
 				patch_prefix="webrtc"
 			elif [[ ${CHROMIUM_COMMITS[$i]} =~ angle ]]; then
 				patch_prefix="angle"
+			elif [[ ${CHROMIUM_COMMITS[$i]} =~ quiche ]]; then
+				patch_prefix="quiche"
+			elif [[ ${CHROMIUM_COMMITS[$i]} =~ vulkan-utility-libraries ]]; then
+				patch_prefix="vulkan-utility-libraries"
+			elif [[ ${CHROMIUM_COMMITS[$i]} =~ ruy ]]; then
+				patch_prefix="ruy"
 			else
 				patch_prefix="chromium"
 			fi
@@ -782,6 +799,7 @@ src_prepare() {
 		third_party/devtools-frontend/src/front_end/third_party/puppeteer
 		third_party/devtools-frontend/src/front_end/third_party/puppeteer/package/lib/esm/third_party/mitt
 		third_party/devtools-frontend/src/front_end/third_party/puppeteer/package/lib/esm/third_party/rxjs
+		third_party/devtools-frontend/src/front_end/third_party/puppeteer/third_party/mitt
 		third_party/devtools-frontend/src/front_end/third_party/vscode.web-custom-data
 		third_party/devtools-frontend/src/front_end/third_party/wasmparser
 		third_party/devtools-frontend/src/third_party
