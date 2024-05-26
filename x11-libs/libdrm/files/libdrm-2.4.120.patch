@@ -1,19 +1,23 @@
---- libdrm/data/amdgpu.ids	2022-11-03 09:33:36.000000000 +0100
-+++ libdrm-patched/data/amdgpu.ids	2023-01-17 06:36:05.670438201 +0100
+diff --git a/data/amdgpu.ids b/data/amdgpu.ids
+index 6a50c97d..aad127e2 100644
+--- a/data/amdgpu.ids
++++ b/data/amdgpu.ids
 @@ -325,6 +325,10 @@
  699F,	C9,	AMD Radeon 540
  6FDF,	E7,	AMD Radeon RX 590 GME
  6FDF,	EF,	AMD Radeon RX 580 2048SP
-+9920,	00,     AMD Liverpool (PlayStation 4)
-+9922,	00,     AMD Liverpool (PlayStation 4)
-+9923,	00,     AMD Liverpool (PlayStation 4)
-+9924,	11,     AMD Gladius (PlayStation 4)
++9920,  00,     AMD Liverpool (PlayStation 4)
++9922,  00,     AMD Liverpool (PlayStation 4)
++9923,  00,     AMD Liverpool (PlayStation 4)
++9924,  11,     AMD Gladius (PlayStation 4)
  7300,	C1,	AMD FirePro S9300 x2
  7300,	C8,	AMD Radeon R9 Fury Series
  7300,	C9,	AMD Radeon Pro Duo
---- libdrm/radeon/r600_pci_ids.h	2022-11-03 09:33:36.000000000 +0100
-+++ libdrm-patched/radeon/r600_pci_ids.h	2023-01-17 06:37:38.044499056 +0100
-@@ -473,6 +473,11 @@
+diff --git a/radeon/r600_pci_ids.h b/radeon/r600_pci_ids.h
+index a3b2eac8..5e5d1e90 100644
+--- a/radeon/r600_pci_ids.h
++++ b/radeon/r600_pci_ids.h
+@@ -473,6 +473,11 @@ CHIPSET(0x131B, KAVERI_131B, KAVERI)
  CHIPSET(0x131C, KAVERI_131C, KAVERI)
  CHIPSET(0x131D, KAVERI_131D, KAVERI)
  
@@ -25,9 +29,11 @@
  CHIPSET(0x67A0, HAWAII_67A0, HAWAII)
  CHIPSET(0x67A1, HAWAII_67A1, HAWAII)
  CHIPSET(0x67A2, HAWAII_67A2, HAWAII)
---- libdrm/radeon/radeon_surface.c	2022-11-03 09:33:36.000000000 +0100
-+++ libdrm-patched/radeon/radeon_surface.c	2023-01-17 06:38:50.169328171 +0100
-@@ -86,6 +86,8 @@
+diff --git a/radeon/radeon_surface.c b/radeon/radeon_surface.c
+index ea0a27a9..594f2354 100644
+--- a/radeon/radeon_surface.c
++++ b/radeon/radeon_surface.c
+@@ -86,6 +86,8 @@ enum radeon_family {
      CHIP_HAINAN,
      CHIP_BONAIRE,
      CHIP_KAVERI,
