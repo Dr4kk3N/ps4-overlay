@@ -27,7 +27,7 @@ RDEPEND="
 	dev-libs/libzip:=
 	media-libs/libpng:=
 	media-libs/libsdl2[joystick]
-	media-video/ffmpeg:0/56.58.58[pic]
+	media-video/ffmpeg[pic]
 	sys-libs/zlib:=
 	opengl? (
 		virtual/opengl
