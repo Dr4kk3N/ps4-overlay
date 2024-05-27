@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{10..12} )
+PYTHON_COMPAT=( python3_{10..11} )
 
 inherit desktop flag-o-matic multilib ninja-utils pax-utils portability python-any-r1 toolchain-funcs xdg-utils
 
@@ -11,23 +11,25 @@ DESCRIPTION="Visual Studio Code - Open Source"
 HOMEPAGE="https://github.com/microsoft/vscode"
 LICENSE="MIT"
 SLOT="0"
-VS_RIPGREP_V="1.15.0"
+VS_RIPGREP_V="1.15.9"
 SRC_URI="
 	https://registry.yarnpkg.com/@vscode/ripgrep/-/ripgrep-${VS_RIPGREP_V}.tgz -> @vscode-ripgrep-${VS_RIPGREP_V}.tgz
 "
 
 REPO="https://github.com/microsoft/vscode"
-ELECTRON_SLOT_DEFAULT="25"
 #CODE_COMMIT_ID="ae245c9b1f06e79cec4829f8cd1555206b0ec8f2"
-IUSE="api-proposals badge-providers electron-19 electron-20 electron-21 electron-22 electron-23 electron-24 electron-26 electron-27 openvsx reh reh-web substitute-urls +temp-fix"
+IUSE="api-proposals badge-providers electron-19 electron-20 electron-21 electron-22 electron-23 electron-24 electron-26 electron-25 electron-27 electron-28 electron-30 openvsx reh reh-web substitute-urls temp-fix"
 
 if [[ ${PV} = *9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="${REPO}.git"
 	DOWNLOAD=""
 	IUSE+=" +build-online"
+	ELECTRON_SLOT_DEFAULT="29"
 else
-	KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
+	IUSE+=" build-online"
+	ELECTRON_SLOT_DEFAULT="29"
+	KEYWORDS="amd64 ~arm64 ~ppc64 ~x86"
 	DOWNLOAD="${REPO}/archive/"
 	if [ -z "$CODE_COMMIT_ID" ]; then
 		DOWNLOAD+="${PV}.tar.gz -> ${P}.tar.gz"
@@ -35,7 +37,6 @@ else
 		DOWNLOAD+="${CODE_COMMIT_ID}.tar.gz -> ${PN}-${CODE_COMMIT_ID}.tar.gz"
 		S="${WORKDIR}/${PN}-${CODE_COMMIT_ID}"
 	fi
-	IUSE+=" build-online"
 fi
 
 SRC_URI+="${DOWNLOAD}"
@@ -57,7 +58,10 @@ COMMON_DEPEND="
 	electron-23? ( dev-util/electron:23 )
 	electron-24? ( dev-util/electron:24 )
 	electron-26? ( dev-util/electron:26 )
+	electron-25? ( dev-util/electron:25 )
 	electron-27? ( dev-util/electron:27 )
+	electron-28? ( dev-util/electron:28 )
+	electron-30? ( dev-util/electron:30 )
 	!electron-19? (
 	!electron-20? (
 	!electron-21? (
@@ -65,10 +69,14 @@ COMMON_DEPEND="
 	!electron-23? (
 	!electron-24? (
 	!electron-26? (
+	!electron-25? (
 	!electron-27? (
+	!electron-28? (
+	!electron-30? (
 		dev-util/electron:${ELECTRON_SLOT_DEFAULT}
-	) ) ) ) ) ) ) )
+	) ) ) ) ) ) ) ) ) ) )
 "
+
 #TODO: oniguruma?
 
 RDEPEND="${COMMON_DEPEND}
@@ -98,8 +106,14 @@ src_unpack() {
 		export ELECTRON_SLOT=24
 	elif use electron-26; then
 		export ELECTRON_SLOT=26
+	elif use electron-25; then
+		export ELECTRON_SLOT=25
 	elif use electron-27; then
 		export ELECTRON_SLOT=27
+	elif use electron-28; then
+		export ELECTRON_SLOT=28
+	elif use electron-30; then
+		export ELECTRON_SLOT=30
 	else
 		export ELECTRON_SLOT=$ELECTRON_SLOT_DEFAULT
 	fi
@@ -107,8 +121,8 @@ src_unpack() {
 		if [ -f "${DISTDIR}/${P}.tar.gz" ]; then
 			unpack "${P}".tar.gz || die
 		else
-			# if use electron-24; then
-			# 	EGIT_BRANCH="electron-24.x.y"
+			# if use electron-29 || use electron-30; then
+			# 	EGIT_BRANCH="electron-29.x.y"
 			# fi
 			git-r3_src_unpack
 		fi
@@ -134,10 +148,10 @@ src_prepare() {
 	einfo "Allowing any nodejs version"
 	sed -i 's/if (majorNodeVersion < 16.*/if (false){/' build/npm/preinstall.js || die
 
-	ewarn "Removing extensions/npm, see #203"
-	ewarn "Please poke Microsoft here: https://github.com/microsoft/vscode/issues/181598"
-	rm -r extensions/npm
-	sed -i '/extensions\/npm/d' build/npm/dirs.js || die
+	# ewarn "Removing extensions/npm, see #203"
+	# ewarn "Please poke Microsoft here: https://github.com/microsoft/vscode/issues/181598"
+	# rm -r extensions/npm
+	# sed -i '/extensions\/npm/d' build/npm/dirs.js || die
 
 	#TODO: applicationinsights
 	# sed -i '/applicationinsights/d' package.json || die
@@ -162,6 +176,7 @@ src_prepare() {
 	sed -i '/test\/integration\/browser/d' build/npm/dirs.js || die
 	sed -i '/test\/smoke/d' build/npm/dirs.js || die
 	sed -i '/test\/monaco/d' build/npm/dirs.js || die
+	sed -i '/vscode-selfhost-test-provider/d' build/npm/dirs.js || die
 
 	einfo "Editing build/gulpfile.extensions.js"
 	sed -i '/bundle-marketplace-extensions-build/d' build/gulpfile.extensions.js || die
@@ -225,6 +240,10 @@ src_configure() {
 		VSCODE_ARCH="x64"
 	elif [[ $myarch = x86 ]]; then
 		VSCODE_ARCH="ia32"
+	elif [[ $myarch = arm64 ]]; then
+		VSCODE_ARCH="arm64"
+	elif [[ $myarch = arm ]]; then
+		VSCODE_ARCH="armhf"
 	elif [[ $myarch = ppc64 ]]; then
 		VSCODE_ARCH="ppc64"
 	else
@@ -238,6 +257,12 @@ src_configure() {
 	# 	CPPFLAGS="${CPPFLAGS} -std=c++17";
 	# 	use build-online || eerror "build-online should be enabled for nan substitution to work" || die;
 	# 	sed -i 's$"resolutions": {$"resolutions": {"nan": "^2.17.0",$' package.json || die;
+	# fi
+
+	# if use build-online; then
+	# 	sed -i 's$"dependencies":$"resolutions": {"nan": "^2.18.0"},"dependencies":$' package.json || die;
+	# else
+	# 	ewarn "If have enabled electron-28/29 and the build fails, try enabling build-online"
 	# fi
 
 	ebegin "Installing node_modules"
@@ -298,6 +323,7 @@ src_configure() {
 }
 
 src_compile() {
+	ulimit -n 8192
 
 	if [ -d ".git" ]; then
 	    COMMIT_ID="$(git rev-parse HEAD)"
@@ -315,29 +341,30 @@ src_compile() {
 	PATH="/usr/$(get_libdir)/electron-${ELECTRON_SLOT}/node_modules/npm/bin:$PATH"
 	PATH="/usr/$(get_libdir)/electron-${ELECTRON_SLOT}:$PATH"
 	export PATH
+	export NODE_OPTIONS="--max-old-space-size=12192 --heapsnapshot-near-heap-limit=5"
 
 	if use temp-fix; then
-	node --max_old_space_size=8192 node_modules/gulp/bin/gulp.js vscode-linux-${VSCODE_ARCH}-min || die
+	node node_modules/gulp/bin/gulp.js vscode-linux-${VSCODE_ARCH}-min || die
 	else
 	# Real nodejs needed (/usr/bin/node). See https://github.com/microsoft/vscode-l10n/issues/104
-	/usr/bin/node --max_old_space_size=8192 node_modules/gulp/bin/gulp.js vscode-linux-${VSCODE_ARCH}-min || die
+	/usr/bin/node node_modules/gulp/bin/gulp.js vscode-linux-${VSCODE_ARCH}-min || die
 	fi
 
 	#TODO: make reh use the same node at runtime as main vscode
 	if use reh; then
 		if use temp-fix; then
-		node --max_old_space_size=8192 node_modules/gulp/bin/gulp.js vscode-reh-linux-${VSCODE_ARCH}-min || die
+		node node_modules/gulp/bin/gulp.js vscode-reh-linux-${VSCODE_ARCH}-min || die
 		else
 		# Real nodejs needed (/usr/bin/node). See https://github.com/microsoft/vscode-l10n/issues/104
-		/usr/bin/node --max_old_space_size=8192 node_modules/gulp/bin/gulp.js vscode-reh-linux-${VSCODE_ARCH}-min || die
+		/usr/bin/node node_modules/gulp/bin/gulp.js vscode-reh-linux-${VSCODE_ARCH}-min || die
 		fi
 	fi
 	if use reh-web; then
 		if use temp-fix; then
-		node --max_old_space_size=8192 node_modules/gulp/bin/gulp.js vscode-reh-web-linux-${VSCODE_ARCH}-min || die
+		node node_modules/gulp/bin/gulp.js vscode-reh-web-linux-${VSCODE_ARCH}-min || die
 		else
 		# Real nodejs needed (/usr/bin/node). See https://github.com/microsoft/vscode-l10n/issues/104
-		/usr/bin/node --max_old_space_size=8192 node_modules/gulp/bin/gulp.js vscode-reh-web-linux-${VSCODE_ARCH}-min || die
+		/usr/bin/node node_modules/gulp/bin/gulp.js vscode-reh-web-linux-${VSCODE_ARCH}-min || die
 		fi
 	fi
 
@@ -363,7 +390,7 @@ src_install() {
 	sed -i '/^ELECTRON/,+3d' "${WORKDIR}"/V*/bin/code-oss || die
 
 	awk -i inplace -v text="$(cat ${FILESDIR}/read_flags_file)" '!/^#/ && !p {print text; p=1} 1' "${WORKDIR}"/V*/bin/code-oss
-	sed -i "s|@ELECTRON@|electron-${ELECTRON_SLOT}|" "${WORKDIR}"/V*/bin/code-oss
+	sed -i "s|@ELECTRON@|code-oss|" "${WORKDIR}"/V*/bin/code-oss
 
 	echo "VSCODE_PATH=\"/usr/$(get_libdir)/vscode\"
 	ELECTRON_PATH=\"/usr/$(get_libdir)/electron-${ELECTRON_SLOT}\"
@@ -406,8 +433,14 @@ src_install() {
 	export PATH=${OLD_PATH}
 }
 
+
+pkg_postrm() {
+	xdg_icon_cache_update
+	xdg_desktop_database_update
+}
+
 pkg_postinst() {
-	if use insiders; then
+	if use api-proposals; then
 		ewarn
 		ewarn "You have enabled insiders API, be warned:"
 		ewarn "this might be against Microsoft licensing terms."
@@ -419,14 +452,7 @@ pkg_postinst() {
 	elog "Consult product.json for a list if you want to install them manually"
 	elog "ms-vscode.references-view is one of them, for example"
 	elog
-}
 
-pkg_postrm() {
-	xdg_icon_cache_update
-	xdg_desktop_database_update
-}
-
-pkg_postinst() {
 	xdg_icon_cache_update
 	xdg_desktop_database_update
 }

@@ -1,11 +1,11 @@
-# Copyright 1999-2023 Gentoo Authors
+# Copyright 1999-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-FIREFOX_PATCHSET="firefox-115esr-patches-06.tar.xz"
+FIREFOX_PATCHSET="firefox-115esr-patches-09.tar.xz"
 
-LLVM_MAX_SLOT=16
+LLVM_MAX_SLOT=17
 
 PYTHON_COMPAT=( python3_{10..11} )
 PYTHON_REQ_USE="ncurses,sqlite,ssl"
@@ -16,12 +16,12 @@ WANT_AUTOCONF="2.1"
 MOZ_PV="${PV/_p*}esr"
 
 # see https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/maint-13.0/projects/firefox/config?ref_type=heads#L17
-# and https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/maint-13.0/projects/browser/config?ref_type=heads#L91
+# and https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/maint-13.0/projects/browser/config?ref_type=heads#L99
 # and https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/tags
-TOR_PV="13.0"
-TOR_TAG="${TOR_PV%a*}-1-build2"
-NOSCRIPT_VERSION="11.4.28"
-CHANGELOG_TAG="${TOR_PV}-build1"
+TOR_PV="13.0.15"
+TOR_TAG="${TOR_PV%.*}-1-build2"
+NOSCRIPT_VERSION="11.4.29"
+CHANGELOG_TAG="${TOR_PV}-build2"
 
 inherit autotools check-reqs desktop flag-o-matic linux-info \
 	llvm multiprocessing pax-utils python-any-r1 toolchain-funcs xdg
@@ -56,6 +56,14 @@ IUSE+=" wayland +X"
 
 BDEPEND="${PYTHON_DEPS}
 	|| (
+		(
+			sys-devel/clang:17
+			sys-devel/llvm:17
+			clang? (
+				sys-devel/lld:17
+				virtual/rust:0/llvm-17
+			)
+		)
 		(
 			sys-devel/clang:16
 			sys-devel/llvm:16
@@ -191,42 +199,6 @@ moz_clear_vendor_checksums() {
 		|| die
 }
 
-moz_install_xpi() {
-	debug-print-function ${FUNCNAME} "$@"
-
-	if [[ ${#} -lt 2 ]] ; then
-		die "${FUNCNAME} requires at least two arguments"
-	fi
-
-	local DESTDIR=${1}
-	shift
-
-	insinto "${DESTDIR}"
-
-	local emid xpi_file xpi_tmp_dir
-	for xpi_file in "${@}" ; do
-		emid=
-		xpi_tmp_dir=$(mktemp -d --tmpdir="${T}")
-
-		# Unpack XPI
-		unzip -qq "${xpi_file}" -d "${xpi_tmp_dir}" || die
-
-		# Determine extension ID
-		if [[ -f "${xpi_tmp_dir}/install.rdf" ]] ; then
-			emid=$(sed -n -e '/install-manifest/,$ { /em:id/!d; s/.*[\">]\([^\"<>]*\)[\"<].*/\1/; p; q }' "${xpi_tmp_dir}/install.rdf")
-			[[ -z "${emid}" ]] && die "failed to determine extension id from install.rdf"
-		elif [[ -f "${xpi_tmp_dir}/manifest.json" ]] ; then
-			emid=$(sed -n -e 's/.*"id": "\([^"]*\)".*/\1/p' "${xpi_tmp_dir}/manifest.json")
-			[[ -z "${emid}" ]] && die "failed to determine extension id from manifest.json"
-		else
-			die "failed to determine extension id"
-		fi
-
-		einfo "Installing ${emid}.xpi into ${ED}${DESTDIR} ..."
-		newins "${xpi_file}" "${emid}.xpi"
-	done
-}
-
 mozconfig_add_options_ac() {
 	debug-print-function ${FUNCNAME} "$@"
 
@@ -360,6 +332,12 @@ pkg_setup() {
 }
 
 src_prepare() {
+	# Workaround for bgo#917599
+	if has_version ">=dev-libs/icu-74.1" && use system-icu ; then
+		eapply "${WORKDIR}"/firefox-patches/0029-bmo-1862601-system-icu-74.patch
+	fi
+	rm -v "${WORKDIR}"/firefox-patches/0029-bmo-1862601-system-icu-74.patch || die
+
 	eapply "${WORKDIR}/firefox-patches"
 
 	# https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/20497#note_2873088
@@ -399,6 +377,10 @@ src_prepare() {
 	einfo "Removing pre-built binaries ..."
 	find "${S}"/third_party -type f \( -name '*.so' -o -name '*.o' \) -print -delete || die
 
+	# Clear cargo checksums from crates we have patched
+	# moz_clear_vendor_checksums crate
+	moz_clear_vendor_checksums audio_thread_priority
+
 	# Create build dir
 	BUILD_DIR="${WORKDIR}/${PN}_build"
 	mkdir -p "${BUILD_DIR}" || die
@@ -426,11 +408,13 @@ src_configure() {
 		if tc-is-gcc; then
 			have_switched_compiler=yes
 		fi
+
 		AR=llvm-ar
 		CC=${CHOST}-clang-${version_clang}
 		CXX=${CHOST}-clang++-${version_clang}
 		NM=llvm-nm
 		RANLIB=llvm-ranlib
+
 	elif ! use clang && ! tc-is-gcc ; then
 		# Force gcc
 		have_switched_compiler=yes
@@ -477,8 +461,6 @@ src_configure() {
 	mozconfig_add_options_ac '' --enable-project=browser
 
 	# Set Gentoo defaults
-	export MOZILLA_OFFICIAL=1
-
 	mozconfig_add_options_ac 'Gentoo default' \
 		--allow-addon-sideload \
 		--disable-cargo-incremental \
@@ -489,12 +471,15 @@ src_configure() {
 		--disable-strip \
 		--disable-tests \
 		--disable-updater \
+		--disable-wmf \
+		--enable-legacy-profile-creation \
 		--enable-negotiateauth \
 		--enable-new-pass-manager \
 		--enable-official-branding \
 		--enable-release \
 		--enable-system-ffi \
 		--enable-system-pixman \
+		--enable-system-policies \
 		--host="${CBUILD:-${CHOST}}" \
 		--libdir="${EPREFIX}/usr/$(get_libdir)" \
 		--prefix="${EPREFIX}/usr" \
@@ -512,6 +497,7 @@ src_configure() {
 		--x-libraries="${ESYSROOT}/usr/$(get_libdir)"
 
 	mozconfig_add_options_ac '' --enable-rust-simd
+	mozconfig_add_options_ac '' --enable-sandbox
 
 	mozconfig_use_with system-av1
 	mozconfig_use_with system-harfbuzz
@@ -570,7 +556,6 @@ src_configure() {
 	export MOZILLA_OFFICIAL=1
 	mozconfig_add_options_ac 'torbrowser' \
 		--enable-official-branding \
-
 		--enable-optimize \
 		--enable-rust-simd \
 		--disable-unverified-updates \
@@ -621,27 +606,14 @@ src_configure() {
 	# Optimization flag was handled via configure
 	filter-flags '-O*'
 
-	if use clang ; then
-		# https://bugzilla.mozilla.org/show_bug.cgi?id=1482204
-		# https://bugzilla.mozilla.org/show_bug.cgi?id=1483822
-		# toolkit/moz.configure Elfhack section: target.cpu in ('arm', 'x86', 'x86_64')
-		local disable_elf_hack=
-		if use amd64 ; then
-			disable_elf_hack=yes
-		fi
+	# With profile 23.0 elf-hack=legacy is broken with gcc.
+	# With Firefox-115esr elf-hack=relr isn't available (only in rapid).
+	# Solution: Disable build system's elf-hack completely, and add "-z,pack-relative-relocs"
+	#  manually with gcc.
+	mozconfig_add_options_ac 'elf-hack disabled' --disable-elf-hack
 
-		if [[ -n ${disable_elf_hack} ]] ; then
-			mozconfig_add_options_ac 'elf-hack is broken when using Clang' --disable-elf-hack
-		fi
-	elif tc-is-gcc ; then
-		if ver_test $(gcc-fullversion) -ge 10 ; then
-			einfo "Forcing -fno-tree-loop-vectorize to workaround GCC bug, see bug 758446 ..."
-			append-cxxflags -fno-tree-loop-vectorize
-		fi
-	fi
-
-	if ! use elibc_glibc ; then
-		mozconfig_add_options_ac '!elibc_glibc' --disable-jemalloc
+	if use amd64 || use x86 ; then
+		! use clang && append-ldflags "-z,pack-relative-relocs"
 	fi
 
 	# Allow elfhack to work in combination with unstripped binaries
@@ -709,10 +681,8 @@ src_compile() {
 	./mach build --verbose || die
 
 	# FIXME: add locale support
-	# see https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/main/projects/firefox/build#L184
-	export MOZ_CHROME_MULTILOCALE=""
-	./mach package-multi-locale --locales en-US $MOZ_CHROME_MULTILOCALE || die
-	AB_CD=multi ./mach build stage-package || die
+	# see https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/maint-13.0/projects/firefox/build?ref_type=heads#L171
+	./mach build stage-package || die
 }
 
 src_install() {
@@ -733,7 +703,7 @@ src_install() {
 		rm -v "${ED}${MOZILLA_FIVE_HOME}/llvm-symbolizer" || die
 	fi
 
-	# https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/main/projects/browser/build#L65
+	# https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/maint-13.0/projects/browser/build?ref_type=heads#L70
 	insinto ${MOZILLA_FIVE_HOME}/browser/extensions
 	newins "${DISTDIR}/noscript-${NOSCRIPT_VERSION}.xpi" {73a6fe31-595d-460b-a920-fcc0f8843232}.xpi
 
@@ -782,11 +752,12 @@ src_install() {
 	newbin - torbrowser <<-EOF
 		#!/bin/bash
 
-		export FONTCONFIG_PATH="/usr/share/torbrowser/fontconfig"
+		export FONTCONFIG_PATH="/usr/share/torbrowser"
 		export FONTCONFIG_FILE="fonts.conf"
 
 		unset SESSION_MANAGER
 		export GSETTINGS_BACKEND=memory
+		export __GL_SHADER_DISK_CACHE=0
 
 		export TOR_SKIP_LAUNCH=1
 		export TOR_SKIP_CONTROLPORTTEST=1
@@ -813,10 +784,10 @@ src_install() {
 
 	# https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/main/projects/browser/RelativeLink/start-browser#L340
 	# https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/tree/main/projects/fonts
-	sed -i -e 's|<dir>fonts</dir>|<dir>/usr/share/torbrowser/fonts</dir>|' \
+	sed -i -e 's|<dir prefix="cwd">fonts</dir>|<dir prefix="relative">fonts</dir>|' \
 		"${WORKDIR}"/tor-browser/Browser/fontconfig/fonts.conf || die
 	insinto /usr/share/torbrowser/
-	doins -r "${WORKDIR}/tor-browser/Browser/fontconfig"
+	doins "${WORKDIR}/tor-browser/Browser/fontconfig/fonts.conf"
 	doins -r "${WORKDIR}/tor-browser/Browser/fonts"
 
 	# see https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/main/projects/browser/Bundle-Data/Docs/ChangeLog.txt
@@ -867,11 +838,5 @@ pkg_postinst() {
 		elog "To get the advanced functionality (network information,"
 		elog "new identity), Torbrowser needs to access a control port."
 		elog "Set the Variables in /etc/env.d/99torbrowser accordingly."
-	fi
-
-	if ver_test "${REPLACING_VERSIONS}" -lt "102.7.0_p12500"; then
-		ewarn "With this update, the profile directory moved from \"~/.mozilla/torbrowser/\""
-		ewarn "to \"~/.torproject/torbrowser/\". To keep your settings and bookmarks,"
-		ewarn "move your profile to the new location before launching torbrowser"
 	fi
 }
