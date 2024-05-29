@@ -1,0 +1,14 @@
+diff --git a/Engine/Config/Linux/LinuxEngine.ini b/Engine/Config/Linux/LinuxEngine.ini
+index 18c029576b15..195bb08cc2b8 100644
+--- a/Engine/Config/Linux/LinuxEngine.ini
++++ b/Engine/Config/Linux/LinuxEngine.ini
+@@ -5,7 +5,7 @@ PlatformFormat=OGG
+ PlatformStreamingFormat=OGG
+ 
+ [SystemSettings]
+-r.setres=1280x720
++r.setres=1920x1080
+ fx.NiagaraAllowRuntimeScalabilityChanges=1
+ ;Perplatform to PerQualityLevel conversion mapping for platform groups
+ QualityLevelMapping="high"
+

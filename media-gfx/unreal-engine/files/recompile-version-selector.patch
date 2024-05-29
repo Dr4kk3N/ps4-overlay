@@ -1,11 +1,12 @@
+diff --git a/Setup.sh b/Setup.sh
+index f91a96aaac6b..37df72d1337b 100755
 --- a/Setup.sh
 +++ b/Setup.sh
-@@ -41,6 +41,8 @@
- 
+@@ -80,6 +80,7 @@ else
  	echo Register the engine installation...
  	if [ -f Engine/Binaries/Linux/UnrealVersionSelector-Linux-Shipping ]; then
-+		make
-+
  		pushd Engine/Binaries/Linux > /dev/null
- 		./UnrealVersionSelector-Linux-Shipping -register
++		make
+ 		./UnrealVersionSelector-Linux-Shipping -register > /dev/null &
  		popd > /dev/null
+ 	fi

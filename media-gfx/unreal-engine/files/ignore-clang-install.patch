@@ -1,6 +1,8 @@
+diff --git a/Engine/Build/BatchFiles/Linux/Setup.sh b/Engine/Build/BatchFiles/Linux/Setup.sh
+index 18dc22fa5019..f8461024d716 100755
 --- a/Engine/Build/BatchFiles/Linux/Setup.sh
 +++ b/Engine/Build/BatchFiles/Linux/Setup.sh
-@@ -41,7 +41,7 @@
+@@ -41,7 +41,7 @@ if [ -e /etc/os-release ]; then
  fi
  
  # Install our bundled toolchain unless we are running a Perforce build or a an our of source toolchain is available.
