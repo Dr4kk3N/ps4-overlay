@@ -86,9 +86,9 @@ RDEPEND="
 	')
 "
 
-PATCHES=(
-	"${FILESDIR}/${P}-menson-fix-dep.patch"
-)
+#PATCHES=(
+#	"${FILESDIR}/${P}-menson-fix-dep.patch"
+#)
 
 src_unpack() {
 
