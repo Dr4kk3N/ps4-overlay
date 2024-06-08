@@ -11,15 +11,4 @@ SRC_URI="https://github.com/hyprwm/${PN}/archive/v${PV}.tar.gz -> ${P}.gh.tar.gz
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~amd64"
-IUSE="test"
-RESTRICT="!test? ( test )"
-
-BUILD_DIR="${S}/build"
-
-src_prepare() {
-	default
-
-	sed "s/\<lib\>/$(get_libdir)/" -i CMakeLists.txt hyprlang.pc.in
-	cmake_src_prepare
-}
+KEYWORDS="~amd64 ~riscv"
