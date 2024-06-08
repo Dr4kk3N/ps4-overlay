@@ -28,6 +28,7 @@ REQUIRED_USE="?? ( elogind systemd )"
 DEPEND="
 	>=media-video/pipewire-0.3.41:=
 	dev-cpp/sdbus-c++
+	dev-libs/hyprlang:=
 	dev-libs/inih
 	dev-libs/wayland
 	qt6? (
@@ -53,7 +54,6 @@ DEPEND="
 RDEPEND="
 	${DEPEND}
 	sys-apps/xdg-desktop-portal
-	dev-libs/hyprlang
 "
 
 BDEPEND="
@@ -89,6 +89,7 @@ src_unpack() {
 
 src_prepare() {
 	eapply "${FILESDIR}/xdg-desktop-portal-hyprland-1.3.1_use_sys_sdbus-c++.patch"
+	eapply "${FILESDIR}/xdg-desktop-portal-hyprland-1.3.1_fix_systemd_path.patch"
 	sed -i "/add_compile_options(-O3)/d" "${S}/CMakeLists.txt" || die
 	cmake_src_prepare
 }

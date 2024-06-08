@@ -28,6 +28,7 @@ REQUIRED_USE="?? ( elogind systemd )"
 DEPEND="
 	>=media-video/pipewire-0.3.41:=
 	dev-cpp/sdbus-c++
+	dev-libs/hyprlang:=
 	dev-libs/inih
 	dev-libs/wayland
 	dev-qt/qtbase
@@ -48,7 +49,6 @@ DEPEND="
 RDEPEND="
 	${DEPEND}
 	sys-apps/xdg-desktop-portal
-	dev-libs/hyprlang
 "
 
 BDEPEND="
