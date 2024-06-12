@@ -3,6 +3,8 @@
 
 EAPI=8
 
+inherit cmake
+
 DESCRIPTION="Official utils for Hyprland."
 HOMEPAGE="https://github.com/hyprwm/hyprutils"
 
