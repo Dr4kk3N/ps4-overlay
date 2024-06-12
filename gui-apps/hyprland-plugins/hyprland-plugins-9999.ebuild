@@ -3,13 +3,13 @@
 
 EAPI=8
 
-inherit optfeature
+inherit optfeature cmake
 
 DESCRIPTION="Official plugins for Hyprland."
 HOMEPAGE="https://github.com/hyprwm/hyprland-plugins"
 
-if [[ ${PV} = 9999 ]]; then
-        EGIT_REPO_URI="https://github.com/hyprwm/hyprland-plugins.git"
+if [[ ${PV} = 9999* ]]; then
+        EGIT_REPO_URI="https://github.com/hyprwm/hyprland-plugins.git/"
         inherit git-r3
 else
 	COMMIT=bb1437add2df7f76147f7beb430365637fc2c35e
@@ -32,14 +32,6 @@ BDEPEND="~gui-wm/hyprland-${PV}
 	x11-libs/pixman
 	x11-libs/xcb-util-wm
 "
-
-src_unpack() {
-	default
-}
-
-src_prepare() {
-	eapply_user
-}
 
 src_compile() {
 	emake -C "${WORKDIR}/hyprland-source" protocols
