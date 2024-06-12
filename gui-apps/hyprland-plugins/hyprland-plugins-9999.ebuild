@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit optfeature cmake
+inherit optfeature
 
 DESCRIPTION="Official plugins for Hyprland."
 HOMEPAGE="https://github.com/hyprwm/hyprland-plugins"
