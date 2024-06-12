@@ -11,31 +11,24 @@ HOMEPAGE="https://github.com/hyprwm/hyprland-plugins"
 if [[ ${PV} = 9999 ]]; then
 	SPLITCOMMIT=feb6ab9a4929a92d41c724f6d16e9d351b12de39
         EGIT_REPO_URI="https://github.com/hyprwm/hyprland-plugins.git/"
-#	SRC_URI="https://github.com/Duckonaut/split-monitor-workspaces/archive/${SPLITCOMMIT}.tar.gz \
-#                -> ${P}-split-monitor-workspaces.gh.tar.gz"
         inherit git-r3
 else
 	COMMIT=bb1437add2df7f76147f7beb430365637fc2c35e
-	SPLITCOMMIT=feb6ab9a4929a92d41c724f6d16e9d351b12de39
 	SRC_URI="https://github.com/hyprwm/${PN}/archive/${COMMIT}.tar.gz -> ${P}.gh.tar.gz
 		https://github.com/hyprwm/Hyprland/releases/download/v${PV}/source-v${PV}.tar.gz \
-		-> ${P}-hyprsrc.gh.tar.gz
-		https://github.com/Duckonaut/split-monitor-workspaces/archive/${SPLITCOMMIT}.tar.gz \
-		-> ${P}-split-monitor-workspaces.gh.tar.gz"
+		-> ${P}-hyprsrc.gh.tar.gz"
 	KEYWORDS="~amd64"
 	S="${WORKDIR}/${PN}-${COMMIT}"
 fi
 
 LICENSE="BSD"
 SLOT="0"
-IUSE="+borders-plus-plus csgo-vulkan-fix +hyprbars split-monitor-workspaces X"
+IUSE="+borders-plus-plus csgo-vulkan-fix +hyprbars hyprexpo hyprtrails hyprwinwrap X"
 REQUIRED_USE="|| ( borders-plus-plus csgo-vulkan-fix hyprbars )"
 
 RDEPEND="gui-wm/hyprland"
 DEPEND="${RDEPEND}"
-BDEPEND="
-	~gui-wm/hyprland-${PV}
-	split-monitor-workspaces? ( gui-libs/wlroots[X?] )
+BDEPEND="~gui-wm/hyprland-${PV}
 	x11-libs/libdrm
 	x11-libs/pixman
 	x11-libs/xcb-util-wm
@@ -43,15 +36,10 @@ BDEPEND="
 
 src_unpack() {
 	default
-	cp "${FILESDIR}/split-monitor-workspaces.patch" "${WORKDIR}/split-monitor-workspaces-${SPLITCOMMIT}" || die
 }
 
 src_prepare() {
 	eapply_user
-	if use split-monitor-workspaces && ! use X; then
-		cd "${WORKDIR}/split-monitor-workspaces-${SPLITCOMMIT}" || die
-		eapply "${WORKDIR}/split-monitor-workspaces-${SPLITCOMMIT}"
-	fi
 }
 
 src_compile() {
@@ -70,9 +58,17 @@ src_compile() {
 		emake -C "${S}/hyprbars" all
 	fi
 
-	if use split-monitor-workspaces; then
-		emake -C "${WORKDIR}/split-monitor-workspaces-${SPLITCOMMIT}" split-monitor-workspaces.so
-	fi
+	if use hyprexpo; then
+                emake -C "${S}/hyprexpo" all
+        fi
+
+	if use hyprtrails; then
+                emake -C "${S}/hyprtrails" all
+        fi
+
+	if use hyprwinwrap; then
+                emake -C "${S}/hyprwinwrap" all
+        fi
 }
 
 src_install() {
@@ -90,10 +86,17 @@ src_install() {
 		doins "${S}/hyprbars/hyprbars.so"
 	fi
 
-	if use split-monitor-workspaces; then
-		doins "${WORKDIR}/split-monitor-workspaces-${SPLITCOMMIT}/split-monitor-workspaces.so"
-		emake -C "${WORKDIR}/split-monitor-workspaces-${SPLITCOMMIT}" all
-	fi
+	if use hyprexpo; then
+                doins "${S}/hyprexpo/hyprexpo.so"
+        fi
+
+	if use hyprtrails; then
+                doins "${S}/hyprtrails/hyprtrails.so"
+        fi
+
+	if use hyprwinwrap; then
+                doins "${S}/hyprwinwrap/hyprwinwrap.so"
+        fi
 }
 
 pkg_postinst() {
