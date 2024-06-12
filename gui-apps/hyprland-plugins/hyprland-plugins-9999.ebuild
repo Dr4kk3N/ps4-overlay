@@ -9,8 +9,7 @@ DESCRIPTION="Official plugins for Hyprland."
 HOMEPAGE="https://github.com/hyprwm/hyprland-plugins"
 
 if [[ ${PV} = 9999 ]]; then
-	SPLITCOMMIT=feb6ab9a4929a92d41c724f6d16e9d351b12de39
-        EGIT_REPO_URI="https://github.com/hyprwm/hyprland-plugins.git/"
+        EGIT_REPO_URI="https://github.com/hyprwm/hyprland-plugins.git"
         inherit git-r3
 else
 	COMMIT=bb1437add2df7f76147f7beb430365637fc2c35e
