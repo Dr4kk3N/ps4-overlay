@@ -3,10 +3,12 @@
 
 EAPI=8
 
+inherit optfeature
+
 DESCRIPTION="Official plugins for Hyprland."
 HOMEPAGE="https://github.com/hyprwm/hyprland-plugins"
 
-if [[ ${PV} = 9999* ]]; then
+if [[ ${PV} = 9999 ]]; then
 	SPLITCOMMIT=feb6ab9a4929a92d41c724f6d16e9d351b12de39
         EGIT_REPO_URI="https://github.com/hyprwm/hyprland-plugins.git/"
 	SRC_URI="https://github.com/Duckonaut/split-monitor-workspaces/archive/${SPLITCOMMIT}.tar.gz \
