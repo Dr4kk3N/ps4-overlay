@@ -11,8 +11,8 @@ HOMEPAGE="https://github.com/hyprwm/hyprland-plugins"
 if [[ ${PV} = 9999 ]]; then
 	SPLITCOMMIT=feb6ab9a4929a92d41c724f6d16e9d351b12de39
         EGIT_REPO_URI="https://github.com/hyprwm/hyprland-plugins.git/"
-	SRC_URI="https://github.com/Duckonaut/split-monitor-workspaces/archive/${SPLITCOMMIT}.tar.gz \
-                -> ${P}-split-monitor-workspaces.gh.tar.gz"
+#	SRC_URI="https://github.com/Duckonaut/split-monitor-workspaces/archive/${SPLITCOMMIT}.tar.gz \
+#                -> ${P}-split-monitor-workspaces.gh.tar.gz"
         inherit git-r3
 else
 	COMMIT=bb1437add2df7f76147f7beb430365637fc2c35e
@@ -29,7 +29,7 @@ fi
 LICENSE="BSD"
 SLOT="0"
 IUSE="+borders-plus-plus csgo-vulkan-fix +hyprbars split-monitor-workspaces X"
-REQUIRED_USE="|| ( borders-plus-plus csgo-vulkan-fix hyprbars split-monitor-workspaces )"
+REQUIRED_USE="|| ( borders-plus-plus csgo-vulkan-fix hyprbars )"
 
 RDEPEND="gui-wm/hyprland"
 DEPEND="${RDEPEND}"
