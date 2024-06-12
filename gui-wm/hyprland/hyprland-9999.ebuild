@@ -90,6 +90,7 @@ DEPEND="
 	>=dev-libs/hyprland-protocols-0.2
 	>=dev-libs/hyprlang-0.3.2
 	>=dev-libs/wayland-protocols-1.34
+	gui-apps/hyprutils
 "
 BDEPEND="
 	${WLROOTS_BDEPEND}
