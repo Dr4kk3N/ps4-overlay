@@ -50,6 +50,10 @@ BDEPEND="
 	virtual/pkgconfig
 "
 
+PATCHES=(
+        "${FILESDIR}"/meson_version.patch
+)
+
 src_prepare() {
 	default
 
