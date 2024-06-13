@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{11..12} )
+PYTHON_COMPAT=( python3_{11..13} )
 PYTHON_REQ_USE="xml(+)"
 
 CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu he
@@ -23,11 +23,9 @@ inherit python-any-r1 qmake-utils readme.gentoo-r1 toolchain-funcs xdg-utils
 DESCRIPTION="Modifications to Chromium for removing Google integration and enhancing privacy"
 HOMEPAGE="https://github.com/ungoogled-software/ungoogled-chromium"
 PATCHSET_PPC64="124.0.6367.78-1raptor0~deb12u1"
-PATCHSET_DEBIAN="${PV/_*}-1"
 PATCH_V="${PV%%\.*}"
 SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/chromium-${PV/_*}.tar.xz
 	https://gitlab.com/Matt.Jolly/chromium-patches/-/archive/${PATCH_V}/chromium-patches-${PATCH_V}.tar.bz2
-	https://salsa.debian.org/chromium-team/chromium/-/archive/debian/${PATCHSET_DEBIAN}/chromium-debian-${PATCHSET_DEBIAN}.tar.bz2
 	ppc64? (
 		https://quickbuild.io/~raptor-engineering-public/+archive/ubuntu/chromium/+files/chromium_${PATCHSET_PPC64}.debian.tar.xz
 		https://deps.gentoo.zip/chromium-ppc64le-gentoo-patches-1.tar.xz
@@ -59,24 +57,23 @@ REQUIRED_USE="
 	vaapi? ( !system-av1 !system-libvpx )
 "
 
-#UGC_COMMIT_ID="d5773b0fb696ef107cc6df6a94cbe732c9e905f9"
+UGC_COMMIT_ID="384bb61fc8182b1fd0b94ff759fc8233d8be9a22"
 # UGC_PR_COMMITS=(
 # 	c917e096342e5b90eeea91ab1f8516447c8756cf
 # 	5794e9d12bf82620d5f24505798fecb45ca5a22d
 # )
 
-CROMITE_COMMIT_ID="726270b960d51569a3b25bbb4770544d8718aece"
+CROMITE_COMMIT_ID="7b0784a8ca4cc6e04a2e9f287964f6346f3c6a14"
 
 declare -A CHROMIUM_COMMITS=(
-	["23646607e16c63231ae9f49ce5355c270145cf30"]="."
-	["39735a1167272326da5ff85e0096b52ca7f47d6c"]="."
-	["37ef38092ab783d0126922e8d463024341c481b9"]="."
-	["0bed9a54baa5058e711a1f051a766f67e1842ec5"]="."
-	["54c4f460f35e0a4003aa4dd01007188ff00295cc"]="."
-	["251c365ea2c268a475f91c9913fabba6b41e2b6b"]="."
 	["587c2cf8b11d3c32fa26887063eda3171a3d353e"]="third_party/ruy/src"
-	["bbd4b7752f0a9e5f486fa55c9f2b80071ef99d01"]="third_party/vulkan-deps/vulkan-utility-libraries/src"
-	["c1af894e0f5c4f732a983e7c93227854e203570e"]="net/third_party/quiche/src"
+	["d3bc5ffc929b0895ae9e16774069a04ae6fe3c58"]="net/third_party/quiche/src"
+	["43e186fe732cc810f14b673393aca88af7093dc1"]="."
+	["f3b236db61a52b30ad3b23fba732b6e8826910e9"]="."
+	["fb3678b0d1084b49c5ca795200131a7c0ac01ffe"]="."
+	["d852bf71654ae63d5e8e6624652584a9adf1df6f"]="."
+	["42fc562599d784a8a646703ce3b7c158ce1a8466"]="."
+	["f3fce92b27296068b4c304321b53bd1c7c4beb61"]="."
 )
 
 UGC_PV="${PV/_p/-}"
@@ -424,14 +421,12 @@ src_prepare() {
 
 	local PATCHES=(
 		"${WORKDIR}/chromium-patches-${PATCH_V}"
-		"${FILESDIR}/chromium-cross-compile.patch"
 		"${FILESDIR}/chromium-109-system-openh264.patch"
 		"${FILESDIR}/chromium-109-system-zlib.patch"
 		"${FILESDIR}/chromium-111-InkDropHost-crash.patch"
-		"${FILESDIR}/chromium-124-libwebp-shim-sharpyuv.patch"
-		"${FILESDIR}/chromium-125-oauth2-client-switches.patch"
 		"${FILESDIR}/chromium-125-system-zstd.patch"
-		"${FILESDIR}/chromium-125-ninja-1-12.patch"
+		"${FILESDIR}/chromium-126-oauth2-client-switches.patch"
+		"${FILESDIR}/chromium-cross-compile.patch"
 		"${FILESDIR}/chromium-125-cloud_authenticator.patch"
 		"${FILESDIR}/chromium-123-qrcode.patch"
 		"${FILESDIR}/chromium-123-stats-collector.patch"
@@ -445,16 +440,16 @@ src_prepare() {
 	if ! use libcxx ; then
 		PATCHES+=(
 			"${FILESDIR}/chromium-124-libstdc++.patch"
-			"${PATCHES_DEB}/fixes/bad-font-gc00000.patch"
-			"${PATCHES_DEB}/fixes/bad-font-gc0000.patch"
-			"${PATCHES_DEB}/fixes/bad-font-gc000.patch"
-			"${PATCHES_DEB}/fixes/bad-font-gc00.patch"
-			"${PATCHES_DEB}/fixes/bad-font-gc0.patch"
-			"${PATCHES_DEB}/fixes/bad-font-gc1.patch"
-			"${PATCHES_DEB}/fixes/bad-font-gc11.patch"
-			"${PATCHES_DEB}/fixes/bad-font-gc2.patch"
-			"${PATCHES_DEB}/fixes/bad-font-gc3.patch"
 		)
+			# "${PATCHES_DEB}/fixes/bad-font-gc00000.patch"
+			# "${PATCHES_DEB}/fixes/bad-font-gc0000.patch"
+			# "${PATCHES_DEB}/fixes/bad-font-gc000.patch"
+			# "${PATCHES_DEB}/fixes/bad-font-gc00.patch"
+			# "${PATCHES_DEB}/fixes/bad-font-gc0.patch"
+			# "${PATCHES_DEB}/fixes/bad-font-gc1.patch"
+			# "${PATCHES_DEB}/fixes/bad-font-gc11.patch"
+			# "${PATCHES_DEB}/fixes/bad-font-gc2.patch"
+			# "${PATCHES_DEB}/fixes/bad-font-gc3.patch"
 	fi
 
 	if use clang ; then
@@ -583,7 +578,7 @@ src_prepare() {
 
 	use bluetooth || eapply "${FILESDIR}/disable-bluez-r1.patch"
 
-	use convert-dict && eapply "${FILESDIR}/chromium-ucf-dict-utility.patch"
+	use convert-dict && eapply "${FILESDIR}/chromium-ucf-dict-utility-r1.patch"
 
 	if use hevc; then
 		sed -i '/^bool IsHevcProfileSupported(const VideoType& type) {$/{s++bool IsHevcProfileSupported(const VideoType\& type) { return true;+;h};${x;/./{x;q0};x;q1}' \
@@ -698,7 +693,6 @@ src_prepare() {
 		base/third_party/double_conversion
 	)
 	keeplibs+=(
-		base/third_party/dynamic_annotations
 		base/third_party/icu
 		base/third_party/nspr
 		base/third_party/superfasthash
@@ -923,6 +917,8 @@ src_prepare() {
 		third_party/s2cellid
 		third_party/securemessage
 		third_party/selenium-atoms
+		third_party/sentencepiece
+		third_party/sentencepiece/src/third_party/darts_clone
 		third_party/shell-encryption
 		third_party/simplejson
 		third_party/skia
