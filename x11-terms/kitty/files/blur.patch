@@ -1,0 +1,13 @@
+diff --git a/kitty/glfw.c b/kitty/glfw.c
+index 96bd5ab04..773cb7fb2 100644
+--- a/kitty/glfw.c
++++ b/kitty/glfw.c
+@@ -1304,8 +1304,6 @@ create_os_window(PyObject UNUSED *self, PyObject *args, PyObject *kw) {
+     init_window_chrome_state(&w->last_window_chrome, OPT(background), w->is_semi_transparent, w->background_opacity);
+ #ifdef __APPLE__
+     apply_window_chrome_state(w->handle, w->last_window_chrome, width, height, OPT(hide_window_decorations) != 0);
+-#else
+-    apply_window_chrome_state(w->handle, w->last_window_chrome, width, height, false);
+ #endif
+     // Update window state
+     // We do not call glfwWindowHint to set GLFW_MAXIMIZED before the window is created.
