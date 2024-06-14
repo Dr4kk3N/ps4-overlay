@@ -63,7 +63,7 @@ CRATES="
 	core-graphics-types@0.1.3
 	core-graphics@0.23.2
 	cpufeatures@0.2.12
-	crc32fast@1.4.0
+	crc32fast@1.4.2
 	crossbeam-channel@0.5.13
 	crossbeam-utils@0.8.20
 	crossterm@0.25.0
