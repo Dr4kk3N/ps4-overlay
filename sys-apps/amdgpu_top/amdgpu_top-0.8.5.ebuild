@@ -236,7 +236,7 @@ CRATES="
 	orbclient@0.3.47
 	owned_ttf_parser@0.21.0
 	owning_ref@0.4.1
-	parking_lot@0.12.2
+	parking_lot@0.12.3
 	parking_lot_core@0.9.10
 	paste@1.0.15
 	percent-encoding@2.3.1
