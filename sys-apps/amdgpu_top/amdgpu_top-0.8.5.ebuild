@@ -225,6 +225,7 @@ CRATES="
 	objc2-app-kit@0.2.2
 	objc2-core-image@0.2.2
 	objc2-core-data@0.2.2
+	objc2-quartz-core@0.2.2
 	objc2-encode@3.0.0
 	objc2-encode@4.0.3
 	objc2-foundation@0.2.2
