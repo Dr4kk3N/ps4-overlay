@@ -64,7 +64,7 @@ CRATES="
 	core-graphics@0.23.2
 	cpufeatures@0.2.12
 	crc32fast@1.4.0
-	crossbeam-channel@0.5.12
+	crossbeam-channel@0.5.13
 	crossbeam-utils@0.8.19
 	crossterm@0.25.0
 	crossterm_winapi@0.9.1
