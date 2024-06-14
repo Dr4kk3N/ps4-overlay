@@ -228,7 +228,7 @@ CRATES="
 	objc2-encode@4.0.1
 	objc2-foundation@0.2.0
 	objc2@0.4.1
-	objc2@0.5.1
+	objc2@0.5.2
 	objc@0.2.7
 	objc_exception@0.1.2
 	objc_id@0.1.1
