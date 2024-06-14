@@ -134,7 +134,7 @@ CRATES="
 	gix-hash@0.14.2
 	gix-hashtable@0.5.2
 	gix-lock@13.1.1
-	gix-macros@0.1.4
+	gix-macros@0.1.5
 	gix-object@0.42.1
 	gix-odb@0.59.0
 	gix-pack@0.49.0
