@@ -305,7 +305,7 @@ CRATES="
 	time-core@0.1.2
 	time-macros@0.2.18
 	time@0.3.36
-	tinystr@0.7.5
+	tinystr@0.7.6
 	tinyvec@1.6.0
 	tinyvec_macros@0.1.1
 	toml@0.5.11
