@@ -32,7 +32,7 @@ CRATES="
 	block-buffer@0.10.4
 	block-sys@0.2.1
 	block2@0.3.0
-	block2@0.5.0
+	block2@0.5.1
 	block@0.1.6
 	bstr@1.9.1
 	bumpalo@3.16.0
