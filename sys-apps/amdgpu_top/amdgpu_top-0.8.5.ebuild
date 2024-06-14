@@ -203,7 +203,7 @@ CRATES="
 	memmap2@0.9.4
 	memoffset@0.9.1
 	metal@0.27.0
-	miniz_oxide@0.7.2
+	miniz_oxide@0.7.3
 	mio@0.8.11
 	naga@0.19.2
 	ndk-context@0.1.1
