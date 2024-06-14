@@ -16,7 +16,7 @@ CRATES="
 	android-activity@0.5.2
 	android-properties@0.2.2
 	android_system_properties@0.1.5
-	anyhow@1.0.83
+	anyhow@1.0.86
 	arboard@3.4.0
 	arc-swap@1.7.1
 	arrayvec@0.7.4
