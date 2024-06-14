@@ -193,7 +193,7 @@ CRATES="
 	libloading@0.8.3
 	libredox@0.0.2
 	libredox@0.1.3
-	linux-raw-sys@0.4.13
+	linux-raw-sys@0.4.14
 	litrs@0.4.1
 	locale_config@0.3.0
 	lock_api@0.4.12
