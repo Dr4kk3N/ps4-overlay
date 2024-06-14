@@ -249,7 +249,7 @@ CRATES="
 	proc-macro-crate@3.1.0
 	proc-macro-error-attr@1.0.4
 	proc-macro-error@1.0.4
-	proc-macro2@1.0.82
+	proc-macro2@1.0.84
 	prodash@28.0.0
 	profiling@1.0.15
 	quick-xml@0.31.0
