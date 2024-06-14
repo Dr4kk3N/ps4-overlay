@@ -188,7 +188,7 @@ CRATES="
 	khronos-egl@6.0.0
 	khronos_api@3.1.0
 	lazy_static@1.4.0
-	libc@0.2.154
+	libc@0.2.155
 	libloading@0.7.4
 	libloading@0.8.3
 	libredox@0.0.2
