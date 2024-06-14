@@ -128,7 +128,7 @@ CRATES="
 	gix-date@0.8.6
 	gix-diff@0.42.0
 	gix-discover@0.31.0
-	gix-features@0.38.1
+	gix-features@0.38.2
 	gix-fs@0.10.2
 	gix-glob@0.16.2
 	gix-hash@0.14.2
