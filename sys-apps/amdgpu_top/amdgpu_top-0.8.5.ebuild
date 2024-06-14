@@ -390,7 +390,7 @@ CRATES="
 	windows_x86_64_msvc@0.52.5
 	winit@0.29.15
 	winnow@0.5.40
-	winnow@0.6.8
+	winnow@0.6.9
 	x11-dl@2.21.0
 	x11rb-protocol@0.13.1
 	x11rb@0.13.1
