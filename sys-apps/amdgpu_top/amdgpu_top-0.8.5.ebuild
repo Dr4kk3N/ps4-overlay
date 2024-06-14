@@ -150,7 +150,7 @@ CRATES="
 	gix-traverse@0.38.0
 	gix-url@0.27.3
 	gix-utils@0.1.12
-	gix-validate@0.8.4
+	gix-validate@0.8.5
 	gix@0.61.0
 	gl_generator@0.14.0
 	glow@0.13.1
