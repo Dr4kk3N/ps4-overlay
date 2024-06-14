@@ -404,7 +404,7 @@ CRATES="
 "
 
 declare -A GIT_CRATES=(
-	[libdrm_amdgpu_sys]='https://github.com/Umio-Yasuno/libdrm-amdgpu-sys-rs;5aae9ece0551b133cfcdd6b305465504b4f28e59;libdrm-amdgpu-sys-rs-%commit%'
+	[libdrm_amdgpu_sys]='https://github.com/Umio-Yasuno/libdrm-amdgpu-sys-rs;b5e281176c6ba5c15379b2bb832d1b37e83e673f;libdrm-amdgpu-sys-rs-%commit%'
 )
 
 inherit desktop cargo
