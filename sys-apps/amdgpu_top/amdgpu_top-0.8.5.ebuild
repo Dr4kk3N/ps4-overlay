@@ -255,7 +255,7 @@ CRATES="
 	quick-xml@0.31.0
 	quote@1.0.36
 	raw-window-handle@0.5.2
-	raw-window-handle@0.6.1
+	raw-window-handle@0.6.2
 	redox_syscall@0.3.5
 	redox_syscall@0.4.1
 	redox_syscall@0.5.1
