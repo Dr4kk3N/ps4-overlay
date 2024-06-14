@@ -37,7 +37,7 @@ CRATES="
 	bstr@1.9.1
 	bumpalo@3.16.0
 	bytemuck@1.16.0
-	bytemuck_derive@1.6.0
+	bytemuck_derive@1.7.0
 	byteorder@1.5.0
 	bytes@1.6.0
 	calloop-wayland-source@0.2.0
