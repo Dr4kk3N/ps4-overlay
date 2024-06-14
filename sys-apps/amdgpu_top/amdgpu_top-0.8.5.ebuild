@@ -276,8 +276,8 @@ CRATES="
 	scopeguard@1.2.0
 	self_cell@0.10.3
 	self_cell@1.0.4
-	serde@1.0.202
-	serde_derive@1.0.202
+	serde@1.0.203
+	serde_derive@1.0.203
 	serde_json@1.0.117
 	serde_spanned@0.6.6
 	sha1_smol@1.0.0
