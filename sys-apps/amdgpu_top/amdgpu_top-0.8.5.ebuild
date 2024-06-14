@@ -42,7 +42,7 @@ CRATES="
 	bytes@1.6.0
 	calloop-wayland-source@0.2.0
 	calloop@0.12.4
-	cc@1.0.97
+	cc@1.0.98
 	cesu8@1.1.0
 	cfg-if@1.0.0
 	cfg_aliases@0.1.1
