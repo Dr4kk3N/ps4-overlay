@@ -297,7 +297,7 @@ CRATES="
 	static_assertions@1.1.0
 	strsim@0.10.0
 	syn@1.0.109
-	syn@2.0.63
+	syn@2.0.66
 	tempfile@3.10.1
 	termcolor@1.4.1
 	thiserror-impl@1.0.61
