@@ -300,8 +300,8 @@ CRATES="
 	syn@2.0.63
 	tempfile@3.10.1
 	termcolor@1.4.1
-	thiserror-impl@1.0.60
-	thiserror@1.0.60
+	thiserror-impl@1.0.61
+	thiserror@1.0.61
 	time-core@0.1.2
 	time-macros@0.2.18
 	time@0.3.36
