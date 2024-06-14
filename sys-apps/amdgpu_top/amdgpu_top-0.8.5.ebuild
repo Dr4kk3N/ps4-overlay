@@ -130,7 +130,7 @@ CRATES="
 	gix-discover@0.31.0
 	gix-features@0.38.2
 	gix-fs@0.10.2
-	gix-glob@0.16.2
+	gix-glob@0.16.3
 	gix-hash@0.14.2
 	gix-hashtable@0.5.2
 	gix-lock@13.1.1
