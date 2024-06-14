@@ -142,7 +142,7 @@ CRATES="
 	gix-quote@0.4.12
 	gix-ref@0.43.0
 	gix-refspec@0.23.0
-	gix-revision@0.27.0
+	gix-revision@0.27.1
 	gix-revwalk@0.13.0
 	gix-sec@0.10.6
 	gix-tempfile@13.1.1
