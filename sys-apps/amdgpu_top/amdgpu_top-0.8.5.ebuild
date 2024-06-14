@@ -120,7 +120,7 @@ CRATES="
 	generic-array@0.14.7
 	gethostname@0.4.3
 	getrandom@0.2.15
-	gix-actor@0.31.1
+	gix-actor@0.31.2
 	gix-chunk@0.4.8
 	gix-commitgraph@0.24.2
 	gix-config-value@0.14.6
