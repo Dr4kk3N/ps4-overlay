@@ -221,7 +221,7 @@ CRATES="
 	num_enum_derive@0.7.2
 	num_threads@0.1.7
 	objc-foundation@0.1.1
-	objc-sys@0.3.3
+	objc-sys@0.3.5
 	objc2-app-kit@0.2.2
 	objc2-core-data@0.2.2
 	objc2-encode@3.0.0
