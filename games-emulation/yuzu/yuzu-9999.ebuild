@@ -1,4 +1,4 @@
-# Copyright 2020-2023 Gentoo Authors
+# Copyright 2020-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -7,59 +7,53 @@ inherit cmake git-r3 toolchain-funcs xdg
 
 DESCRIPTION="An emulator for Nintendo Switch"
 HOMEPAGE="https://yuzu-emu.org"
-EGIT_REPO_URI="https://github.com/yuzu-emu/yuzu-mainline"
-EGIT_SUBMODULES=( '-*' 'dynarmic' 'sirit' 'xbyak' 'tzdb_to_nx' 'externals/nx_tzdb/tzdb_to_nx/externals/tz/tz' 'VulkanMemoryAllocator' 'simpleini' )
+EGIT_REPO_URI="https://codeberg.org/yuzu-emu/yuzu"
+EGIT_SUBMODULES=( '-*' 'dynarmic' 'simpleini' 'sirit' 'tzdb_to_nx' 'externals/nx_tzdb/tzdb_to_nx/externals/tz/tz' 'VulkanMemoryAllocator' 'xbyak' )
 # Dynarmic is not intended to be generic, it is tweaked to fit emulated processor
 # TODO wait 'xbyak' waiting version bump. see #860816
 
 LICENSE="|| ( Apache-2.0 GPL-2+ ) 0BSD BSD GPL-2+ ISC MIT
 	!system-vulkan? ( Apache-2.0 )"
 SLOT="0"
-KEYWORDS=""
-IUSE="+compatibility-list +cubeb discord +qt5 qt6 sdl +system-libfmt +system-vulkan test webengine +webservice"
+KEYWORDS="amd64"
+IUSE="+compatibility-list +cubeb discord +qt5 qt6 sdl +system-vulkan test webengine +webservice"
 
 RDEPEND="
 	<net-libs/mbedtls-3.1[cmac]
 	>=app-arch/zstd-1.5
 	>=dev-libs/inih-52
+	>=dev-libs/libfmt-9:=
 	>=dev-libs/openssl-1.1:=
 	>=media-video/ffmpeg-4.3:=
 	>=net-libs/enet-1.3
 	app-arch/lz4:=
 	dev-libs/boost:=[context]
 	media-libs/opus
-	>=media-libs/vulkan-loader-1.3.275
-	>=dev-util/vulkan-utility-libraries-1.3.275
+	media-libs/vulkan-loader
 	sys-libs/zlib
 	virtual/libusb:1
 	cubeb? ( media-libs/cubeb )
 	qt5? (
-		|| ( qt6? (
-			>=dev-qt/qtbase-6.6.1:6[gui,dbus,widgets]
-			)
 		>=dev-qt/qtcore-5.15:5
 		>=dev-qt/qtgui-5.15:5
 		>=dev-qt/qtmultimedia-5.15:5
 		>=dev-qt/qtwidgets-5.15:5
-		>=dev-qt/qtdbus-5.15:5
-		>=dev-qt/qtconcurrent-5.15:5
-		>=dev-qt/linguist-tools-5.15:5
-		webengine? ( >=dev-qt/qtwebengine-5.15:5 )
-		)
 	)
 	qt6? (
-		>=dev-qt/qtbase-6.6.1:6[gui,dbus,widgets]
-		webengine? ( >=dev-qt/qtwebengine-6.6.1:6 )
+		>=dev-qt/qtbase-6.6.0:6[gui,widgets]
 	)
-	sdl? ( >=media-libs/libsdl2-2.28 )
-	system-libfmt? ( >=dev-libs/libfmt-9:= )
+	sdl? (
+		>=media-libs/libsdl2-2.0.18
+	)
 "
 DEPEND="${RDEPEND}
 	dev-cpp/cpp-httplib
 	dev-cpp/cpp-jwt
-	system-vulkan? ( >=dev-util/vulkan-headers-1.3.275
-		dev-util/spirv-headers )
-	test? ( >dev-cpp/catch-3:0 )
+	system-vulkan? (
+		>=dev-util/vulkan-headers-1.3.236
+		>=dev-util/vulkan-utility-libraries-1.3.236
+	)
+	test? ( <dev-cpp/catch-3:0 )
 "
 BDEPEND="
 	>=dev-cpp/nlohmann_json-3.8.0
@@ -83,7 +77,7 @@ src_unpack() {
 	fi
 
 	if use !system-vulkan; then
-		EGIT_SUBMODULES+=('Vulkan-Headers')
+		EGIT_SUBMODULES+=('Vulkan-Headers' 'Vulkan-Utility-Libraries')
 	fi
 
 	if use test; then
@@ -91,23 +85,19 @@ src_unpack() {
 	fi
 
 	git-r3_src_unpack
-
 	# Do not fetch via sources because this file always changes
-	use compatibility-list && curl https://api.yuzu-emu.org/gamedb/ > "${S}"/compatibility_list.json
+	#use compatibility-list && curl https://api.yuzu-emu.org/gamedb/ > "${S}"/compatibility_list.json
 }
 
 src_prepare() {
 	# temporary fix
 	sed -i -e '/Werror/d' src/CMakeLists.txt || die
 
-	# Unbundle inih
-	sed -i -e '/^if.*inih/,/^endif()/d' externals/CMakeLists.txt || die
-	sed -i -e '1afind_package(PkgConfig REQUIRED)\npkg_check_modules(INIH REQUIRED INIReader)' \
-		src/yuzu_cmd/CMakeLists.txt || die
-#	sed -i -e 's:inih/cpp/::' src/yuzu_cmd/config.cpp || die
+	# Allow skip submodule downloading
+	rm .gitmodules || die
 
 	# Unbundle mbedtls
-	sed -i -e '/mbedtls/d' -e '/^if (NOT MSVC)/,/endif()/d' externals/CMakeLists.txt || die
+	sed -i -e '/^# mbedtls/,/^endif()/d' externals/CMakeLists.txt || die
 	sed -i -e 's/mbedtls/& mbedcrypto mbedx509/' \
 		src/dedicated_room/CMakeLists.txt \
 		src/core/CMakeLists.txt || die
@@ -142,14 +132,8 @@ src_prepare() {
 	# LZ4 temporary fix: https://github.com/yuzu-emu/yuzu/pull/9054/commits/a8021f5a18bc5251aef54468fa6033366c6b92d9
 	sed -i 's/lz4::lz4/lz4/' src/common/CMakeLists.txt || die
 
-	if ! use system-libfmt; then # libfmt >= 9
-		sed -i '/fmt.*REQUIRED/d' CMakeLists.txt || die
-	fi
-
 	# Allow compiling using older glslang
-	if use system-vulkan -a has_version '<dev-util/glslang-1.3.256'; then
-		sed -i '/Vulkan/s/256/250/' CMakeLists.txt
-	fi
+	sed -i -e '/Vulkan/s/274/275/' CMakeLists.txt || die
 
 	cmake_src_prepare
 }
@@ -161,18 +145,17 @@ src_configure() {
 		-DENABLE_COMPATIBILITY_LIST_DOWNLOAD=$(usex compatibility-list)
 		-DENABLE_CUBEB=$(usex cubeb)
 		-DENABLE_LIBUSB=ON
-		-DENABLE_QT=$(usex qt5)
-		-DENABLE_QT_TRANSLATION=$(usex qt5)
+		-DENABLE_QT=$(usev qt5 ON || usev qt6 ON || echo OFF )
+		-DENABLE_QT_TRANSLATION=$(usev qt5 ON || usev qt6 ON || echo OFF )
 		-DENABLE_QT6=$(usex qt6)
 		-DENABLE_SDL2=$(usex sdl)
 		-DENABLE_WEB_SERVICE=$(usex webservice)
-		-DSIRIT_USE_SYSTEM_SPIRV_HEADERS=$([ use system-vulkan ] && echo OFF || echo ON)
+		-DSIRIT_USE_SYSTEM_SPIRV_HEADERS=yes
 		-DUSE_DISCORD_PRESENCE=$(usex discord)
 		-DYUZU_TESTS=$(usex test)
-		-DYUZU_USE_EXTERNAL_VULKAN_HEADERS=$([ use system-vulkan ] && echo ON || echo OFF)
-		-DYUZU_USE_EXTERNAL_VULKAN_UTILITY_LIBRARIES=$([ use system-vulkan ] && echo ON || echo OFF)
+		-DYUZU_USE_EXTERNAL_VULKAN_HEADERS=$(usex system-vulkan no yes)
+		-DYUZU_USE_EXTERNAL_VULKAN_UTILITY_LIBRARIES=$(usex system-vulkan no yes)
 		-DYUZU_USE_EXTERNAL_SDL2=OFF
-		-DYUZU_CHECK_SUBMODULES=false
 		-DYUZU_USE_QT_WEB_ENGINE=$(usex webengine)
 	)
 
@@ -180,6 +163,7 @@ src_configure() {
 
 	# This would be better in src_unpack but it would be unlinked
 	if use compatibility-list; then
-		mv "${S}"/compatibility_list.json "${BUILD_DIR}"/dist/compatibility_list/ || die
+		#mv "${S}"/compatibility_list.json "${BUILD_DIR}"/dist/compatibility_list/ || die
+		xz --decompress --stdout "${FILESDIR}/gamedb.xz" > "${BUILD_DIR}"/dist/compatibility_list/compatibility_list.json || die
 	fi
 }
