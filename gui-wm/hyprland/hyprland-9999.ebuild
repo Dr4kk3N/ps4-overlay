@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit meson toolchain-funcs
+inherit cmake toolchain-funcs
 
 DESCRIPTION="A dynamic tiling Wayland compositor that doesn't sacrifice on its looks"
 HOMEPAGE="https://github.com/hyprwm/Hyprland"
@@ -11,6 +11,7 @@ HOMEPAGE="https://github.com/hyprwm/Hyprland"
 if [[ "${PV}" = *9999 ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/hyprwm/${PN^}.git"
+	HYPRPM_RDEPEND="=dev-libs/hyprland-protocols-9999"
 else
 	SRC_URI="https://github.com/hyprwm/${PN^}/releases/download/v${PV}/source-v${PV}.tar.gz -> ${P}.gh.tar.gz"
 	S="${WORKDIR}/${PN}-source"
@@ -25,9 +26,9 @@ IUSE="X legacy-renderer systemd"
 # hyprpm (hyprland plugin manager) requires the dependencies at runtime
 # so that it can clone, compile and install plugins.
 HYPRPM_RDEPEND="
+	${HYPRPM_RDEPEND}
 	app-alternatives/ninja
 	dev-build/cmake
-	dev-build/meson
 	dev-libs/libliftoff
 	dev-vcs/git
 	virtual/pkgconfig
@@ -63,7 +64,7 @@ WLROOTS_RDEPEND="
 "
 WLROOTS_BDEPEND="
 	>=dev-libs/wayland-protocols-1.32
-	dev-util/hyprwayland-scanner
+	>=dev-util/hyprwayland-scanner-0.3.10
 	virtual/pkgconfig
 "
 RDEPEND="
@@ -90,7 +91,6 @@ DEPEND="
 	>=dev-libs/hyprland-protocols-0.2
 	>=dev-libs/hyprlang-0.3.2
 	>=dev-libs/wayland-protocols-1.34
-	gui-apps/hyprutils
 "
 BDEPEND="
 	${WLROOTS_BDEPEND}
@@ -116,30 +116,17 @@ pkg_setup() {
 }
 
 src_configure() {
-	local emesonargs=(
-		$(meson_feature legacy-renderer legacy_renderer)
-		$(meson_feature systemd)
-		$(meson_feature X xwayland)
-		$(meson_feature X wlroots:xwayland)
+	local mycmakeargs=(
+		-DLEGACY_RENDERER=$(usex legacy-renderer '1' '0')
+		-DNO_SYSTEMD=$(usex systemd '0' '1')
+		-DNO_XWAYLAND=$(usex X '0' '1')
 		-Dwlroots:backends=drm,libinput$(usev X ',x11')
 		-Dwlroots:xcb-errors=disabled
 	)
 
-	meson_src_configure
+	cmake_src_configure
 }
 
 src_install() {
-	# First install everything except wlroots to avoid conflicts.
-	meson_src_install --skip-subprojects wlroots
-	# Then install development files (mainly wlroots) for bug #916760.
-	meson_src_install --tags devel
-
-	# Wlroots headers are required by hyprland-plugins and the pkgconfig file expects
-	# them to be in /usr/include/hyprland/wlroots, despite this they aren't installed there.
-	# Ideally you could override includedir per subproject and the install tags would
-	# be granular enough to only install headers. But its not requiring this.
-	mkdir "${ED}"/usr/include/hyprland/wlroots || die
-	mv "${ED}"/usr/include/hyprland/wlr "${ED}"/usr/include/hyprland/wlroots || die
-	# devel tag includes wlroots .pc and .a files still
-	rm -rf "${ED}"/usr/$(get_libdir)/ || die
+	cmake_src_install
 }

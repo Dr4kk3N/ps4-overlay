@@ -3,24 +3,22 @@
 
 EAPI=8
 
-inherit cmake
+inherit cmake git-r3
 
 DESCRIPTION="The hyprland cursor format, library and utilities"
 HOMEPAGE="https://github.com/hyprwm/hyprcursor"
-SRC_URI="https://github.com/hyprwm/hyprcursor/archive/v${PV}.tar.gz -> ${P}.gh.tar.gz"
+EGIT_REPO_URI="${HOMEPAGE}.git"
 
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="~amd64 ~riscv"
 
-# Disable tests since as per upstream, tests require a theme to be installed
+# Disable tests since as per the documentation, tests require a theme to be installed
 # See also https://github.com/hyprwm/hyprcursor/commit/94361fd8a75178b92c4bb24dcd8c7fac8423acf3
 RESTRICT="test"
-
 RDEPEND="
-	dev-cpp/tomlplusplus
-	>=dev-libs/hyprlang-0.4.2
+	dev-libs/hyprlang
 	dev-libs/libzip
-	gnome-base/librsvg:2
+	gnome-base/librsvg
 	x11-libs/cairo
 "
