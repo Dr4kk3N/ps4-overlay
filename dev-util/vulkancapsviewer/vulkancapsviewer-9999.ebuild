@@ -4,7 +4,7 @@
 EAPI=8
 
 MY_PN=VulkanCapsViewer
-PYTHON_COMPAT=( python3_{9..11} )
+PYTHON_COMPAT=( python3_{9..12} )
 inherit cmake-multilib python-any-r1 xdg-utils
 
 if [[ ${PV} == *9999* ]]; then
