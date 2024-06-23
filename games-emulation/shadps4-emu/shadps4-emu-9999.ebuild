@@ -18,24 +18,28 @@ then
 			  'externals/discord-rpc' \
 			  'externals/fmt' \
 			  'externals/glslang' \
+			  'externals/magic_enum' \
 			  'externals/robin-map' \
 			  'externals/sdl3' \
+			  'externals/sirit' \
+			  'externals/toml11' \
+			  'externals/tracy' \
 			  'externals/wma' \
 			  'externals/vulkan-headers' \
+			  'externals/winpthread' \
+			  'externals/xbyak' \
+			  'externals/xxhash' \
 			  'externals/zlib-ng' \
-			  'third-party/magic_enum' \
-			  'third-party/toml11' \
-			  'third-party/vulkan' \
-			  'third-party/winpthread' \
-			  'third-party/xxHash' \
-			  'third-party/zydis/dependencies'
+			  'externals/zydis' \
+			  'externals/zydis/dependencies/zycore' \
+			  'externals/sirit/externals/SPIRV-Headers'
 			)
 	inherit git-r3
 else
-	EGIT_COMMIT=0f2540a0d1133950467845f20b1e003181147781
-	ZYDIS_COMMIT=a6d0c713b71b5009634868389f0ff551871273d6
+	EGIT_COMMIT=86911747bf64324cfd438afc08f6f6a0a9f7ff41
+	ZYDIS_COMMIT=5a68f639e4f01604cc7bfc8d313f583a8137e3d3
 	SRC_URI="
-		https://github.com/dolphin-emu/dolphin/archive/${EGIT_COMMIT}.tar.gz
+		https://github.com/shadps4-emu/shadPS4/archive/${EGIT_COMMIT}.tar.gz
 			-> ${P}.tar.gz
 		https://github.com/zyantific/zydis/archive/${ZYDIS_COMMIT}.tar.gz
 		mgba? (

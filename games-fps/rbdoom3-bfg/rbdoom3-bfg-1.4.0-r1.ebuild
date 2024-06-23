@@ -5,9 +5,13 @@ EAPI=8
 
 inherit cmake
 
+GLSLANG_HASH="bcf6a2430e99e8fc24f9f266e99316905e6d5134"
+
 DESCRIPTION="Doom 3 BFG Edition with modern engine features"
 HOMEPAGE="https://www.moddb.com/mods/rbdoom-3-bfg"
-SRC_URI="https://github.com/RobertBeckebans/RBDOOM-3-BFG/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/RobertBeckebans/RBDOOM-3-BFG/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz
+	https://github.com/KhronosGroup/glslang/archive/${GLSLANG_HASH}.zip -> ${P}-glslang.zip
+"
 
 # GPL-3			- Main Code
 # BSD			- msinttypes, TinyEXR, OpenEXR
@@ -61,18 +65,28 @@ BDEPEND=""
 S=${WORKDIR}/RBDOOM-3-BFG-${PV}/neo
 CMAKE_BUILD_TYPE=Release
 
-#PATCHES=(
+PATCHES=(
 	# Remove non C compliant code in Material.h - Fixed Upstream
-	#"${FILESDIR}"/${PN}-${PV}-fix-non-standard-C-typedef.patch
+	"${FILESDIR}"/${PN}-${PV}-fix-non-standard-C-typedef.patch
 
 	# Remove JPEG_INTERNALS from Cinematic.cpp
-	#"${FILESDIR}"/${PN}-remove-jpeg-internals-in-renderer.patch
+	"${FILESDIR}"/${PN}-remove-jpeg-internals-in-renderer.patch
 	# Fix bfgimgui include
-	#"${FILESDIR}"/${PN}-fix-bfgimgui-include.patch
+	"${FILESDIR}"/${PN}-fix-bfgimgui-include.patch
 
 	# Use system glslang; Makes installation easier
-	#"${FILESDIR}"/${PN}-system-glslang.patch
-#)
+	"${FILESDIR}"/${PN}-system-glslang.patch
+)
+
+src_unpack() {
+	unpack ${P}.tar.gz
+
+	if ( use vulkan ); then
+		unpack ${P}-glslang.zip
+		rmdir ${S}/extern/glslang
+		mv ${WORKDIR}/glslang-${GLSLANG_HASH} ${S}/extern/glslang
+	fi
+}
 
 src_configure() {
 	mycmakeargs=(
