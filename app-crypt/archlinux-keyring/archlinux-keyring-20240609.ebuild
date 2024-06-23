@@ -12,7 +12,7 @@ LICENSE="GPL-2" # "GPL" for the Arch linux package
 SLOT="0"
 
 KEYWORDS="~amd64"
-PATCHES="${FILESDIR}/01_adapt_to_sequoia_sq_0_34.patch"
+#PATCHES="${FILESDIR}/01_adapt_to_sequoia_sq_0_34.patch"
 
 BDEPEND=">=app-crypt/sequoia-sq-0.33.0"
 
