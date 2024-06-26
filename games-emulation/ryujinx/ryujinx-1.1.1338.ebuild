@@ -28,7 +28,7 @@ avalonia.themes.simple@11.0.10
 avalonia.win32@11.0.10
 avalonia.x11@11.0.10
 commandlineparser@2.9.1
-concentus@1.1.7
+concentus@2.2.0
 discordrichpresence@1.2.1.24
 dynamicdata@8.4.1
 excss@4.2.3
@@ -63,11 +63,11 @@ microsoft.csharp@4.3.0
 microsoft.csharp@4.7.0
 microsoft.dotnet.platformabstractions@3.1.6
 microsoft.extensions.dependencymodel@6.0.0
-microsoft.identitymodel.abstractions@7.5.1
-microsoft.identitymodel.jsonwebtokens@7.5.1
-microsoft.identitymodel.logging@7.5.1
-microsoft.identitymodel.tokens@7.5.1
-microsoft.io.recyclablememorystream@3.0.0
+microsoft.identitymodel.abstractions@7.6.2
+microsoft.identitymodel.jsonwebtokens@7.6.2
+microsoft.identitymodel.logging@7.6.2
+microsoft.identitymodel.tokens@7.6.2
+microsoft.io.recyclablememorystream@3.0.1
 microsoft.netcore.platforms@1.0.1
 microsoft.netcore.platforms@1.1.0
 microsoft.netcore.platforms@2.0.0
@@ -383,6 +383,10 @@ src_test() {
 }
 
 src_install() {
+	# Bug https://bugs.gentoo.org/933075
+        # and bug https://github.com/Ryujinx/Ryujinx/issues/5566
+        dotnet-pkg-base_append-launchervar "GDK_BACKEND=x11"
+
 	dotnet-pkg-base_install
 
 	# "Ryujinx.sh" launcher script is only copied for "linux-x64" RID,
