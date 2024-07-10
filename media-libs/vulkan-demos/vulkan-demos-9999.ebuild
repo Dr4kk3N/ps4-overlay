@@ -4,7 +4,7 @@
 
 EAPI=7
 
-inherit git-r3 eutils cmake
+inherit git-r3 cmake
 
 DESCRIPTION="Examples and demos for the Vulkan API"
 HOMEPAGE="https://github.com/SaschaWillems/Vulkan"
@@ -45,7 +45,6 @@ src_install() {
 	cd ${BUILD_DIR}/bin/
 	for filename in * ; do mv "$filename" "vulkan$filename"; done;
 	doexe ${BUILD_DIR}/bin/*
- 
 
 	insinto /usr/share/vulkan/data
 	doins -r ${S}/data/*
