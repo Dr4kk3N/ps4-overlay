@@ -17,7 +17,7 @@ SLOT="0"
 KEYWORDS=""
 
 RDEPEND="media-libs/vulkan-loader
-	dev-util/cmake
+	dev-build/cmake
 	media-libs/assimp"
 
 DEPEND="${RDEPEND}
