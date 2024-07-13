@@ -22,7 +22,8 @@ if [[ ${PV} == 9999 ]]; then
 			  "external/obstack"
 			  "external/partio_zip"
 			  "external/sexp-cpp"
-			  "external/squirrel"
+			  "external/simplesquirrel"
+			  "external/simplesquirrel/libs/squirrel"
 			  "external/tinygettext"
 			)
 else
@@ -59,14 +60,21 @@ BDEPEND="
 	virtual/pkgconfig
 "
 
-PATCHES=(
-	"${FILESDIR}"/${PN}-0.5.0-tinygettext.patch
-	"${FILESDIR}"/${PN}-0.6.3-missing-include.patch
-)
+#PATCHES=(
+#	"${FILESDIR}"/${PN}-0.6.3-missing-include.patch
+#)
 
+#	"${FILESDIR}"/${PN}-0.5.0-tinygettext.patch
 #	"${FILESDIR}"/${PN}-0.6.0-{license,icon,obstack}.patch
 #	"${FILESDIR}"/${PN}-0.6.3-squirrel-CVE-2021-41556.patch
 #       "${FILESDIR}"/${PN}-0.6.3-squirrel-CVE-2022-30292.patch
+
+src_prepare() {
+   default
+   #  usr/lib/libsimplesquirrel.so
+   sed -i "s|SET(LIB_INSTALL_DIR \"lib\/\"|SET(LIB_INSTALL_DIR \"$(get_libdir)/\"|" external/simplesquirrel/libs/squirrel/CMakeLists.txt
+   cmake_src_prepare
+}
 
 src_configure() {
 	local mycmakeargs=(
