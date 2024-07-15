@@ -1,5 +1,5 @@
-# Copyright 2023 Kirixetamine <revelation@krxt.dev>
-# Distributed under the terms of the ISC License
+# Copyright 1999-2024 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
@@ -8,38 +8,36 @@ inherit meson
 DESCRIPTION="The theme from libadwaita ported to GTK-3"
 HOMEPAGE="https://github.com/lassekongo83/adw-gtk3"
 
-if [[ ${PV} == 9999 ]]; then
+if [[ "${PV}" = 9999 ]]; then
 	inherit git-r3
-	EGIT_REPO_URI="https://github.com/lassekongo83/adw-gtk3"
+
+	EGIT_REPO_URI="https://github.com/lassekongo83/adw-gtk3.git"
 else
 	SRC_URI="https://github.com/lassekongo83/adw-gtk3/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~amd64 ~x86"
+	KEYWORDS="~amd64"
 fi
 
 LICENSE="LGPL-2.1"
 SLOT="0"
+IUSE="dark"
+RESTRICT="binchecks strip test"
 
-BDEPEND="
-	dev-lang/sassc
-	dev-build/ninja
+BDEPEND="dev-lang/sassc"
+
+RDEPEND="
+	|| (
+		gui-libs/gtk:4
+		>=x11-libs/gtk+-3.24:3
+	)
 "
 
-src_compile() {
-	meson build
-	meson compile -C build
-}
+DOCS=(
+	CONTRIBUTING.md
+	README.md
+)
 
-src_install() {
-	local themes=(
-		adw-gtk3
-		adw-gtk3-dark
-	)
+src_configure() {
+	local emesonargs=( $(meson_use dark) )
 
-	meson install -C build --destdir ${S}/complete
-
-	insinto /usr/share/themes
-	for theme in ${themes[@]}; do
-		doins -r "complete/usr/share/themes/${theme}"
-	done
-	einstalldocs
+	meson_src_configure
 }
