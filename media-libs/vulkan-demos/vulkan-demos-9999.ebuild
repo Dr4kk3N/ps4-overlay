@@ -47,5 +47,5 @@ src_install() {
 	doexe ${BUILD_DIR}/bin/*
 
 	insinto /usr/share/vulkan/data
-	doins -r ${S}/data/*
+	doins -r ${S}/shaders
 }
