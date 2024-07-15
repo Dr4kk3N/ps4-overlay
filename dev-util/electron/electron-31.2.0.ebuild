@@ -14,11 +14,11 @@ inherit check-reqs chromium-2 desktop flag-o-matic llvm ninja-utils pax-utils
 inherit python-any-r1 readme.gentoo-r1 toolchain-funcs xdg-utils
 
 CHROMIUM_VERSION_WARNING="false"
-CHROMIUM_VERSION="126.0.6478.61"
+CHROMIUM_VERSION="126.0.6478.127"
 CHROMIUM_P="chromium-${CHROMIUM_VERSION}"
-NODE_VERSION="20.14.0"
+NODE_VERSION="20.15.0"
 NODE_P="node-v${NODE_VERSION}"
-UGC_PVR="${CHROMIUM_VERSION}-1"
+UGC_PVR="126.0.6478.114-1"
 UGC_PF="ungoogled-chromium-${UGC_PVR}"
 UGC_WD="${WORKDIR}/${UGC_PF}"
 
@@ -31,10 +31,12 @@ UGC_WD="${WORKDIR}/${UGC_PF}"
 
 DESCRIPTION="Cross platform application development framework based on web technologies"
 HOMEPAGE="https://electronjs.org/"
-PATCHSET_PPC64="124.0.6367.78-1raptor0~deb12u1"
+PATCHSET_PPC64="126.0.6478.126-1raptor0~deb12u1"
+PATCHSET_DEBIAN="126.0.6478.126-1"
 PATCH_V="${CHROMIUM_VERSION%%\.*}"
 SRC_URI="mirror+https://commondatastorage.googleapis.com/chromium-browser-official/${CHROMIUM_P}.tar.xz
 	mirror+https://gitlab.com/Matt.Jolly/chromium-patches/-/archive/${PATCH_V}/chromium-patches-${PATCH_V}.tar.bz2
+	mirror+https://salsa.debian.org/chromium-team/chromium/-/archive/debian/${PATCHSET_DEBIAN}/chromium-debian-${PATCHSET_DEBIAN}.tar.bz2
 	mirror+https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.xz
 	https://github.com/electron/electron/archive/v${PV}.tar.gz -> ${P}.tar.gz
 	ppc64? (
@@ -45,6 +47,8 @@ SRC_URI="mirror+https://commondatastorage.googleapis.com/chromium-browser-offici
 		https://github.com/ungoogled-software/ungoogled-chromium/archive/${UGC_PVR}.tar.gz -> ${UGC_PF}.tar.gz
 	)
 
+	https://codeload.github.com/nodejs/nan/tar.gz/e14bdcd1f72d62bca1d541b66da43130384ec213
+	https://codeload.github.com/nodejs/nan/tar.gz/e14bdcd1f72d62bca1d541b66da43130384ec213
 	https://codeload.github.com/nodejs/nan/tar.gz/e14bdcd1f72d62bca1d541b66da43130384ec213
 	https://codeload.github.com/nodejs/nan/tar.gz/e14bdcd1f72d62bca1d541b66da43130384ec213
 	https://codeload.github.com/nodejs/nan/tar.gz/e14bdcd1f72d62bca1d541b66da43130384ec213
@@ -144,7 +148,6 @@ SRC_URI="mirror+https://commondatastorage.googleapis.com/chromium-browser-offici
 	https://registry.yarnpkg.com/@types/events/-/events-3.0.0.tgz -> @types-events-3.0.0.tgz
 	https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.17.28.tgz -> @types-express-serve-static-core-4.17.28.tgz
 	https://registry.yarnpkg.com/@types/express/-/express-4.17.13.tgz -> @types-express-4.17.13.tgz
-	https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-9.0.1.tgz -> @types-fs-extra-9.0.1.tgz
 	https://registry.yarnpkg.com/@types/glob/-/glob-7.1.1.tgz -> @types-glob-7.1.1.tgz
 	https://registry.yarnpkg.com/@types/http-cache-semantics/-/http-cache-semantics-4.0.1.tgz -> @types-http-cache-semantics-4.0.1.tgz
 	https://registry.yarnpkg.com/@types/is-empty/-/is-empty-1.2.0.tgz -> @types-is-empty-1.2.0.tgz
@@ -156,7 +159,6 @@ SRC_URI="mirror+https://commondatastorage.googleapis.com/chromium-browser-offici
 	https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz -> @types-json5-0.0.29.tgz
 	https://registry.yarnpkg.com/@types/jsonwebtoken/-/jsonwebtoken-9.0.1.tgz -> @types-jsonwebtoken-9.0.1.tgz
 	https://registry.yarnpkg.com/@types/keyv/-/keyv-3.1.4.tgz -> @types-keyv-3.1.4.tgz
-	https://registry.yarnpkg.com/@types/klaw/-/klaw-3.0.1.tgz -> @types-klaw-3.0.1.tgz
 	https://registry.yarnpkg.com/@types/linkify-it/-/linkify-it-2.1.0.tgz -> @types-linkify-it-2.1.0.tgz
 	https://registry.yarnpkg.com/@types/markdown-it/-/markdown-it-12.2.3.tgz -> @types-markdown-it-12.2.3.tgz
 	https://registry.yarnpkg.com/@types/mdast/-/mdast-3.0.7.tgz -> @types-mdast-3.0.7.tgz
@@ -258,7 +260,6 @@ SRC_URI="mirror+https://commondatastorage.googleapis.com/chromium-browser-offici
 	https://registry.yarnpkg.com/astral-regex/-/astral-regex-2.0.0.tgz
 	https://registry.yarnpkg.com/async/-/async-3.2.4.tgz
 	https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz
-	https://registry.yarnpkg.com/at-least-node/-/at-least-node-1.0.0.tgz
 	https://registry.yarnpkg.com/available-typed-arrays/-/available-typed-arrays-1.0.5.tgz
 	https://registry.yarnpkg.com/bail/-/bail-2.0.1.tgz
 	https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.2.tgz
@@ -459,7 +460,6 @@ SRC_URI="mirror+https://commondatastorage.googleapis.com/chromium-browser-offici
 	https://registry.yarnpkg.com/fs-extra/-/fs-extra-10.1.0.tgz
 	https://registry.yarnpkg.com/fs-extra/-/fs-extra-7.0.1.tgz
 	https://registry.yarnpkg.com/fs-extra/-/fs-extra-8.1.0.tgz
-	https://registry.yarnpkg.com/fs-extra/-/fs-extra-9.0.1.tgz
 	https://registry.yarnpkg.com/fs-minipass/-/fs-minipass-2.1.0.tgz
 	https://registry.yarnpkg.com/fs.realpath/-/fs.realpath-1.0.0.tgz
 	https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.2.tgz
@@ -592,7 +592,6 @@ SRC_URI="mirror+https://commondatastorage.googleapis.com/chromium-browser-offici
 	https://registry.yarnpkg.com/jws/-/jws-3.2.2.tgz
 	https://registry.yarnpkg.com/keyv/-/keyv-4.3.1.tgz
 	https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.3.tgz
-	https://registry.yarnpkg.com/klaw/-/klaw-3.0.0.tgz
 	https://registry.yarnpkg.com/kleur/-/kleur-4.1.5.tgz
 	https://registry.yarnpkg.com/levn/-/levn-0.4.1.tgz
 	https://registry.yarnpkg.com/libnpmconfig/-/libnpmconfig-1.2.1.tgz
@@ -1317,6 +1316,7 @@ src_unpack() {
 	unpack "${P}.tar.gz"
 	unpack "node-v${NODE_VERSION}.tar.xz"
 	unpack "chromium-patches-${PATCH_V}.tar.bz2"
+	unpack "chromium-debian-${PATCHSET_DEBIAN}.tar.bz2"
 	use ungoogled && unpack "${UGC_PF}.tar.gz"
 	if use ppc64; then
 		unpack "chromium_${PATCHSET_PPC64}.debian.tar.xz"
@@ -1401,26 +1401,29 @@ src_prepare() {
 		"${FILESDIR}/perfetto-system-zlib.patch"
 		"${FILESDIR}/gtk-fix-prefers-color-scheme-query.diff"
 		"${FILESDIR}/restore-x86-r2.patch"
+		"${FILESDIR}/chromium-126-observers-fix.patch"
+		"${FILESDIR}/clang-19-fix.patch"
 	)
 
+	PATCHES_DEB="${WORKDIR}/chromium-debian-${PATCHSET_DEBIAN}/debian/patches"
 	if ! use libcxx ; then
 		PATCHES+=(
 			"${FILESDIR}/chromium-124-libstdc++.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc00000.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc0000.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc000.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc00.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc0.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc1.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc11.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc2.patch"
+			"${PATCHES_DEB}/fixes/bad-font-gc3.patch"
 		)
-			# "${PATCHES_DEB}/fixes/bad-font-gc00000.patch"
-			# "${PATCHES_DEB}/fixes/bad-font-gc0000.patch"
-			# "${PATCHES_DEB}/fixes/bad-font-gc000.patch"
-			# "${PATCHES_DEB}/fixes/bad-font-gc00.patch"
-			# "${PATCHES_DEB}/fixes/bad-font-gc0.patch"
-			# "${PATCHES_DEB}/fixes/bad-font-gc1.patch"
-			# "${PATCHES_DEB}/fixes/bad-font-gc11.patch"
-			# "${PATCHES_DEB}/fixes/bad-font-gc2.patch"
-			# "${PATCHES_DEB}/fixes/bad-font-gc3.patch"
 	fi
 
-	if use clang ; then
-		PATCHES+=( "${FILESDIR}/chromium-120-autofill-clang.patch" )
-	fi
+	# if use clang ; then
+	# 	PATCHES+=( "${FILESDIR}/chromium-120-autofill-clang.patch" )
+	# fi
 
 	if [ ! -z "${CHROMIUM_COMMITS[*]}" ]; then
 		for i in "${!CHROMIUM_COMMITS[@]}"; do

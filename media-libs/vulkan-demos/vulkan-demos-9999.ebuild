@@ -48,4 +48,6 @@ src_install() {
 
 	insinto /usr/share/vulkan/data
 	doins -r ${S}/shaders
+	doins -r ${S}/assets
+	doins -r ${S}/images
 }

@@ -1,23 +1,22 @@
-# Copyright 1999-2023 Gentoo Authors
+# Copyright 1999-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
 inherit desktop font
 
-REVISION=71415
+REVISION=74745
 
 DESCRIPTION="An open source metaverse viewer"
 HOMEPAGE="http://www.firestormviewer.org/"
 
 MY_PV=$(ver_cut 1-3)
 MY_PV=${MY_PV//\./-}
-MY_P="Phoenix-Firestorm-Alphax64-${MY_PV}-${REVISION}"
+MY_P="Phoenix-Firestorm-Releasex64-${MY_PV}-${REVISION}"
 SRC_URI="
-	https://downloads.firestormviewer.org/preview/linux/${MY_P}.tar.xz
+	https://downloads.firestormviewer.org/release/linux/${MY_P}.tar.xz
 "
-# https://downloads.firestormviewer.org/preview/linux/Phoenix-Firestorm-Betax64-6-6-9-68580.tar.xz
-# https://downloads.firestormviewer.org/preview/linux/Phoenix-Firestorm-Releasex64-6-6-8-68355.tar.xz
+# https://downloads.firestormviewer.org/release/linux/Phoenix-Firestorm-Releasex64-7-1-9-74745.tar.xz
 
 RESTRICT="mirror"
 
