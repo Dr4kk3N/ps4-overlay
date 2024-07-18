@@ -223,11 +223,11 @@ RDEPEND="
 	>=dev-cpp/robin-map-0.6.2
 	>=dev-libs/libfmt-9.1.0
 	color-management? ( >=media-libs/opencolorio-2.3.0:= )
-	openexr? ( >=media-libs/openexr-3.2.1:= )
-	openpgl? (
-		<media-libs/openpgl-0.6[tbb?]
-		>=media-libs/openpgl-0.5[tbb?]
+	openexr? (
+		>=dev-libs/imath-3.1.7:=
+		>=media-libs/openexr-3.2.1:0=
 	)
+	openpgl? ( media-libs/openpgl:= )
 	opensubdiv? ( >=media-libs/opensubdiv-3.6.0[cuda?,openmp?,tbb?,opengl] )
 	openvdb? (
 		>=media-gfx/openvdb-9.0.0:=[${OPENVDB_SINGLE_USEDEP},cuda?,nanovdb?]
