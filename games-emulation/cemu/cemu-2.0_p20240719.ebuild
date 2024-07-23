@@ -7,7 +7,7 @@ inherit cmake desktop xdg
 
 DESCRIPTION="Wii U emulator."
 HOMEPAGE="https://cemu.info/ https://github.com/cemu-project/Cemu"
-SHA="9d366937cd1c5908e073ecd726a0b12763838ef7"
+SHA="7522c8470ee27d50a68ba662ae721b69018f3a8f"
 MY_PN="Cemu"
 GLSLANG_SHA="36d08c0d940cf307a23928299ef52c7970d8cee6"
 IMGUI_PV="1.88"
@@ -56,6 +56,8 @@ src_prepare() {
 		-i src/CMakeLists.txt || die
 	mv "${WORKDIR}/glslang-${GLSLANG_SHA}" "${S}/glslang" || die
 	sed -re 's/find_package\(glslang.*/add_subdirectory(glslang)/' -i CMakeLists.txt || die
+	sed -re '1s/^\.rodata$/.section .rodata,"",%progbits/' -i src/resource/embedded/fontawesome.S || die
+	echo '.section .note.GNU-stack,"",%progbits' >> src/resource/embedded/fontawesome.S || die
 	cmake_src_prepare
 	rmdir dependencies/imgui || die
 	mv "${WORKDIR}/imgui-${IMGUI_PV}" dependencies/imgui || die
