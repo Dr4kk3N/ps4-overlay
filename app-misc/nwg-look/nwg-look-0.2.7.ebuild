@@ -5,9 +5,7 @@ EAPI=8
 
 DESCRIPTION="GTK3 settings editor adapted to work in the sway / wlroots environment"
 HOMEPAGE="https://github.com/nwg-piotr/nwg-look"
-SRC_URI="https://github.com/nwg-piotr/nwg-look/archive/refs/tags/v${PV}.tar.gz -> nwg-look-${PV}.tar.gz
-				https://github.com/micielski/nwg-look-vendor/releases/download/${PV}/nwg-look-${PV}-vendor.tar.xz
-"
+SRC_URI="https://github.com/nwg-piotr/nwg-look/archive/refs/tags/v${PV}.tar.gz -> nwg-look-${PV}.tar.gz"
 
 inherit go-module xdg desktop
 

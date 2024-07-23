@@ -1,0 +1,31 @@
+From 58a8528da7d17a17d9de9c18a6cf866bb27d8553 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Matt=C3=A9o=20Rossillol=E2=80=91=E2=80=91Laruelle?=
+ <beatussum@protonmail.com>
+Date: Sun, 7 Jul 2024 12:38:02 +0200
+Subject: [PATCH] fix cxxflags
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This commit removes the `-O3` cxxflag added by CMakeLists.txt.
+
+Signed-off-by: Mattéo Rossillol‑‑Laruelle <beatussum@protonmail.com>
+---
+ CMakeLists.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 162a1e6..488ee2b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,7 +14,6 @@ if(CMAKE_BUILD_TYPE MATCHES Debug OR CMAKE_BUILD_TYPE MATCHES DEBUG)
+     message(STATUS "Configuring hyprlock in Debug with CMake")
+     add_compile_definitions(HYPRLAND_DEBUG)
+ else()
+-    add_compile_options(-O3)
+     message(STATUS "Configuring hyprlock in Release with CMake")
+ endif()
+ 
+-- 
+2.44.2
+
