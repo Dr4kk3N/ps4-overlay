@@ -24,7 +24,7 @@ LICENSE="BSD"
 SLOT="0"
 
 RDEPEND="
-	dev-util/hyprutils
+	gui-libs/hyprutils
 	dev-libs/date
 	dev-libs/wayland
 	media-libs/mesa[opengl]
