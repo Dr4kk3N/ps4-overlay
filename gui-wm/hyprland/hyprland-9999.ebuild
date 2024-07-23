@@ -120,6 +120,8 @@ src_prepare() {
 
 	# Don't create symlinks.
         sed -i -e '353,359d' CMakeLists.txt || die
+
+	cmake_src_prepare
 }
 
 src_configure() {
