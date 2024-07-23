@@ -115,6 +115,11 @@ pkg_setup() {
 	fi
 }
 
+src_prepare() {
+	# Don't create symlinks.
+        sed -i -e '353,359d' CMakeLists.txt || die
+}
+
 src_configure() {
 	local mycmakeargs=(
 		-DLEGACY_RENDERER=$(usex legacy-renderer '1' '0')

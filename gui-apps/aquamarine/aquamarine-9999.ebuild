@@ -3,9 +3,7 @@
 
 EAPI=8
 
-inherit cmake toolchain-funcs flag-o-matic
-
-replace-flags -O2 -O3
+inherit cmake toolchain-funcs
 
 DESCRIPTION="A very light linux rendering backend library."
 HOMEPAGE="https://github.com/hyprwm/aquamarine"
@@ -51,19 +49,11 @@ DEPEND="
 "
 BDEPEND="
 	dev-build/cmake
-	dev-util/hyprwayland-scanner
+	>=dev-util/hyprwayland-scanner-0.4.0
 	virtual/pkgconfig
 "
 
 src_configure() {
-#	local mycmakeargs=(
-#		-DLEGACY_RENDERER=$(usex legacy-renderer '1' '0')
-#		-DNO_SYSTEMD=$(usex systemd '0' '1')
-#		-DNO_XWAYLAND=$(usex X '0' '1')
-#		-Dwlroots:backends=drm,libinput$(usev X ',x11')
-#		-Dwlroots:xcb-errors=disabled
-#	)
-
 	cmake_src_configure
 }
 
