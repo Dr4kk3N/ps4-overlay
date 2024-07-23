@@ -3,16 +3,18 @@
 
 EAPI=8
 
-inherit cmake toolchain-funcs
+inherit cmake toolchain-funcs flag-o-matic
+
+replace-flags -O2 -O3
 
 DESCRIPTION="A very light linux rendering backend library."
 HOMEPAGE="https://github.com/hyprwm/aquamarine"
 
 if [[ "${PV}" = *9999 ]]; then
 	inherit git-r3
-	EGIT_REPO_URI="https://github.com/hyprwm/aquamarine/${PN^}.git"
+	EGIT_REPO_URI="https://github.com/hyprwm/aquamarine/${PN}.git"
 else
-	SRC_URI="https://github.com/hyprwm/${PN^}/releases/download/v${PV}/source-v${PV}.tar.gz -> ${P}.gh.tar.gz"
+	SRC_URI="https://github.com/hyprwm/${PN}/releases/download/v${PV}/source-v${PV}.tar.gz -> ${P}.gh.tar.gz"
 	S="${WORKDIR}/${PN}-source"
 
 	KEYWORDS="~amd64"
@@ -20,7 +22,7 @@ fi
 
 LICENSE="BSD"
 SLOT="0"
-IUSE="X legacy-renderer systemd"
+IUSE="X debug"
 
 RDEPEND="
 	dev-libs/glib:2
@@ -48,7 +50,6 @@ DEPEND="
 	x11-libs/pixman
 "
 BDEPEND="
-	app-misc/jq
 	dev-build/cmake
 	dev-util/hyprwayland-scanner
 	virtual/pkgconfig
