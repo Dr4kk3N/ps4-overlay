@@ -116,6 +116,8 @@ pkg_setup() {
 }
 
 src_prepare() {
+	default
+
 	# Don't create symlinks.
         sed -i -e '353,359d' CMakeLists.txt || die
 }
