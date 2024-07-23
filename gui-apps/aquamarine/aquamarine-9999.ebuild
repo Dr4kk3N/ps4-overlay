@@ -12,7 +12,7 @@ HOMEPAGE="https://github.com/hyprwm/aquamarine"
 
 if [[ "${PV}" = *9999 ]]; then
 	inherit git-r3
-	EGIT_REPO_URI="https://github.com/hyprwm/aquamarine/${PN}.git"
+	EGIT_REPO_URI="https://github.com/hyprwm/${PN}.git"
 else
 	SRC_URI="https://github.com/hyprwm/${PN}/releases/download/v${PV}/source-v${PV}.tar.gz -> ${P}.gh.tar.gz"
 	S="${WORKDIR}/${PN}-source"
