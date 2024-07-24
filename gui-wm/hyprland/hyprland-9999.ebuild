@@ -33,43 +33,9 @@ HYPRPM_RDEPEND="
 	dev-vcs/git
 	virtual/pkgconfig
 "
-# bundled wlroots has the following dependency string according to included headers.
-# wlroots[drm,gles2-renderer,libinput,x11-backend?,X?]
-# enable x11-backend with X and vice versa
-WLROOTS_DEPEND="
-	>=dev-libs/wayland-1.22
-	media-libs/libglvnd
-	|| (
-		>=media-libs/mesa-24.1.0_rc1[opengl]
-		<media-libs/mesa-24.1.0_rc1[egl(+),gles2]
-	)
-	>=x11-libs/libdrm-2.4.114
-	x11-libs/libxkbcommon
-	>=x11-libs/pixman-0.42.0
-	media-libs/libdisplay-info
-	sys-apps/hwdata
-	>=dev-libs/libinput-1.14.0:=
-	sys-auth/seatd:=
-	virtual/libudev:=
-	X? (
-		x11-libs/libxcb:=
-		x11-libs/xcb-util-errors
-		x11-libs/xcb-util-renderutil
-		x11-libs/xcb-util-wm
-		x11-base/xwayland
-	)
-"
-WLROOTS_RDEPEND="
-	${WLROOTS_DEPEND}
-"
-WLROOTS_BDEPEND="
-	>=dev-libs/wayland-protocols-1.32
-	>=dev-util/hyprwayland-scanner-0.3.10
-	virtual/pkgconfig
-"
+
 RDEPEND="
 	${HYPRPM_RDEPEND}
-	${WLROOTS_RDEPEND}
 	dev-cpp/tomlplusplus
 	dev-libs/glib:2
 	dev-libs/libinput
@@ -87,14 +53,13 @@ RDEPEND="
 "
 DEPEND="
 	${RDEPEND}
-	${WLROOTS_DEPEND}
 	>=dev-libs/hyprland-protocols-0.2
 	>=dev-libs/hyprlang-0.3.2
 	>=dev-libs/wayland-protocols-1.34
 "
 BDEPEND="
-	${WLROOTS_BDEPEND}
-	|| ( >=sys-devel/gcc-13:* >=sys-devel/clang-16:* )
+	>=sys-devel/gcc-13:*
+	>=sys-devel/clang-16:*
 	app-misc/jq
 	dev-build/cmake
 	dev-util/hyprwayland-scanner
@@ -129,8 +94,6 @@ src_configure() {
 		-DLEGACY_RENDERER=$(usex legacy-renderer '1' '0')
 		-DNO_SYSTEMD=$(usex systemd '0' '1')
 		-DNO_XWAYLAND=$(usex X '0' '1')
-		-Dwlroots:backends=drm,libinput$(usev X ',x11')
-		-Dwlroots:xcb-errors=disabled
 	)
 
 	cmake_src_configure
