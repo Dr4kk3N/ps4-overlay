@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit cmake desktop xdg-utils pax-utils
+inherit cmake desktop flag-o-matic xdg-utils pax-utils
 
 if [[ ${PV} == *9999 ]]
 then
@@ -11,13 +11,16 @@ then
 	EGIT_SUBMODULES=( Externals/mGBA/mgba Externals/zlib-ng/zlib-ng Externals/minizip-ng/minizip-ng Externals/enet/enet Externals/expr Externals/FatFs Externals/rcheevos/rcheevos Externals/implot/implot Externals/tinygltf/tinygltf )
 	inherit git-r3
 else
-	EGIT_COMMIT=0f2540a0d1133950467845f20b1e003181147781
-	ENET_COMMIT=2a85cd64459f6ba038d233a634d9440490dbba12
-	IMPLOT_COMMIT=cc5e1daa5c7f2335a9460ae79c829011dc5cef2d
+#	EGIT_COMMIT=0f2540a0d1133950467845f20b1e003181147781
+	EGIT_COMMIT=b92e354389bb7c0bd114a8631b8af110d3cb3a14
 	MGBA_COMMIT=8739b22fbc90fdf0b4f6612ef9c0520f0ba44a51
 	ZLIB_NG_COMMIT=ce01b1e41da298334f8214389cc9369540a7560f
 	MINIZIP_NG_COMMIT=3eed562ef0ea3516db30d1c8ecb0e1b486d8cb70
+#	MINIZIP_NG_COMMIT=fe5fedc365f7824ada0cf9a84fb79b30d5fc97a8
+	ENET_COMMIT=2a85cd64459f6ba038d233a634d9440490dbba12
 	RCHEEVOS_COMMIT=d54cf8f1059cebc90a6f5ecdf03df69259f22054
+	IMPLOT_COMMIT=cc5e1daa5c7f2335a9460ae79c829011dc5cef2d
+	TINYGLTF_COMMIT=c5641f2c22d117da7971504591a8f6a41ece488b
 	SRC_URI="
 		https://github.com/dolphin-emu/dolphin/archive/${EGIT_COMMIT}.tar.gz
 			-> ${P}.tar.gz
@@ -27,12 +30,15 @@ else
 			)
 		https://github.com/zlib-ng/zlib-ng/archive/${ZLIB_NG_COMMIT}.tar.gz
 			-> zlib-ng-${ZLIB_NG_COMMIT}.tar.gz
+		https://github.com/zlib-ng/minizip-ng/archive/${MINIZIP_NG_COMMIT}.tar.gz
+			-> minizip-ng-${MINIZIP_NG_COMMIT}.tar.gz
+		https://github.com/lsalzman/enet/archive/${ENET_COMMIT}.tar.gz
+                        -> enet-${ENET_COMMIT}.tar.gz
 		https://github.com/RetroAchievements/rcheevos/archive/${RCHEEVOS_COMMIT}.tar.gz
 			-> rcheevos-${RCHEEVOS_COMMIT}.tar.gz
-		https://github.com/lsalzman/enet/archive/${ENET_COMMIT}.tar.gz
-			-> enet-${ENET_COMMIT}.tar.gz
 		https://github.com/epezent/implot/archive/${IMPLOT_COMMIT}.tar.gz
-			-> implot-${IMPLOT_COMMIT}.tar.gz
+			-> implot-${TINYGLTF_COMMIT}.tar.gz
+		https://github.com/syoyo/tinygltf/archive/${TINYGLTF_COMMIT}.tar.gz
 	"
 	S=${WORKDIR}/${PN}-${EGIT_COMMIT}
 	KEYWORDS="~amd64 ~arm64"
@@ -61,6 +67,7 @@ RDEPEND="
 	media-libs/libspng:=
 	media-libs/libsfml:=
 	media-libs/mesa[egl(+)]
+	net-libs/enet:1.3
 	dev-libs/vulkan-memory-allocator
 	net-libs/mbedtls:=
 	net-misc/curl:=
@@ -114,7 +121,7 @@ declare -A KEEP_BUNDLED=(
 	[tinygltf]=MIT
 	[VulkanMemoryAllocator]=MIT
 	# This is actually minizip-ng and needs minizip-ng[compat], which is masked in base profile.
-	[minizip]=ZLIB
+	[minizip-ng]=ZLIB
 	# zlib-ng[compat] is masked.
 	[zlib-ng]=ZLIB
 	[enet]=MIT
@@ -171,6 +178,9 @@ src_prepare() {
 }
 
 src_configure() {
+	# bug #891225 (https://bugs.dolphin-emu.org/issues/11481, QTBUG-61710)
+	use gui && filter-lto
+
 	local mycmakeargs=(
 		# Use ccache only when user did set FEATURES=ccache (or similar)
 		# not when ccache binary is present in system (automagic).
