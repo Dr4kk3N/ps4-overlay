@@ -71,6 +71,7 @@ RDEPEND="
 	dev-libs/vulkan-memory-allocator
 	net-libs/mbedtls:=
 	net-misc/curl:=
+	dev-perl/Net-DBus:=
 	sys-libs/readline:=
 	sys-libs/zlib:=[minizip]
 	x11-libs/libXext
