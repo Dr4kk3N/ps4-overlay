@@ -6,7 +6,7 @@ EAPI=7
 DESCRIPTION="Emulator of the Amstrad CPC and ZX Spectrum home computers and clones"
 HOMEPAGE="https://www.retrovirtualmachine.org/en/"
 
-SRC_URI="amd64? ( https://static.retrovm.org/release/2.1.15/RetroVirtualMachine.2.1.15.Linux.x64.zip )"
+SRC_URI="amd64? ( https://static.retrovm.org/release/2.1.16/RetroVirtualMachine.2.1.16.Linux.x64.zip )"
 
 inherit desktop xdg
 

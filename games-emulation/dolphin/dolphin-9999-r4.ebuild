@@ -8,15 +8,16 @@ inherit cmake desktop xdg-utils pax-utils
 if [[ ${PV} == *9999 ]]
 then
 	EGIT_REPO_URI="https://github.com/dolphin-emu/dolphin"
-	EGIT_SUBMODULES=( Externals/mGBA/mgba Externals/zlib-ng/zlib-ng Externals/enet/enet Externals/expr Externals/FatFs Externals/rcheevos/rcheevos Externals/implot/implot Externals/tinygltf/tinygltf )
+	EGIT_SUBMODULES=( Externals/mGBA/mgba Externals/zlib-ng/zlib-ng Externals/minizip-ng/minizip-ng Externals/enet/enet Externals/expr Externals/FatFs Externals/rcheevos/rcheevos Externals/implot/implot Externals/tinygltf/tinygltf )
 	inherit git-r3
 else
 	EGIT_COMMIT=0f2540a0d1133950467845f20b1e003181147781
 	ENET_COMMIT=2a85cd64459f6ba038d233a634d9440490dbba12
 	IMPLOT_COMMIT=cc5e1daa5c7f2335a9460ae79c829011dc5cef2d
-	MGBA_COMMIT=40d4c430fc36caeb7ea32fd39624947ed487d2f2
+	MGBA_COMMIT=8739b22fbc90fdf0b4f6612ef9c0520f0ba44a51
 	ZLIB_NG_COMMIT=ce01b1e41da298334f8214389cc9369540a7560f
-	RCHEEVOS_COMMIT=d9e990e6d13527532b7e2bb23164a1f3b7f33bb5
+	MINIZIP_NG_COMMIT=3eed562ef0ea3516db30d1c8ecb0e1b486d8cb70
+	RCHEEVOS_COMMIT=d54cf8f1059cebc90a6f5ecdf03df69259f22054
 	SRC_URI="
 		https://github.com/dolphin-emu/dolphin/archive/${EGIT_COMMIT}.tar.gz
 			-> ${P}.tar.gz
