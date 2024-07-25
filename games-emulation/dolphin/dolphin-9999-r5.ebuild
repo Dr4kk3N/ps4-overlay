@@ -72,6 +72,7 @@ RDEPEND="
 	net-libs/mbedtls:=
 	net-misc/curl:=
 	dev-perl/Net-DBus:=
+	dev-perl/X11-Protocol:=
 	sys-libs/readline:=
 	sys-libs/zlib:=[minizip]
 	x11-libs/libXext
