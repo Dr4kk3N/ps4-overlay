@@ -26,14 +26,12 @@ DEPEND="${RDEPEND}
 	dev-qt/qtmultimedia:5[widgets]
 	dev-qt/qtcore:5
 	dev-qt/qtgui:5[accessibility]
-	dev-qt/qtopengl:5
 	dev-qt/qtsql:5[sqlite]
 	dev-qt/qtsvg:5
 	dev-qt/qttest:5
 	dev-qt/qtwebengine:5
 	dev-qt/qtxmlpatterns:5
-	dev-qt/qtscript:5[scripttools]
-	dev-qt/linguist
+	dev-qt/linguist-tools:5
 	media-libs/libsdl
 	net-misc/rsync
 	sys-libs/zlib
@@ -41,7 +39,7 @@ DEPEND="${RDEPEND}
 	arcade? ( dev-qt/qtdeclarative:5 )
 	joystick? ( media-libs/libsdl[joystick] )
 	opengl? ( dev-qt/qtopengl:5 )
-	tools? ( dev-qt/qtscript )"
+	tools? ( dev-qt/qtscript:5[scripttools] )"
 
 # S="${WORKDIR}/${PN}"
 

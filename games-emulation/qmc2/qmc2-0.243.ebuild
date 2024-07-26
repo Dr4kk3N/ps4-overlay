@@ -7,15 +7,23 @@ inherit desktop toolchain-funcs
 
 DESCRIPTION="Frontend for MAME/MESS"
 HOMEPAGE="http://qmc2.arcadehits.net/wordpress/"
-SRC_URI="https://github.com/qmc2/qmc2-mame-fe/archive/refs/tags/v0.243.tar.gz -> ${P}.tar.gz"
+#SRC_URI="https://github.com/qmc2/qmc2-mame-fe/archive/refs/tags/v0.243.tar.gz -> ${P}.tar.gz"
 
 #http://sourceforge.net/projects/${PN}/files/${PN}/${PV}/${P}.tar.bz2/download -> ${P}.tar.bz2"
 #https://github.com/yuzu-emu/yuzu-mainline/archive/d5f6201521cdfd0be09a187d62f95d3a38f18c3e.tar.gz -> ${P}.tar.gz
 #https://github.com/qmc2/qmc2-mame-fe/archive/refs/tags/v0.243.tar.gz
 
+if [[ "${PV}" == *9999* ]] ; then
+        inherit git-r3
+        EGIT_REPO_URI="https://github.com/qmc2/qmc2-mame-fe"
+else
+	SRC_URI="https://github.com/qmc2/qmc2-mame-fe/archive/refs/tags/v0.243.tar.gz -> ${P}.tar.gz"
+#        SRC_URI="https://github.com/qmc2/qmc2-mame-fe/archive/refs/tags/v${PV}/${P}.tar.xz"
+        KEYWORDS="~x86 ~amd64"
+fi
+
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~x86 ~amd64"
 IUSE="debug +arcade joystick opengl tools"
 RESTRICT="mirror"
 
@@ -24,12 +32,12 @@ DEPEND="${RDEPEND}
 	dev-qt/qtmultimedia:5[widgets]
 	dev-qt/qtcore:5
 	dev-qt/qtgui:5[accessibility]
-	dev-qt/qtopengl:5
 	dev-qt/qtsql:5[sqlite]
 	dev-qt/qtsvg:5
 	dev-qt/qttest:5
 	dev-qt/qtwebengine:5
 	dev-qt/qtxmlpatterns:5
+	dev-qt/linguist-tools:5
 	media-libs/libsdl
 	net-misc/rsync
 	sys-libs/zlib
@@ -37,29 +45,30 @@ DEPEND="${RDEPEND}
 	arcade? ( dev-qt/qtdeclarative:5 )
 	joystick? ( media-libs/libsdl[joystick] )
 	opengl? ( dev-qt/qtopengl:5 )
-	tools? ( dev-qt/qtscript )"
+	tools? ( dev-qt/qtscript:5[scripttools] )"
 
-S="${WORKDIR}/${PN}"
+S="${WORKDIR}/qmc2-mame-fe-0.243"
 
 src_prepare() {
+	eapply_user
 	# *.desktop files belong in /usr/share/applications, not /usr/share/games/applications #
 	sed -e "s:\$(GLOBAL_DATADIR)/applications:${ED}usr/share/applications:g" \
 		-i Makefile || die
 }
 
 src_compile() {
-	FLAGS="DESTDIR=\"${ED}\" PREFIX=\"${GAMES_PREFIX}\" SYSCONFDIR=\"${GAMES_SYSCONFDIR}\" DATADIR=\"${GAMES_DATADIR}\" CTIME=0"
+	FLAGS="DESTDIR=\"${ED}\" PREFIX=\"/usr\" SYSCONFDIR=\"/etc\" DATADIR=\"/usr/share\" QMAKE=qmake5 LRELEASE=/usr/lib64/qt5/bin/lrelease LUPDATE=/usr/lib64/qt5/bin/lupdate LIBARCHIVE=1 CTIME=0"
 	emake ${FLAGS} \
 		DEBUG=$(usex debug "1" "0") \
 		JOYSTICK=$(usex joystick "1" "0") \
 		OPENGL=$(usex opengl "1" "0") \
-		PHONON=$(usex phonon "1" "0")
+		#PHONON=$(usex phonon "1" "0")
 
 	use arcade && \
 		emake ${FLAGS} arcade
 
 	use tools && \
-		emake ${FLAGS} tools
+		emake ${FLAGS} qchdman
 }
 
 src_install() {
@@ -69,7 +78,10 @@ src_install() {
 		emake ${FLAGS} arcade-install
 
 	use tools && \
-		emake ${FLAGS} tools-install
+		emake ${FLAGS} qchdman-install
 
 	prepgamesdirs
+
+	doicon "${FILESDIR}/qmc2.png"
+        domenu "${FILESDIR}/qmc2.desktop"
 }
