@@ -68,7 +68,7 @@ src_prepare() {
 
 src_configure() {
 	local emesonargs=(
-		--buildtype $(usex debug debug release)
+		--Dbuildtype $(usex debug debug release)
 		--prefix=/usr
 	)
 	meson_src_configure
