@@ -1,4 +1,4 @@
-# Copyright 1999-2023 Gentoo Authors
+# Copyright 1999-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -21,10 +21,18 @@ esac
 LICENSE="GPL-3"
 SLOT="0"
 
-RESTRICT="mirror test"
-
 RDEPEND="
-	media-video/mpv[libmpv]
-	gui-libs/wlroots
+	dev-libs/wayland
+	media-libs/libglvnd
+	media-video/mpv:=[libmpv]
 "
-DEPEND="${RDEPEND}"
+DEPEND="
+	${RDEPEND}
+	dev-libs/wayland-protocols
+"
+BDEPEND="dev-util/wayland-scanner"
+
+src_install() {
+	meson_src_install
+	newman mpvpaper.man mpvpaper.1
+}
