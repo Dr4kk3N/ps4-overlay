@@ -1,4 +1,4 @@
-# appimagetool ebuild file
+# Generated via: https://github.com/arran4/arrans_overlay/blob/main/.github/workflows/app-misc-appimagetool-appimage-update.yaml
 EAPI=8
 DESCRIPTION="AppImage tool to create AppImages (As an AppImage)"
 HOMEPAGE="https://github.com/AppImage/AppImageKit"
@@ -28,6 +28,8 @@ src_unpack() {
 
 src_prepare() {
   sed -i 's:^Exec=.*:Exec=/opt/bin/appimagetool:' squashfs-root/appimagetool.desktop
+  find squashfs-root -type d -exec rmdir -p {} \; 
+  find squashfs-root -type f \( -name index.theme -or -name icon-theme.cache \) -exec rm -v {} \; 
   eapply_user
 }
 
