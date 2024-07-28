@@ -13,7 +13,7 @@ else
 fi
 
 QTMIN=6.7.1
-inherit cmake linux-info pam systemd tmpfiles
+inherit cmake linux-info optfeature pam systemd tmpfiles
 
 DESCRIPTION="Simple Desktop Display Manager"
 HOMEPAGE="https://github.com/sddm/sddm"
@@ -34,7 +34,10 @@ COMMON_DEPEND="
 	sys-libs/pam
 	x11-libs/libXau
 	x11-libs/libxcb:=
-	elogind? ( sys-auth/elogind[pam] )
+	elogind? (
+		sys-auth/elogind[pam]
+		sys-power/upower
+	)
 	systemd? ( sys-apps/systemd:=[pam] )
 	!systemd? ( sys-power/upower )
 "
@@ -141,6 +144,9 @@ pkg_postinst() {
 		elog "  Nvidia GPU owners in particular should pay attention"
 		elog "  to the troubleshooting section."
 	fi
+
+	optfeature "Weston DisplayServer support (EXPERIMENTAL)" "dev-libs/weston[kiosk]"
+	optfeature "KWin DisplayServer support (EXPERIMENTAL)" "kde-plasma/kwin"
 
 	systemd_reenable sddm.service
 }
