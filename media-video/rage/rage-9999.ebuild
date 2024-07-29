@@ -11,6 +11,7 @@ HOMEPAGE="https://www.enlightenment.org/about-rage"
 EGIT_REPO_URI="https://git.enlightenment.org/enlightenment/${PN}.git"
 [ "${PV}" = 9999 ] || SRC_URI="http://download.enlightenment.org/rel/apps/${PN}/${P/_/-}.tar.xz"
 
+S="${WORKDIR}/${P/_/-}"
 LICENSE="BSD-2"
 [ "${PV}" = 9999 ] || KEYWORDS="~amd64 ~x86"
 SLOT="0"
@@ -23,11 +24,9 @@ RDEPEND="
 	>=dev-libs/efl-1.18.0
 	dev-libs/efl[gstreamer]
 "
-DEPEND="${RDEPEND}
+BDEPEND="${RDEPEND}
 	virtual/pkgconfig
-	dev-util/meson"
-
-S="${WORKDIR}/${P/_/-}"
+	dev-build/meson"
 
 src_configure() {
 	local emesonargs=()

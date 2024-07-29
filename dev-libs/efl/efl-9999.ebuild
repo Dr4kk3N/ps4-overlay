@@ -3,35 +3,36 @@
 
 EAPI=7
 
-inherit git-r3 meson xdg
+LUA_REQ_USE="deprecated(+)"
+LUA_COMPAT=( lua5-{1,2} luajit )
+
+inherit git-r3 lua-single meson xdg
 
 DESCRIPTION="Enlightenment Foundation Core Libraries"
 HOMEPAGE="https://www.enlightenment.org/"
 EGIT_REPO_URI="https://git.enlightenment.org/enlightenment/${PN}.git"
 #EGIT_REPO_URI="file:///data/projects/efl"
 
+S="${WORKDIR}/${P/_/-}"
 LICENSE="BSD-2 GPL-2 LGPL-2.1 ZLIB"
-[ "${PV}" = 9999 ] || KEYWORDS="~amd64 ~x86"
-SLOT="0"
 
-IUSE="avahi +bmp connman example dds debug doc drm +eet egl eo fbcon +fontconfig fribidi gif gles glib gnutls gstreamer +harfbuzz +heif hyphen +ibus +ico jpeg2k json libuv lua luajit nls opengl pdf pixman physics +ppm postscript +psd pulseaudio raw scim sdl sound ssl +svg systemd tga tiff tslib unwind v4l vlc vnc test wayland +webp +X xcf +xim xine xpresent xpm"
+SLOT="0"
+KEYWORDS="amd64 x86"
+
+IUSE="avahi +bmp connman example dds debug doc drm +eet egl eo fbcon +fontconfig fribidi gif +glib gnutls gstreamer +harfbuzz +heif hyphen +ibus +ico jpeg2k json libuv lua luajit nls opengl pdf pixman physics +ppm postscript +psd pulseaudio raw scim sdl sound ssl +svg systemd tga tiff tslib unwind v4l vlc vnc test wayland +webp +X xcf +xim xine xpresent xpm"
 
 REQUIRED_USE="
+	${LUA_REQUIRED_USE}
 	fbcon? ( !tslib )
-	gles? (
-		|| ( X wayland )
-		egl
-	)
 	ibus? ( glib )
-	opengl?		( || ( X sdl wayland ) )
+	opengl?		( X )
 	pulseaudio?	( sound )
 	vnc?        ( X fbcon )
-	wayland?	( || ( egl opengl gles ) )
 	xim?		( X )
 "
 
 # Possibly, the media-libs/libjpeg-turbo dependency can be removed
-RDEPEND="
+RDEPEND="${LUA_DEPS}
 	app-arch/lz4:0=
 	net-misc/curl
 	media-libs/libpng:0=
@@ -54,7 +55,6 @@ RDEPEND="
 	fribidi? ( dev-libs/fribidi )
 	gif? ( media-libs/giflib:= )
 	glib? ( dev-libs/glib:2 )
-	gles? ( media-libs/mesa[gles2] )
 	gstreamer? (
 		media-libs/gstreamer:1.0
 		media-libs/gst-plugins-base:1.0
@@ -73,16 +73,18 @@ RDEPEND="
 	luajit? ( dev-lang/luajit:= )
 	!luajit? ( dev-lang/lua:* )
 	nls? ( sys-devel/gettext )
+	opengl? (
+		virtual/opengl
+	)
 	pdf? ( app-text/poppler:=[cxx] )
 	physics? ( sci-physics/bullet:= )
 	pixman? ( x11-libs/pixman )
 	postscript? ( app-text/libspectre:* )
-	pulseaudio? ( media-sound/pulseaudio )
+	pulseaudio? ( media-libs/libpulse )
 	raw? ( media-libs/libraw:* )
 	scim? ( app-i18n/scim )
 	sdl? (
 		media-libs/libsdl2
-		virtual/opengl
 	)
 	sound? ( media-libs/libsndfile )
 	svg? (
@@ -98,7 +100,7 @@ RDEPEND="
 	wayland? (
 		>=dev-libs/wayland-1.8.0
 		>=x11-libs/libxkbcommon-0.3.1
-		media-libs/mesa[gles2,wayland]
+		media-libs/mesa[gles2(-),wayland]
 	)
 	webp? ( media-libs/libwebp:= )
 	X? (
@@ -114,20 +116,11 @@ RDEPEND="
 		x11-libs/libXrender
 		x11-libs/libXtst
 		x11-libs/libXScrnSaver
-		opengl? (
-			x11-libs/libX11
-			x11-libs/libXrender
-			virtual/opengl
-		)
-		gles? (
-			x11-libs/libX11
-			x11-libs/libXrender
-			virtual/opengl
-			xpresent? ( x11-libs/libXpresent )
-		)
+		!opengl? ( media-libs/mesa[egl(+),gles2(-)] )
 	)
 	xine? ( media-libs/xine-lib )
 	xpm? ( x11-libs/libXpm )
+	xpresent? ( x11-libs/libXpresent )
 "
 
 DEPEND="${RDEPEND}"
@@ -136,8 +129,6 @@ DEPEND="${RDEPEND}"
 #	virtual/p/followed-cams/kgconfig
 #	doc? ( app-doc/doxygen )
 #"
-
-S="${WORKDIR}/${P/_/-}"
 
 src_prepare() {
 	eapply_user
@@ -151,9 +142,7 @@ src_configure() {
 	fi
 
 	local emesonargs=(
-		-Dlua-interpreter=$(usex luajit luajit lua)
-		-Dbindings=$(usex lua 'lua,' '')cxx
-		# Add a mono use flag to build mono binding
+		$(meson_use lua_single_target_luajit elua)
 
 		$(meson_use lua elua)
 		$(meson_use sound audio)
@@ -198,6 +187,17 @@ src_configure() {
 		-Deeze=true
 		-Dlibmount=true
 	)
+	local bindingsList="cxx,"
+	use lua_single_target_luajit && bindingsList+="lua,"
+	[[ ! -z "$bindingsList" ]] && bindingsList=${bindingsList::-1}
+	emesonargs+=( -D bindings="${bindingsList}" )
+
+	local luaChoice="lua"
+	if use lua_single_target_luajit; then
+		luaChoice="luajit"
+	fi
+	emesonargs+=( -D lua-interpreter="${luaChoice}")
+
 	# Options dependant on others
 	if use X; then
 		emesonargs+=(
@@ -244,19 +244,18 @@ src_configure() {
 		-Devas-loaders-disabler="$combined_evas_loaders"
 	)
 
-	if use opengl && ( use gles || use egl ); then
-		einfo "You enabled both USE=opengl and USE=gles or USE=egl, but modern systems doing gl, they probably also do egl/gles.;"
-		einfo "Because of this, gl has been selected for you."
-	fi
-	if use opengl ; then
-			emesonargs+=( -Dopengl=full )
-			einfo "Using full as a backend."
-	elif use egl && use gles ; then
-			emesonargs+=( -Dopengl=es-egl )
-			einfo "Using es-egl as a backend."
+	if use wayland; then
+		einfo "Using es-egl as a backendi because you selected wayland."
+		emesonargs+=( -D opengl=es-egl )
+	elif ! use wayland && use opengl; then
+		einfo "Using full as a backend."
+		emesonargs+=( -D opengl=full )
+	elif ! use wayland && use X && ! use opengl; then
+		einfo "Using es-egl as a backend."
+		emesonargs+=( -D opengl=es-egl )
 	else
-			emesonargs+=( -Dopengl=none )
-			ewarn "Disabling gl for all backends."
+		ewarn "Disabling gl for all backends."
+		emesonargs+=( -D opengl=none )
 	fi
 
 	meson_src_configure
