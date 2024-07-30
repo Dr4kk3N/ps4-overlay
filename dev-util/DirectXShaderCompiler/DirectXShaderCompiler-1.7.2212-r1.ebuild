@@ -30,14 +30,15 @@ RDEPEND="
 	sys-libs/zlib:0=
 	>=dev-libs/libffi-3.4.2-r1:0=
 "
-BDEPEND="dev-util/cmake
-	sys-devel/gnuconfig
-"
+BDEPEND="sys-devel/gnuconfig"
 
 CHECKREQS_MEMORY="4G"
 CHECKREQS_DISK_BUILD="4G"
 CMAKE_EXTRA_CACHE_FILE="${S}/cmake/caches/PredefinedParams.cmake"
 
+PATCHES=(
+	"${FILESDIR}"/${P}-fix-changes-meaning.patch  # bgo #905173
+)
 src_prepare() {
 	rm -d "${S}"/external/SPIRV* || die
 	rm -d "${S}"/external/DirectX* || die
