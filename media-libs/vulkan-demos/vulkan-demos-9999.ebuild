@@ -4,7 +4,7 @@
 
 EAPI=8
 
-inherit git-r3 cmake
+inherit git-r3 cmake xdg xdg-utils
 
 DESCRIPTION="Examples and demos for the Vulkan API"
 HOMEPAGE="https://github.com/SaschaWillems/Vulkan"
@@ -43,13 +43,14 @@ DEPEND="${RDEPEND}
 	virtual/pkgconfig"
 
 src_prepare() {
+        eapply -p1 "${FILESDIR}"/data.patch
+        eapply_user
 	cmake_src_prepare
 }
 
 src_configure() {
     local mycmakeargs=(
 		-DCMAKE_BUILD_TYPE=Release
-		-DUSE_RELATIVE_ASSET_PATH=/usr/share/vulkan/demos/
 		-DUSE_WAYLAND_WSI=$(usex wayland)
 		-DUSE_D2D_WSI=$(usex d2d)
 		-USE_HEADLESS=$(usex headless)
@@ -59,7 +60,9 @@ src_configure() {
 }
 
 src_install() {
-	mkdir -p ${D}/usr/share/vulkan/demos
+	mkdir -p "${D}"/usr/share/vulkan/{demos,data}
+
+	exeinto /usr/share/vulkan/demos
 
 	exeinto /usr/share/vulkan/demos
 	doexe ${BUILD_DIR}/bin/vulkanscene
@@ -69,8 +72,24 @@ src_install() {
 	for filename in * ; do mv "$filename" "vulkan$filename"; done;
 	doexe ${BUILD_DIR}/bin/*
 
-	insinto /usr/share/vulkan/
+	insinto /usr/share/vulkan/data
 	doins -r ${S}/shaders
 	doins -r ${S}/assets
 	doins -r ${S}/images
+
+	domenu "${FILESDIR}"/vulkanscene.desktop
+
+	doicon -s 128 "${FILESDIR}"/vulkanscene.png
+#       doicon -s scalable assets/vulkanscene.svg
+
+        exeinto "/user/share/vulkan/demos"
+        dosym "/usr/share/vulkan/demos/vulkanscene" "/usr/bin/vulkanscene"
+}
+
+pkg_postinst() {
+        xdg_icon_cache_update
+}
+
+pkg_postrm() {
+        xdg_icon_cache_update
 }

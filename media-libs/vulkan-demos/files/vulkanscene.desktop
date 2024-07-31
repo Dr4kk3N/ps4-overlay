@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Categories=Application;Benchmark;
+Name=Vulkanscene
+GenericName=Vulkan Scene
+Comment=Vulkan Scene Benchmark
+Exec=/usr/share/vulkan/demos/vulkanscene
+Icon=/usr/share/icons/hicolor/128x128/apps/Vulkan.png
+StartupWMClass=vulkan-demos
+Keywords=Application;Benchmark;System;Monitor;Vulkan
+Terminal=false

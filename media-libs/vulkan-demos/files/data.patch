@@ -1,13 +1,15 @@
-diff --git a/swdemos/base/vulkanexamplebase.cpp b/swdemos/base/vulkanexamplebase.cpp
-index 8573ca9..e365d7c 100644
---- a/swdemos/base/vulkanexamplebase.cpp
-+++ b/swdemos/base/vulkanexamplebase.cpp
-@@ -73,7 +73,7 @@ const std::string VulkanExampleBase::getAssetPath()
- #if defined(__ANDROID__)
- 	return "";
- #else
--	return "./../data/";
-+	return "/usr/share/vulkan/data/";
- #endif
- }
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4322e4b6..10711e50 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -150,8 +150,8 @@ if(RESOURCE_INSTALL_DIR)
+ 	install(DIRECTORY shaders/ DESTINATION ${RESOURCE_INSTALL_DIR}/shaders/)
+ else()
+ 	if(NOT USE_RELATIVE_ASSET_PATH)
+-		add_definitions(-DVK_EXAMPLE_ASSETS_DIR=\"${CMAKE_SOURCE_DIR}/assets/\")
+-		add_definitions(-DVK_EXAMPLE_SHADERS_DIR=\"${CMAKE_SOURCE_DIR}/shaders/\")
++		add_definitions(-DVK_EXAMPLE_ASSETS_DIR=\"/usr/share/vulkan/data/assets/\")
++		add_definitions(-DVK_EXAMPLE_SHADERS_DIR=\"/usr/share/vulkan/data/shaders/\")
+ 	endif()
+ endif()
  
