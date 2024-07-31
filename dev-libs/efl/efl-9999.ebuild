@@ -100,7 +100,7 @@ RDEPEND="${LUA_DEPS}
 	wayland? (
 		>=dev-libs/wayland-1.8.0
 		>=x11-libs/libxkbcommon-0.3.1
-		media-libs/mesa[gles2(-),wayland]
+		media-libs/mesa[wayland]
 	)
 	webp? ( media-libs/libwebp:= )
 	X? (
