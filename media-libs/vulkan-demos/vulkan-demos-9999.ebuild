@@ -4,7 +4,7 @@
 
 EAPI=7
 
-inherit git-r3 cmake
+inherit git-r3 cmake font
 
 DESCRIPTION="Examples and demos for the Vulkan API"
 HOMEPAGE="https://github.com/SaschaWillems/Vulkan"
@@ -15,10 +15,24 @@ SRC_URI="http://vulkan.gpuinfo.org/downloads/vulkan_asset_pack.zip"
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS=""
+IUSE="+X wayland"
 
 RDEPEND="media-libs/vulkan-loader
 	dev-build/cmake
-	media-libs/assimp"
+	media-libs/assimp
+	X? (
+		x11-libs/libX11
+		x11-libs/libXcomposite
+		x11-libs/libXext
+		x11-libs/libXfixes
+		x11-libs/libXrandr
+		x11-libs/libxcb:=
+	)
+	wayland? (
+		dev-libs/wayland-protocols
+		dev-libs/wayland
+		gui-libs/egl-wayland
+	)"
 
 DEPEND="${RDEPEND}
 	virtual/pkgconfig"
@@ -30,7 +44,11 @@ src_prepare() {
 src_configure() {
     local mycmakeargs=(
 		-DRESOURCE_INSTALL_DIR=/usr/share/vulkan/data/
-		-DCMAKE_INSTALL_BINDIR=/usr/share/vulkan/demos/
+		#-DCMAKE_INSTALL_BINDIR=/usr/bin/
+		-DUSE_WAYLAND_WSI=$(usex wayland)
+		-DUSE_DIRECTFB_WSI=OFF
+		-DUSE_D2D_WSI=OFF
+		-Wno-dev
     )
 	cmake_src_configure
 }
@@ -50,4 +68,8 @@ src_install() {
 	doins -r ${S}/shaders
 	doins -r ${S}/assets
 	doins -r ${S}/images
+
+	mkdir -p "${D}/usr/share/fonts/truetype/vulkandemos/"
+	dosym /usr/share/vulkan/data/assets/Roboto-Medium.ttf /usr/share/fonts/truetype/vulkandemos/Roboto-Medium.ttf
+	font_src_install
 }
