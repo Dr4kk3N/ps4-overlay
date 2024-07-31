@@ -30,8 +30,6 @@ DEPEND="${RDEPEND}
 BDEPEND="virtual/libintl
 	virtual/pkgconfig"
 
-PATCHES=( "${FILESDIR}"/edi-0.8.0-meson-0.61.1-fix.patch )
-
 llvm_check_deps() {
 	has_version "sys-devel/clang:${LLVM_SLOT}"
 }
