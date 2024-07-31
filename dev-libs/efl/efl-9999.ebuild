@@ -35,6 +35,7 @@ REQUIRED_USE="
 RDEPEND="${LUA_DEPS}
 	app-arch/lz4:0=
 	net-misc/curl
+	media-libs/rlottie
 	media-libs/libpng:0=
 	sys-apps/dbus
 	>=sys-apps/util-linux-2.20.0
