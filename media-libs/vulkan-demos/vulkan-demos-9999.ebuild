@@ -17,6 +17,8 @@ SLOT="0"
 KEYWORDS=""
 IUSE="+X wayland d2d headless"
 
+REQUIRED_USE="^^ ( X wayland d2d headless )"
+
 RDEPEND="media-libs/vulkan-loader
 	dev-build/cmake
 	media-libs/assimp
