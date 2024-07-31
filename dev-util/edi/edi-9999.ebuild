@@ -3,7 +3,7 @@
 
 EAPI=8
 LLVM_COMPAT=( {16..18} )
-inherit git-r3 meson llvm-r1
+inherit git-r3 meson llvm-r1 xdg
 
 DESCRIPTION="An IDE using EFL"
 HOMEPAGE="https://git.enlightenment.org/enlightenment/edi.git"
@@ -13,27 +13,55 @@ S="${WORKDIR}/${P/_/-}"
 LICENSE="BSD-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
+IUSE="clang"
+DOCS=( AUTHORS NEWS README.md )
 
-RDEPEND="
-	>=dev-libs/efl-1.18.0
+RDEPEND="|| ( dev-libs/efl[X] dev-libs/efl[wayland] )
+	>=dev-libs/efl-1.22.0[eet]
+	clang? (
+		dev-util/bear
+		sys-devel/clang:=
+	)
 	>=sys-devel/llvm-11:=
 "
 DEPEND="${RDEPEND}
-dev-util/bear
-dev-libs/check
-"
+	dev-libs/check"
 
-DOCS=( AUTHORS NEWS README.md )
+BDEPEND="virtual/libintl
+	virtual/pkgconfig"
+
+PATCHES=( "${FILESDIR}"/edi-0.8.0-meson-0.61.1-fix.patch )
+
+llvm_check_deps() {
+	has_version "sys-devel/clang:${LLVM_SLOT}"
+}
+
+pkg_setup() {
+	use clang && llvm_pkg_setup
+}
+
+src_prepare() {
+	default
+
+	# fix a QA issue with .desktop file, https://phab.enlightenment.org/T7368
+	sed -i '/Version=/d' data/desktop/edi.desktop* || die
+
+	# fix 'unexpected path' QA warning
+	sed -i 's|share/doc/edi/|share/doc/'${PF}'/|g' doc/meson.build || die
+}
 
 src_configure() {
-	local llvm_prefix="$(get_llvm_prefix)"
-	local llvm_include="${llvm_prefix}/include/"
-	local llvm_lib="${llvm_prefix}/lib64/"
-
-	einfo "${llvm_include}"
 	local emesonargs=(
-		-D libclang-libdir=${llvm_lib}
-		-D libclang-headerdir=${llvm_include}
+		$(meson_use clang bear)
+		$(meson_use clang libclang)
 	)
+
+	if use clang; then
+		emesonargs+=(
+			-D libclang-headerdir="$(llvm-config --includedir)"
+			-D libclang-libdir="$(llvm-config --libdir)"
+		)
+	fi
+
 	meson_src_configure
 }
