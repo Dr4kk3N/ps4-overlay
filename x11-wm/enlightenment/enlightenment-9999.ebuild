@@ -39,12 +39,8 @@ RDEPEND="
 	mixer? ( >=media-libs/alsa-lib-1.0.8 )
 	pam? ( sys-libs/pam )
 	policykit? ( sys-auth/polkit )
-	systemd? ( sys-apps/systemd )
 	udisks? ( sys-fs/udisks:2 )
 	wayland? (
-		|| (
-			dev-libs/efl[systemd]
-		)
 		dev-libs/efl[drm,wayland]
 		>=dev-libs/wayland-1.3.0
 		>=dev-libs/weston-1.11.0

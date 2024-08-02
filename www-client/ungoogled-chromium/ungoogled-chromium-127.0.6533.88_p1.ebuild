@@ -22,12 +22,11 @@ inherit python-any-r1 qmake-utils readme.gentoo-r1 toolchain-funcs xdg-utils
 
 DESCRIPTION="Modifications to Chromium for removing Google integration and enhancing privacy"
 HOMEPAGE="https://github.com/ungoogled-software/ungoogled-chromium"
-PATCHSET_PPC64="126.0.6478.126-1raptor0~deb12u1"
-PATCHSET_DEBIAN="126.0.6478.126-1"
+PATCHSET_PPC64="127.0.6533.88-1raptor0~deb12u2"
+# PATCHSET_DEBIAN="126.0.6478.126-1"
 PATCH_V="${PV%%\.*}"
 SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/chromium-${PV/_*}.tar.xz
 	https://gitlab.com/Matt.Jolly/chromium-patches/-/archive/${PATCH_V}/chromium-patches-${PATCH_V}.tar.bz2
-	https://salsa.debian.org/chromium-team/chromium/-/archive/debian/${PATCHSET_DEBIAN}/chromium-debian-${PATCHSET_DEBIAN}.tar.bz2
 	ppc64? (
 		https://quickbuild.io/~raptor-engineering-public/+archive/ubuntu/chromium/+files/chromium_${PATCHSET_PPC64}.debian.tar.xz
 		https://deps.gentoo.zip/chromium-ppc64le-gentoo-patches-1.tar.xz
@@ -36,7 +35,7 @@ SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/chro
 
 LICENSE="BSD cromite? ( GPL-3 )"
 SLOT="0"
-# KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
+KEYWORDS="amd64 ~arm64 ~ppc64 ~x86"
 IUSE_SYSTEM_LIBS="abseil-cpp av1 brotli crc32c double-conversion ffmpeg +harfbuzz +icu jsoncpp +libevent +libusb libvpx +openh264 openjpeg +png re2 snappy woff2 +zstd"
 IUSE="+X bluetooth cfi +clang convert-dict cups cpu_flags_arm_neon custom-cflags debug enable-driver gtk4 hangouts headless hevc kerberos libcxx nvidia +official optimize-thinlto optimize-webui override-data-dir pax-kernel pgo +proprietary-codecs pulseaudio qt5 qt6 screencast selinux thinlto cromite vaapi wayland widevine"
 RESTRICT="
@@ -59,16 +58,19 @@ REQUIRED_USE="
 	vaapi? ( !system-av1 !system-libvpx )
 "
 
-UGC_COMMIT_ID="37452608f8406c6d8b5f7fa3f27fa69a905109d2"
+# UGC_COMMIT_ID="37452608f8406c6d8b5f7fa3f27fa69a905109d2"
 # UGC_PR_COMMITS=(
 # 	c917e096342e5b90eeea91ab1f8516447c8756cf
 # 	5794e9d12bf82620d5f24505798fecb45ca5a22d
 # )
 
-CROMITE_COMMIT_ID="9dd1210c242c21dc5093aeff920348e132a8908a"
+CROMITE_COMMIT_ID="2295ca7b5986f413c9b2c583953b96d1386497b9"
 
 declare -A CHROMIUM_COMMITS=(
 	["587c2cf8b11d3c32fa26887063eda3171a3d353e"]="third_party/ruy/src"
+	["48e39d6afd40de031c860bf920239fa850bc5d7c"]="."
+	["0ed5f7a0d2b8dd43ba63da30bd2e7d23424f6e69"]="."
+	["5b37e76c6f3ac85117eb4f25afdcaa4559042ae3"]="."
 )
 
 UGC_PV="${PV/_p/-}"
@@ -85,6 +87,11 @@ fi
 
 SRC_URI+="${UGC_URL}
 "
+
+if [ ! -z "$PATCHSET_DEBIAN" ]; then
+	SRC_URI+="https://salsa.debian.org/chromium-team/chromium/-/archive/debian/${PATCHSET_DEBIAN}/chromium-debian-${PATCHSET_DEBIAN}.tar.bz2
+	"
+fi
 
 if [ ! -z "${UGC_PR_COMMITS[*]}" ]; then
 	for i in "${UGC_PR_COMMITS[@]}"; do
@@ -407,16 +414,19 @@ src_unpack() {
 		--exclude=chromium-${PV/_*}/third_party/llvm \
 		--exclude=chromium-${PV/_*}/third_party/llvm-build \
 		--exclude=chromium-${PV/_*}/third_party/node/linux \
-		--exclude=chromium-${PV/_*}/third_party/node/node_modules \
 		--exclude=chromium-${PV/_*}/third_party/rust-src \
 		--exclude=chromium-${PV/_*}/third_party/rust-toolchain \
 		--exclude=chromium-${PV/_*}/build/linux/debian_bullseye_i386-sysroot \
 		--exclude=chromium-${PV/_*}/build/linux/debian_bullseye_amd64-sysroot \
+		--exclude=chromium-${PV/_*}/third_party/angle/third_party/VK-GL-CTS \
 	"
-		# --exclude=chromium-${PV/_*}/third_party/rust \
 
 	if ! use libcxx ; then
 		XCLD+=" --exclude=chromium-${PV/_*}/third_party/libc++"
+	fi
+
+	if ! use pgo ; then
+		XCLD+=" --exclude=chromium-${PV/_*}/chrome/build/pgo_profiles"
 	fi
 
 	einfo "Unpacking chromium-${PV/_*}.tar.xz to ${WORKDIR}"
@@ -433,7 +443,9 @@ src_unpack() {
 	fi
 
 	if ! use libcxx ; then
+	if [ ! -z "$PATCHSET_DEBIAN" ]; then
 		unpack chromium-debian-${PATCHSET_DEBIAN}.tar.bz2
+	fi
 	fi
 
 	if use ppc64; then
@@ -469,13 +481,25 @@ src_prepare() {
 		"${FILESDIR}/chromium-122-cfi-no-split-lto-unit.patch"
 		"${FILESDIR}/perfetto-system-zlib.patch"
 		"${FILESDIR}/gtk-fix-prefers-color-scheme-query.diff"
+		"${FILESDIR}/chromium-127-cargo_crate.patch"
+		"${FILESDIR}/chromium-127-crabby.patch"
+		"${FILESDIR}/chromium-127-fontations.patch"
+		"${FILESDIR}/chromium-127-ui_lens.patch"
+		"${FILESDIR}/fix-official.patch"
 		"${FILESDIR}/restore-x86-r2.patch"
 	)
 
-	PATCHES_DEB="${WORKDIR}/chromium-debian-${PATCHSET_DEBIAN}/debian/patches"
+	ewarn
+	ewarn "Following features are disabled:"
+	ewarn " - Fontations Rust font stack"
+	ewarn " - Crabby Avif parser/decoder implementation in Rust"
+	ewarn
+
+	# PATCHES_DEB="${WORKDIR}/chromium-debian-${PATCHSET_DEBIAN}/debian/patches"
 	if ! use libcxx ; then
 		PATCHES+=(
 			"${FILESDIR}/chromium-124-libstdc++.patch"
+			"${FILESDIR}/font-gc.patch"
 		)
 			# "${PATCHES_DEB}/fixes/bad-font-gc00000.patch"
 			# "${PATCHES_DEB}/fixes/bad-font-gc0000.patch"
@@ -486,8 +510,8 @@ src_prepare() {
 			# "${PATCHES_DEB}/fixes/bad-font-gc11.patch"
 			# "${PATCHES_DEB}/fixes/bad-font-gc2.patch"
 			# "${PATCHES_DEB}/fixes/bad-font-gc3.patch"
-		sed -i "s|std::string filename_|WTF::String filename_|" \
-			"third_party/blink/renderer/platform/fonts/font_face_creation_params.h"
+		# sed -i "s|std::string filename_|WTF::String filename_|" \
+		# 	"third_party/blink/renderer/platform/fonts/font_face_creation_params.h"
 	fi
 
 	if [ ! -z "${CHROMIUM_COMMITS[*]}" ]; then
@@ -541,6 +565,8 @@ src_prepare() {
 		sed -i '/b\/chrome\/android\/java\/res\/xml\/privacy_preferences\.xml/,+13d' "${BR_PA_PATH}/Add-cromite-flags-support.patch" || die
 		sed -i '/webapps_strings.grdp" \/>/{s++webapps_strings.grdp" /><part file="cromite_components_strings_grd/placeholder.txt"/>+;h};${x;/./{x;q0};x;q1}' \
 			components/components_strings.grd || die
+
+		sed -i 's/absl::/std::/' "${BR_PA_PATH}/Add-a-proxy-configuration-page.patch" || die
 
 		BROMITE_PATCHES=(
 			"${BR_PA_PATH}/bromite-build-utils.patch"
@@ -686,13 +712,14 @@ src_prepare() {
 	sed -i "\!build/linux/debian_bullseye_amd64-sysroot!d" "${ugc_pruning_list}" || die
 	sed -i "\!third_party/llvm-build!d" "${ugc_pruning_list}" || die
 	sed -i "\!third_party/node/linux!d" "${ugc_pruning_list}" || die
-	sed -i "\!third_party/node/node_modules!d" "${ugc_pruning_list}" || die
 	sed -i "\!third_party/rust-src!d" "${ugc_pruning_list}" || die
 	sed -i "\!third_party/rust-toolchain!d" "${ugc_pruning_list}" || die
 	if ! use libcxx ; then
 		sed -i "\!third_party/libc!d" "${ugc_pruning_list}" || die
 	fi
 	sed -i "s|debug('Files|error('Files|" \
+		"${UGC_WD}/utils/prune_binaries.py" || die
+	sed -i "\!third_party/node/linux!d" \
 		"${UGC_WD}/utils/prune_binaries.py" || die
 
 	local ugc_p ugc_dir
@@ -1398,6 +1425,8 @@ src_configure() {
 	myconf_gn+=" use_system_libjpeg=true"
 	myconf_gn+=" rtc_build_examples=false"
 	myconf_gn+=" enable_chromium_prelude=false"
+	myconf_gn+=" enable_updater=false"
+	myconf_gn+=" enable_update_notifications=false"
 
 	# Disable pseudolocales, only used for testing
 	myconf_gn+=" enable_pseudolocales=false"
