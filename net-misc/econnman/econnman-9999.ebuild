@@ -24,6 +24,7 @@ DEPEND="${RDEPEND}
 
 src_prepare() {
 	[ ${PV} = 9999 ] && eautoreconf
+	eapply_user
 }
 
 src_configure() {
