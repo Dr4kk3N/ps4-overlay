@@ -63,10 +63,10 @@ microsoft.csharp@4.3.0
 microsoft.csharp@4.7.0
 microsoft.dotnet.platformabstractions@3.1.6
 microsoft.extensions.dependencymodel@6.0.0
-microsoft.identitymodel.abstractions@7.6.2
-microsoft.identitymodel.jsonwebtokens@7.6.2
-microsoft.identitymodel.logging@7.6.2
-microsoft.identitymodel.tokens@7.6.2
+microsoft.identitymodel.abstractions@8.0.1
+microsoft.identitymodel.jsonwebtokens@8.0.1
+microsoft.identitymodel.logging@8.0.1
+microsoft.identitymodel.tokens@8.0.1
 microsoft.io.recyclablememorystream@3.0.1
 microsoft.netcore.platforms@1.0.1
 microsoft.netcore.platforms@1.1.0
