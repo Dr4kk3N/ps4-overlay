@@ -30,7 +30,7 @@ avalonia.x11@11.0.10
 commandlineparser@2.9.1
 concentus@2.2.0
 discordrichpresence@1.2.1.24
-dynamicdata@8.4.1
+dynamicdata@9.0.1
 excss@4.2.3
 fluentavaloniaui@2.0.5
 fsharp.core@7.0.200
@@ -234,7 +234,7 @@ system.numerics.vectors@4.5.0
 system.objectmodel@4.0.12
 system.objectmodel@4.3.0
 system.private.uri@4.3.0
-system.reactive@6.0.0
+system.reactive@6.0.1
 system.reflection@4.1.0
 system.reflection@4.3.0
 system.reflection.emit@4.0.1
